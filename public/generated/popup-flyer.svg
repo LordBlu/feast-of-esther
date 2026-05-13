@@ -1,0 +1,16 @@
+<svg width="900" height="1200" viewBox="0 0 900 1200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="b" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#6A0F35"/>
+      <stop offset="100%" stop-color="#280A1B"/>
+    </linearGradient>
+  </defs>
+  <rect width="900" height="1200" fill="url(#b)"/>
+  <circle cx="710" cy="220" r="240" fill="#E8C97A" fill-opacity="0.16"/>
+  <circle cx="160" cy="1020" r="210" fill="#E8C97A" fill-opacity="0.12"/>
+  <rect x="90" y="90" width="720" height="1020" rx="14" stroke="#E8C97A" stroke-opacity="0.5" stroke-width="2"/>
+  <rect x="125" y="125" width="650" height="950" rx="10" stroke="#E8C97A" stroke-opacity="0.25"/>
+  <path d="M270 340C320 260 430 240 500 300C590 378 620 490 620 490C620 490 530 455 460 430C390 405 320 360 270 340Z" fill="#F9E8B3" fill-opacity="0.2"/>
+  <text x="450" y="640" text-anchor="middle" fill="#F8EED0" font-size="74" font-family="Georgia, serif" font-style="italic">Feast Of Esther</text>
+  <text x="450" y="705" text-anchor="middle" fill="#E8C97A" font-size="34" font-family="Arial, sans-serif" letter-spacing="4">EVENT FLYER PLACEHOLDER</text>
+</svg>

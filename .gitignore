@@ -17,6 +17,9 @@
 /.next/
 /out/
 
+# Accidental nested dev output (e.g. ran `next dev` from wrong cwd once)
+/feast-of-esther/
+
 # production
 /build
 

@@ -1,0 +1,215 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { usePathname } from 'next/navigation';
+import Link from 'next/link';
+import type { PopupContent } from '@/lib/cms-types';
+import { popupStyleToCss } from '@/lib/popup-styles';
+
+function IconClose({ className }: { className?: string }) {
+  return (
+    <svg className={className} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
+      <path d="M18 6L6 18M6 6l12 12" />
+    </svg>
+  );
+}
+
+const ALLOWED_PATHS = ['/'];
+const POPUP_TTL_MS = 1000 * 60 * 60 * 12;
+
+export default function EventPopup() {
+  const pathname = usePathname();
+  const [visible, setVisible] = useState(false);
+  const [popup, setPopup] = useState<PopupContent | null>(null);
+  const [popupFallbackImage, setPopupFallbackImage] = useState('');
+  const [portraitImage, setPortraitImage] = useState(false);
+
+  useEffect(() => {
+    fetch('/api/site-config')
+      .then((res) => res.json())
+      .then((data) => {
+        setPopup(data.popup);
+        setPopupFallbackImage(
+          data.images?.popupImageUrl ??
+            'https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1778244638/Save_thedate_mkpbnu.jpg'
+        );
+      })
+      .catch(() => {
+        setPopup(null);
+        setPopupFallbackImage(
+          'https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1778244638/Save_thedate_mkpbnu.jpg'
+        );
+      });
+  }, []);
+
+  useEffect(() => {
+    if (popup && !popup.enabled) return;
+    if (!ALLOWED_PATHS.includes(pathname ?? '')) return;
+
+    const lastDismissedAt = Number(localStorage.getItem('foe-popup-dismissed-at') ?? 0);
+    const shouldShow = !lastDismissedAt || Date.now() - lastDismissedAt > POPUP_TTL_MS;
+    if (!shouldShow) return;
+
+    const timer = setTimeout(() => {
+      setVisible(true);
+    }, 1200);
+    return () => clearTimeout(timer);
+  }, [pathname, popup]);
+
+  const dismiss = () => {
+    localStorage.setItem('foe-popup-dismissed-at', String(Date.now()));
+    setVisible(false);
+  };
+
+  if (!visible) return null;
+
+  const rightKicker = popup?.rightKicker ?? 'Upcoming Event';
+  const bodyFooter =
+    popup?.bodyFooter ?? 'Seats are limited — secure your place today.';
+  const popupImageSrc = popup?.imageUrl || popupFallbackImage;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={dismiss} />
+
+      <div
+        className={`relative z-10 flex w-full flex-col overflow-hidden bg-white sm:flex-row ${
+          portraitImage ? 'max-w-[760px]' : 'max-w-[860px]'
+        }`}
+        style={{
+          borderRadius: '3px',
+          boxShadow: '0 32px 100px rgba(0,0,0,0.35)',
+          maxHeight: portraitImage ? '90vh' : '82vh',
+          minHeight: portraitImage ? '560px' : undefined,
+        }}
+      >
+        <button
+          onClick={dismiss}
+          className="absolute right-3 top-3 z-20 flex h-8 w-8 items-center justify-center rounded-full bg-white/80 text-gray-500 transition-all hover:bg-white hover:text-gray-800"
+          aria-label="Close"
+        >
+          <IconClose />
+        </button>
+
+        <div
+          className={`relative flex min-h-[260px] flex-col items-center justify-center overflow-hidden text-center text-white sm:min-h-0 ${
+            portraitImage ? 'sm:w-[50%]' : 'sm:w-[42%]'
+          }`}
+          style={{
+            background: 'linear-gradient(160deg, var(--primary) 0%, var(--primary-dark) 100%)',
+          }}
+        >
+          {popupImageSrc ? (
+            <img
+              src={popupImageSrc}
+              alt=""
+              className="absolute inset-0 h-full w-full object-cover"
+              onLoad={(event) => {
+                const { naturalWidth, naturalHeight } = event.currentTarget;
+                if (naturalWidth > 0 && naturalHeight > 0) {
+                  setPortraitImage(naturalHeight / naturalWidth > 1.2);
+                }
+              }}
+            />
+          ) : (
+            <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+              <div className="h-72 w-72 rounded-full border border-white/10" />
+              <div className="absolute h-52 w-52 rounded-full border border-white/10" />
+              <div className="absolute h-36 w-36 rounded-full border border-white/10" />
+            </div>
+          )}
+        </div>
+
+        <div className={`flex flex-1 flex-col justify-center ${portraitImage ? 'p-5 sm:p-6' : 'p-8 sm:p-10'}`}>
+          <p
+            style={{
+              fontFamily: 'var(--font-body)',
+              fontSize: '0.62rem',
+              fontWeight: 700,
+              letterSpacing: '0.22em',
+              textTransform: 'uppercase',
+              color: 'var(--primary)',
+              marginBottom: '0.75rem',
+              ...popupStyleToCss(popup?.rightKickerStyle),
+            }}
+          >
+            {rightKicker}
+          </p>
+
+          <h2
+            style={{
+              fontFamily: 'var(--font-display)',
+              fontSize: 'clamp(1.5rem, 3vw, 2rem)',
+              fontWeight: 400,
+              color: 'var(--primary-dark)',
+              lineHeight: 1.2,
+              marginBottom: '0.5rem',
+              ...popupStyleToCss(popup?.rightTitleStyle),
+            }}
+          >
+            {'Feast of Esther 2026'}
+          </h2>
+
+          <p
+            style={{
+              fontFamily: 'var(--font-body)',
+              fontSize: '0.7rem',
+              color: '#aaa',
+              letterSpacing: '0.1em',
+              marginBottom: '1.25rem',
+              ...popupStyleToCss(popup?.rightScriptureStyle),
+            }}
+          >
+            {popup?.scripture || '2 Kings 13:20-21'}
+          </p>
+
+          <div
+            style={{ width: '2rem', height: '1.5px', background: 'var(--gold)', marginBottom: '1.25rem' }}
+          />
+
+          <p
+            className="mb-2 leading-relaxed text-gray-600"
+            style={{ fontSize: portraitImage ? '0.82rem' : '0.88rem', ...popupStyleToCss(popup?.rightBodyStyle) }}
+          >
+            {popup?.body ||
+              'Three days of powerful worship, fellowship, and renewal. An annual retreat for wives of General Overseers, Senior Pastors, Heads of Ministries, and Women Leaders.'}
+          </p>
+          <p
+            className="mb-7 text-gray-400"
+            style={{ fontSize: portraitImage ? '0.78rem' : '0.83rem', ...popupStyleToCss(popup?.rightFooterStyle) }}
+          >
+            {bodyFooter}
+          </p>
+
+          <div className="flex flex-col items-start gap-3 sm:flex-row">
+            <Link
+              href={popup?.ctaUrl || '/registration'}
+              onClick={dismiss}
+              className="btn-primary"
+              style={{ fontSize: '0.72rem', padding: '0.75rem 1.6rem' }}
+            >
+              {popup?.ctaLabel || 'Register Now'}
+            </Link>
+            <button
+              onClick={dismiss}
+              style={{
+                fontFamily: 'var(--font-body)',
+                fontSize: '0.78rem',
+                color: '#aaa',
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                padding: '0.75rem 0',
+                letterSpacing: '0.04em',
+              }}
+              className="transition-colors hover:text-gray-600"
+              type="button"
+            >
+              Maybe Later
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

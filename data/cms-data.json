@@ -1,0 +1,81 @@
+{
+  "events": [
+    {
+      "id": "event-foe-2026",
+      "title": "Feast of Esther 2026",
+      "theme": "...the anointing that endures",
+      "scripture": "2 Kings 13:20-21",
+      "description": "Three days of powerful worship, prayer, fellowship, and spiritual renewal for women in ministry across North America.",
+      "dateLabel": "June 18-20, 2026",
+      "venue": "Dallas/Fort Worth Airport Marriott, Irving, Texas",
+      "registrationUrl": "/registration",
+      "imageUrl": "https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1778244638/Save_thedate_mkpbnu.jpg",
+      "status": "published",
+      "createdAt": "2026-04-29T21:35:00.000Z",
+      "updatedAt": "2026-04-29T21:35:00.000Z"
+    }
+  ],
+  "popup": {
+    "enabled": true,
+    "title": "\"...the anointing that endures\"",
+    "scripture": "2 Kings 13:20-21",
+    "body": "Feast of Esther 2026 is now open for registration. Reserve your seat and join us for an unforgettable encounter.",
+    "ctaLabel": "Register Now",
+    "ctaUrl": "/registration",
+    "imageUrl": "https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1778244638/Save_thedate_mkpbnu.jpg"
+  },
+  "images": {
+    "heroPosterUrl": "/generated/hero-poster.svg",
+    "homeVideoEmbedUrl": "https://www.youtube.com/embed/UVRoPXdUSC8?si=C8U1Ia-5ceios_e1",
+    "founderImageUrl": "/generated/founder-placeholder.svg",
+    "popupImageUrl": "https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1778244638/Save_thedate_mkpbnu.jpg"
+  },
+  "registrations": [],
+  "countdown": {
+    "enabled": true,
+    "sourceEventId": null,
+    "fallbackTargetAt": "2026-06-18T14:00:00.000Z"
+  },
+  "about": {
+    "heroEyebrow": "ABOUT US",
+    "heroTitle": "We are the Feast of Esther.",
+    "heroImageUrl": "https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1778084218/founder_m47pqn.jpg",
+    "storyTitle": "Our Story",
+    "storyParagraphs": [
+      "Feast of Esther is an annual divine assignment organized by Pastor (Mrs.) Folu Adeboye, wife of the General Overseer of the Redeemed Christian Church of God.",
+      "Since its inception in 2002, the gathering has expanded from Nigeria across Africa, Europe, and North America, strengthening women in ministry through worship, prayer, and fellowship."
+    ],
+    "missionEyebrow": "Mission and Values",
+    "missionTitle": "For such a time as this.",
+    "missionIntro": "Feast of Esther 2026 will be held June 18th–20th, 2026 at Dallas/Fort Worth Airport Marriott, 8440 Freeport Parkway, Irving, Texas, USA, 75063.",
+    "missionBody": "A forum where women in ministry learn to accomplish their calling, stand in the gap, and impact the church for revival in the nation.",
+    "leadershipEyebrow": "Our Leadership",
+    "leadershipTitle": "Leading with grace and conviction",
+    "leadershipProfiles": [
+      {
+        "name": "Pastor Mrs. Grace Okonrende",
+        "role": "Country Coordinator Feast of Esther USA",
+        "imageUrl": "https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1778084218/founder_m47pqn.jpg",
+        "blurb": "Continental Evangelist RCCG America and a seasoned ministry leader with global impact across evangelism, revival, and women mentorship."
+      },
+      {
+        "name": "Regional Leadership Team",
+        "role": "Chapter Leadership",
+        "imageUrl": "https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1777761835/20260221_002014_nethgk.jpg",
+        "blurb": "Women across chapters serving with unity, grace, and conviction."
+      },
+      {
+        "name": "Feast of Esther Fellowship",
+        "role": "Women in Ministry Network",
+        "imageUrl": "https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1777761813/20260220_131948_hjl3jz.jpg",
+        "blurb": "A faith-forward community building women for kingdom impact."
+      },
+      {
+        "name": "Conference Leadership Circle",
+        "role": "Event and Care Team",
+        "imageUrl": "https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1777761762/20260219_223755_odcohd.jpg",
+        "blurb": "Supporting hospitality, prayer, and leadership formation at every gathering."
+      }
+    ]
+  }
+}

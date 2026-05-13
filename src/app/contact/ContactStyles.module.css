@@ -1,0 +1,293 @@
+.container {
+  background: #f2f2f4;
+  padding: 56px 20px 72px;
+  display: flex;
+  justify-content: center;
+}
+
+.card {
+  max-width: 1120px;
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1.15fr;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 16px 48px rgba(15, 20, 30, 0.08);
+  background: #fff;
+}
+
+/* Left: magenta form */
+.formPanel {
+  background: #9d2a6a;
+  padding: 44px 36px 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  font-family: var(--font-body);
+}
+
+.formTitle {
+  margin: 0;
+  text-align: center;
+  font-size: clamp(2rem, 4vw, 2.65rem);
+  font-weight: 600;
+  color: #fff;
+  font-family: var(--font-display);
+}
+
+.formRule {
+  width: 48px;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.85);
+  margin: 4px auto 8px;
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.label {
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.formPanel input,
+.formPanel textarea {
+  width: 100%;
+  padding: 14px 16px;
+  border: none;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.92);
+  font: inherit;
+  color: #2b2e33;
+  outline: none;
+}
+
+.formPanel input::placeholder,
+.formPanel textarea::placeholder {
+  color: #9aa0a6;
+}
+
+.formPanel textarea {
+  min-height: 140px;
+  resize: vertical;
+}
+
+.submitBtn {
+  margin-top: 8px;
+  align-self: center;
+  background: #fff;
+  color: #9d2a6a;
+  border: none;
+  padding: 14px 36px;
+  border-radius: 999px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.15s;
+}
+
+.submitBtn:hover {
+  opacity: 0.92;
+  transform: translateY(-1px);
+}
+
+.sent {
+  margin: 0;
+  text-align: center;
+  font-size: 0.92rem;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+/* Right: info + map */
+.infoPanel {
+  padding: 40px 36px 44px;
+  background: #f7f7f8;
+  font-family: var(--font-body);
+}
+
+.infoHeading {
+  margin: 0;
+  text-align: center;
+  font-size: clamp(1.85rem, 3.5vw, 2.35rem);
+  font-weight: 600;
+  color: #9d2a6a;
+  font-family: var(--font-display);
+}
+
+.infoRule {
+  width: 48px;
+  height: 2px;
+  background: #9d2a6a;
+  margin: 12px auto 24px;
+  opacity: 0.85;
+}
+
+.aboutCard {
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px 22px;
+  margin-bottom: 18px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+}
+
+.aboutTitle {
+  margin: 0 0 10px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #9d2a6a;
+  font-family: var(--font-body);
+}
+
+.aboutText {
+  margin: 0;
+  font-size: 0.98rem;
+  line-height: 1.65;
+  color: #4a4f56;
+}
+
+.infoRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  background: #fff;
+  border-radius: 12px;
+  padding: 16px 18px;
+  margin-bottom: 12px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+}
+
+.iconCircle {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  background: #9d2a6a;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.infoIconSvg {
+  width: 20px;
+  height: 20px;
+}
+
+.infoRowText {
+  margin: 0;
+  font-size: 0.98rem;
+  line-height: 1.5;
+  color: #34373d;
+}
+
+.infoRowText a {
+  color: #9d2a6a;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.infoRowText a:hover {
+  text-decoration: underline;
+}
+
+.infoOr {
+  color: #6b7078;
+  font-weight: 400;
+}
+
+.followLabel {
+  margin: 22px 0 12px;
+  text-align: center;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #9d2a6a;
+}
+
+.socialRow {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 22px;
+}
+
+.socialBtn {
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s;
+}
+
+.socialInstagram {
+  background: linear-gradient(180deg, #f58529 0%, #dd2a7b 45%, #8134af 100%);
+}
+
+.socialTiktok {
+  background: #000;
+}
+
+.socialFacebook {
+  background: #1877f2;
+}
+
+.socialYoutube {
+  background: #ff0000;
+}
+
+.socialBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
+  opacity: 0.95;
+}
+
+.socialIcon {
+  width: 22px;
+  height: 22px;
+}
+
+.mapWrap {
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid #e8e9ec;
+  background: #e5e7eb;
+  min-height: 260px;
+}
+
+.mapFrame {
+  display: block;
+  width: 100%;
+  height: 280px;
+  border: 0;
+}
+
+@media (max-width: 900px) {
+  .card {
+    grid-template-columns: 1fr;
+    border-radius: 16px;
+  }
+
+  .formPanel {
+    padding: 36px 24px 40px;
+  }
+
+  .infoPanel {
+    padding: 32px 22px 36px;
+  }
+
+  .container {
+    padding: 40px 16px 56px;
+  }
+
+  .mapFrame {
+    height: 220px;
+  }
+}

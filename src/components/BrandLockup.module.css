@@ -1,0 +1,86 @@
+/* Shared “muted → full color + pop” hover for brand lockups */
+
+.wrapDark,
+.wrapLight {
+  display: inline-block;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    opacity 0.4s ease,
+    filter 0.4s ease,
+    transform 0.4s ease;
+  transform-origin: center center;
+}
+
+.wrapDark {
+  opacity: 0.6;
+  filter: grayscale(100%) brightness(0.85);
+}
+
+.wrapDark:hover,
+.wrapDark:focus-visible {
+  opacity: 1;
+  filter: grayscale(0%) brightness(1.15);
+  transform: scale(1.05);
+}
+
+.wrapDark:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.8);
+  outline-offset: 4px;
+}
+
+.wrapLight {
+  opacity: 0.82;
+  filter: grayscale(100%) brightness(0.72);
+}
+
+.wrapLight:hover,
+.wrapLight:focus-visible {
+  opacity: 1;
+  filter: grayscale(0%) brightness(1.02);
+  transform: scale(1.04);
+}
+
+.wrapLight:focus-visible {
+  outline: 2px solid var(--primary-light);
+  outline-offset: 4px;
+}
+
+.titleDark {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.35rem, 3vw, 1.75rem);
+  font-style: italic;
+  font-weight: 400;
+  color: #f4e8ef;
+  letter-spacing: 0.01em;
+  line-height: 1.15;
+}
+
+.titleLight {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-style: italic;
+  font-weight: 400;
+  color: var(--primary-dark);
+  letter-spacing: 0.01em;
+  line-height: 1.15;
+}
+
+.tagline {
+  display: block;
+  margin-top: 4px;
+  font-family: var(--font-body);
+  font-size: 0.55rem;
+  font-style: normal;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+.taglineTight {
+  margin-top: -2px;
+}

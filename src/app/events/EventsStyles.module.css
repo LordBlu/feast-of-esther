@@ -1,0 +1,305 @@
+.eventsContainer {
+  background: #f3f0f8;
+}
+
+.eventsHero {
+  height: 80vh;
+  min-height: 560px;
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: center;
+}
+
+.heroContent {
+  width: min(1120px, 92%);
+  margin: 0 auto;
+  color: #fff;
+  display: grid;
+  gap: 16px;
+}
+
+.dateBadge {
+  display: inline-flex;
+  width: fit-content;
+  border-radius: 999px;
+  background: #e9cd56;
+  color: #241f16;
+  padding: 10px 20px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.heroContent h1 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(2.8rem, 7vw, 5.2rem);
+  line-height: 0.92;
+  color: #fff;
+}
+
+.heroContent p {
+  margin: 0;
+  max-width: 620px;
+  font-size: clamp(1.06rem, 1.8vw, 1.46rem);
+  line-height: 1.45;
+}
+
+.btnPrimary {
+  margin-top: 10px;
+  width: fit-content;
+  border-radius: 999px;
+  background: #e9cd56;
+  color: #241f16;
+  text-decoration: none;
+  padding: 13px 28px;
+  font-weight: 700;
+}
+
+.infoCardSection {
+  width: min(1120px, 92%);
+  margin: 48px auto 0;
+}
+
+.infoCard {
+  background: #fff;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.06);
+  display: grid;
+  grid-template-columns: 0.92fr 1.08fr;
+}
+
+.infoImage img {
+  width: 100%;
+  height: 100%;
+  min-height: 420px;
+  object-fit: cover;
+  display: block;
+}
+
+.infoDetails {
+  padding: 34px 36px;
+}
+
+.eyebrow {
+  display: inline-flex;
+  border-radius: 999px;
+  background: #f5e9ff;
+  color: #c02995;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 9px 15px;
+}
+
+.infoDetails h2 {
+  margin: 14px 0 4px;
+  font-family: var(--font-display);
+  color: #6f1254;
+  font-size: clamp(2.1rem, 4.4vw, 3.5rem);
+  line-height: 0.94;
+}
+
+.verse {
+  margin: 0;
+  color: #8f8f96;
+  font-family: var(--font-display);
+  font-size: 1.55rem;
+}
+
+.iconList {
+  margin-top: 24px;
+  display: grid;
+  gap: 12px;
+  color: #4b4f5c;
+}
+
+.iconList div {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  font-size: 1.04rem;
+  line-height: 1.45;
+}
+
+.regBtn {
+  margin-top: 26px;
+  display: inline-flex;
+  text-decoration: none;
+  border-radius: 999px;
+  background: #cc24af;
+  color: #fff;
+  padding: 12px 22px;
+  font-weight: 700;
+}
+
+.programmeSectionOuter {
+  margin-top: 48px;
+}
+
+.hotelSection {
+  width: min(1120px, 92%);
+  margin: 62px auto 0;
+}
+
+.hotelHeader {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.hotelHeader h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  color: #2f3440;
+  font-size: clamp(2.1rem, 4.5vw, 3.6rem);
+}
+
+.hotelHeader p {
+  margin: 8px 0 0;
+  color: #666b78;
+  font-size: 1.12rem;
+}
+
+.hotelGrid {
+  border-radius: 14px;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  background: #fff;
+  border: 1px solid #e6d8e9;
+}
+
+.hotelPhoto img {
+  width: 100%;
+  height: 100%;
+  min-height: 360px;
+  object-fit: cover;
+  display: block;
+}
+
+.hotelDetails {
+  padding: 30px;
+}
+
+.hotelDetails h3 {
+  margin: 0;
+  font-family: var(--font-display);
+  color: #2f3440;
+  font-size: clamp(2rem, 3.6vw, 2.9rem);
+}
+
+.hotelAddress {
+  margin: 10px 0 0;
+  color: #b39b45;
+  font-weight: 600;
+  font-size: 1.03rem;
+}
+
+.hotelBody {
+  margin: 16px 0 0;
+  border-left: 4px solid #d3b55e;
+  background: #fff8dd;
+  padding: 12px 14px;
+  color: #5c5f69;
+  line-height: 1.5;
+}
+
+.bookBtn {
+  margin-top: 18px;
+  display: inline-flex;
+  text-decoration: none;
+  border-radius: 999px;
+  background: #e9cd56;
+  color: #241f16;
+  padding: 12px 24px;
+  font-weight: 700;
+}
+
+.pastSection {
+  margin-top: 54px;
+  background: #fff;
+  padding: 54px 0 66px;
+}
+
+.pastSection h2 {
+  margin: 0;
+  text-align: center;
+  font-family: var(--font-display);
+  color: #7f1b66;
+  font-size: clamp(2rem, 4.2vw, 3rem);
+}
+
+.pastSection > p {
+  margin: 8px 0 0;
+  text-align: center;
+  color: #666b78;
+}
+
+.pastGrid {
+  width: min(1120px, 92%);
+  margin: 24px auto 0;
+  display: grid;
+  gap: 18px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.pastCard {
+  border-radius: 12px;
+  border: 1px solid #e6d8e9;
+  overflow: hidden;
+  background: #fff;
+}
+
+.pastCard img {
+  width: 100%;
+  height: 176px;
+  object-fit: cover;
+  display: block;
+}
+
+.pastCardBody {
+  padding: 16px;
+}
+
+.pastCardBody h3 {
+  margin: 0;
+  font-family: var(--font-display);
+  color: #6f1254;
+  font-size: 1.55rem;
+}
+
+.pastCardBody p {
+  margin: 6px 0 0;
+  color: #6f7483;
+  font-size: 0.95rem;
+}
+
+.pastCardBody a {
+  margin-top: 10px;
+  display: inline-flex;
+  color: #9d2a6a;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 0.92rem;
+}
+
+@media (max-width: 1024px) {
+  .infoCard,
+  .hotelGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .pastGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 800px) {
+  .pastGrid {
+    grid-template-columns: 1fr;
+  }
+}
