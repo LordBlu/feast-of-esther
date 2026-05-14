@@ -11,10 +11,22 @@ import {
   PopupContent,
   PopupTextStyle,
   RegistrationRecord,
+  SitePageContents,
+  SocialLink,
   SiteCountdownSettings,
   SiteEvent,
   SiteImages,
 } from '@/lib/cms-types';
+
+const emptySitePageContents = (): SitePageContents => ({
+  gallery: {},
+  events: {},
+  contact: {},
+  donate: {},
+  registration: {},
+  founder: {},
+  about2: {},
+});
 
 const emptyEvent: Omit<SiteEvent, 'id' | 'createdAt' | 'updatedAt'> = {
   title: '',
@@ -69,6 +81,16 @@ const emptyAbout: AboutPageContent = {
   leadershipTitle: 'Leading with grace and conviction',
   leadershipProfiles: [],
 };
+
+const defaultSocialLinks: SocialLink[] = [
+  { id: 'linkedin', label: 'LinkedIn', url: 'https://linkedin.com', enabled: true },
+  { id: 'facebook', label: 'Facebook', url: 'https://facebook.com', enabled: true },
+  { id: 'instagram', label: 'Instagram', url: 'https://instagram.com', enabled: true },
+  { id: 'x', label: 'X (Twitter)', url: 'https://x.com', enabled: true },
+  { id: 'youtube', label: 'YouTube', url: 'https://youtube.com', enabled: true },
+  { id: 'tiktok', label: 'TikTok', url: 'https://tiktok.com', enabled: true },
+  { id: 'whatsapp', label: 'WhatsApp', url: 'https://wa.me/18323720860', enabled: true },
+];
 
 function preventDragDefaults(e: DragEvent) {
   e.preventDefault();
@@ -169,7 +191,7 @@ function PopupTypoFields({
 export default function AdminDashboardPage() {
   const router = useRouter();
   const [tab, setTab] = useState<
-    'events' | 'countdown' | 'popup' | 'images' | 'about' | 'registrations'
+    'events' | 'countdown' | 'popup' | 'images' | 'social' | 'about' | 'pages' | 'registrations'
   >('events');
   const [events, setEvents] = useState<SiteEvent[]>([]);
   const [eventFilter, setEventFilter] = useState<'all' | EventStatus>('all');
@@ -183,6 +205,9 @@ export default function AdminDashboardPage() {
   const [about, setAbout] = useState<AboutPageContent>(emptyAbout);
   const [aboutStoryRaw, setAboutStoryRaw] = useState('[]');
   const [aboutLeadersRaw, setAboutLeadersRaw] = useState('[]');
+  const [socialLinks, setSocialLinks] = useState<SocialLink[]>(defaultSocialLinks);
+  const [pageContent, setPageContent] = useState<SitePageContents>(emptySitePageContents);
+  const [pageEditSection, setPageEditSection] = useState<keyof SitePageContents>('gallery');
   const [registrations, setRegistrations] = useState<RegistrationRecord[]>([]);
   const [regTotal, setRegTotal] = useState(0);
   const [regPage, setRegPage] = useState(1);
@@ -204,21 +229,25 @@ export default function AdminDashboardPage() {
   }, [eventFilter, router]);
 
   const loadCore = useCallback(async () => {
-    const [popupRes, imagesRes, countdownRes, aboutRes] = await Promise.all([
+    const [popupRes, imagesRes, countdownRes, aboutRes, socialRes, pagesRes] = await Promise.all([
       fetch('/api/admin/popup'),
       fetch('/api/admin/images'),
       fetch('/api/admin/countdown'),
       fetch('/api/admin/about'),
+      fetch('/api/admin/social'),
+      fetch('/api/admin/page-content'),
     ]);
-    if ([popupRes, imagesRes, countdownRes, aboutRes].some((res) => res.status === 401)) {
+    if ([popupRes, imagesRes, countdownRes, aboutRes, socialRes, pagesRes].some((res) => res.status === 401)) {
       router.push('/admin/login');
       return;
     }
-    const [popupData, imagesData, countdownData, aboutData] = await Promise.all([
+    const [popupData, imagesData, countdownData, aboutData, socialData, pagesData] = await Promise.all([
       popupRes.json(),
       imagesRes.json(),
       countdownRes.json(),
       aboutRes.json(),
+      socialRes.json(),
+      pagesRes.json(),
     ]);
     setPopup({ ...emptyPopup, ...(popupData.popup ?? {}) });
     setImages(imagesData.images ?? {});
@@ -230,6 +259,25 @@ export default function AdminDashboardPage() {
     setAbout(aboutNext);
     setAboutStoryRaw(JSON.stringify(aboutNext.storyParagraphs ?? [], null, 2));
     setAboutLeadersRaw(JSON.stringify(aboutNext.leadershipProfiles ?? [], null, 2));
+    setSocialLinks(
+      Array.isArray(socialData.socialLinks) && socialData.socialLinks.length > 0
+        ? socialData.socialLinks
+        : defaultSocialLinks
+    );
+    setPageContent({
+      ...emptySitePageContents(),
+      ...(pagesData.pageContent as SitePageContents | undefined),
+      gallery: { ...emptySitePageContents().gallery, ...(pagesData.pageContent?.gallery ?? {}) },
+      events: { ...emptySitePageContents().events, ...(pagesData.pageContent?.events ?? {}) },
+      contact: { ...emptySitePageContents().contact, ...(pagesData.pageContent?.contact ?? {}) },
+      donate: { ...emptySitePageContents().donate, ...(pagesData.pageContent?.donate ?? {}) },
+      registration: {
+        ...emptySitePageContents().registration,
+        ...(pagesData.pageContent?.registration ?? {}),
+      },
+      founder: { ...emptySitePageContents().founder, ...(pagesData.pageContent?.founder ?? {}) },
+      about2: { ...emptySitePageContents().about2, ...(pagesData.pageContent?.about2 ?? {}) },
+    });
   }, [router]);
 
   const loadRegistrations = useCallback(async () => {
@@ -426,6 +474,56 @@ export default function AdminDashboardPage() {
     setMessage('About page content updated.');
   }
 
+  async function savePageContent() {
+    const response = await fetch('/api/admin/page-content', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ pageContent }),
+    });
+    if (!response.ok) {
+      setMessage('Could not save site page copy.');
+      return;
+    }
+    const data = await response.json();
+    const next = data.pageContent as SitePageContents;
+    setPageContent({
+      ...emptySitePageContents(),
+      ...next,
+      gallery: { ...emptySitePageContents().gallery, ...next.gallery },
+      events: { ...emptySitePageContents().events, ...next.events },
+      contact: { ...emptySitePageContents().contact, ...next.contact },
+      donate: { ...emptySitePageContents().donate, ...next.donate },
+      registration: { ...emptySitePageContents().registration, ...next.registration },
+      founder: { ...emptySitePageContents().founder, ...next.founder },
+      about2: { ...emptySitePageContents().about2, ...next.about2 },
+    });
+    setMessage('Site page copy saved.');
+  }
+
+  async function saveSocialLinks() {
+    const cleaned = socialLinks
+      .map((item) => ({
+        ...item,
+        id: item.id.trim().toLowerCase().replace(/[^a-z0-9-]+/g, '-'),
+        label: item.label.trim(),
+        url: item.url.trim(),
+      }))
+      .filter((item) => item.label && item.url);
+
+    const response = await fetch('/api/admin/social', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ socialLinks: cleaned }),
+    });
+    if (!response.ok) {
+      setMessage('Could not save social links.');
+      return;
+    }
+    const data = await response.json();
+    setSocialLinks(data.socialLinks ?? cleaned);
+    setMessage('Social links updated.');
+  }
+
   async function uploadImage(file: File, onUploaded: (url: string) => void) {
     const formData = new FormData();
     formData.append('file', file);
@@ -488,7 +586,7 @@ export default function AdminDashboardPage() {
         </header>
 
         <nav className="admin-tabs" aria-label="Dashboard sections">
-          {(['events', 'countdown', 'popup', 'images', 'about', 'registrations'] as const).map((key) => (
+          {(['events', 'countdown', 'popup', 'images', 'social', 'about', 'pages', 'registrations'] as const).map((key) => (
             <button
               key={key}
               type="button"
@@ -499,7 +597,9 @@ export default function AdminDashboardPage() {
               {key === 'countdown' && 'Countdown'}
               {key === 'popup' && 'Popup'}
               {key === 'images' && 'Imagery'}
+              {key === 'social' && 'Social Links'}
               {key === 'about' && 'About Page'}
+              {key === 'pages' && 'Site pages'}
               {key === 'registrations' && 'Registrations'}
             </button>
           ))}
@@ -1145,6 +1245,86 @@ export default function AdminDashboardPage() {
           </div>
         ) : null}
 
+        {tab === 'social' ? (
+          <div className="admin-card max-w-4xl space-y-6">
+            <h2>Footer social links</h2>
+            <p className="text-sm text-black/55">
+              Manage the links shown in the bottom footer. Add, remove, reorder, or disable any platform.
+            </p>
+            <div className="space-y-3">
+              {socialLinks.map((item, index) => (
+                <div
+                  key={`${item.id}-${index}`}
+                  className="grid gap-3 rounded-xl border border-[rgba(194,24,91,0.12)] bg-white/65 p-4 md:grid-cols-[1fr_1.4fr_auto_auto]"
+                >
+                  <input
+                    className="admin-input"
+                    placeholder="Label (e.g. Instagram)"
+                    value={item.label}
+                    onChange={(e) =>
+                      setSocialLinks((prev) =>
+                        prev.map((row, i) => (i === index ? { ...row, label: e.target.value } : row))
+                      )
+                    }
+                  />
+                  <input
+                    className="admin-input"
+                    placeholder="https://..."
+                    value={item.url}
+                    onChange={(e) =>
+                      setSocialLinks((prev) =>
+                        prev.map((row, i) => (i === index ? { ...row, url: e.target.value } : row))
+                      )
+                    }
+                  />
+                  <label className="flex cursor-pointer items-center gap-2 px-1 text-sm font-medium text-[var(--primary-dark)]">
+                    <input
+                      type="checkbox"
+                      className="h-4 w-4 accent-[var(--primary)]"
+                      checked={item.enabled}
+                      onChange={(e) =>
+                        setSocialLinks((prev) =>
+                          prev.map((row, i) => (i === index ? { ...row, enabled: e.target.checked } : row))
+                        )
+                      }
+                    />
+                    Enabled
+                  </label>
+                  <button
+                    type="button"
+                    className="admin-btn-ghost"
+                    onClick={() => setSocialLinks((prev) => prev.filter((_, i) => i !== index))}
+                  >
+                    Remove
+                  </button>
+                </div>
+              ))}
+            </div>
+            <div className="flex flex-wrap gap-3">
+              <button
+                type="button"
+                className="admin-btn-ghost"
+                onClick={() =>
+                  setSocialLinks((prev) => [
+                    ...prev,
+                    {
+                      id: `social-${prev.length + 1}`,
+                      label: 'New platform',
+                      url: '',
+                      enabled: true,
+                    },
+                  ])
+                }
+              >
+                Add social platform
+              </button>
+              <button type="button" onClick={saveSocialLinks} className="btn-primary rounded-full px-10">
+                Save social links
+              </button>
+            </div>
+          </div>
+        ) : null}
+
         {tab === 'about' ? (
           <div className="admin-card max-w-4xl space-y-6">
             <h2>About page content</h2>
@@ -1281,6 +1461,538 @@ export default function AdminDashboardPage() {
             <button type="button" onClick={saveAbout} className="btn-primary rounded-full px-10">
               Save About page
             </button>
+          </div>
+        ) : null}
+
+        {tab === 'pages' ? (
+          <div className="space-y-6">
+            <div className="admin-card space-y-3">
+              <h2>Site pages</h2>
+              <p className="text-sm text-black/55">
+                Update headlines and supporting text visitors see on Gallery, Events, Contact, Donate, Register, Founder,
+                and About Us. Images for collections and carousels still live under <strong>Imagery</strong>; paste image
+                URLs here for the founder hero.
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {(
+                  [
+                    ['gallery', 'Gallery'],
+                    ['events', 'Events'],
+                    ['contact', 'Contact'],
+                    ['donate', 'Donate'],
+                    ['registration', 'Register'],
+                    ['founder', 'Founder'],
+                    ['about2', 'About Us'],
+                  ] as const
+                ).map(([id, label]) => (
+                  <button
+                    key={id}
+                    type="button"
+                    onClick={() => setPageEditSection(id)}
+                    className={`rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-wide transition ${
+                      pageEditSection === id
+                        ? 'border-[var(--primary)] bg-[rgba(252,228,236,0.85)] text-[var(--primary-dark)]'
+                        : 'border-black/10 bg-white/70 text-black/55 hover:border-[var(--primary)]/40'
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {pageEditSection === 'gallery' ? (
+              <div className="admin-card grid gap-4 md:grid-cols-2">
+                <div className="md:col-span-2">
+                  <label className="admin-field-label">Gallery page title</label>
+                  <input
+                    className="admin-input"
+                    value={pageContent.gallery.pageTitle ?? ''}
+                    onChange={(e) =>
+                      setPageContent((p) => ({ ...p, gallery: { ...p.gallery, pageTitle: e.target.value } }))
+                    }
+                    placeholder="Moments From the Feast"
+                  />
+                </div>
+                <div className="md:col-span-2">
+                  <label className="admin-field-label">Gallery subtitle</label>
+                  <textarea
+                    className="admin-input min-h-[88px]"
+                    value={pageContent.gallery.pageSubtitle ?? ''}
+                    onChange={(e) =>
+                      setPageContent((p) => ({ ...p, gallery: { ...p.gallery, pageSubtitle: e.target.value } }))
+                    }
+                  />
+                </div>
+              </div>
+            ) : null}
+
+            {pageEditSection === 'events' ? (
+              <div className="admin-card grid gap-4 md:grid-cols-2">
+                {(
+                  [
+                    ['hotelSectionTitle', 'Hotel section title'],
+                    ['hotelSectionSubtitle', 'Hotel section subtitle'],
+                    ['hotelName', 'Hotel name'],
+                    ['hotelBody', 'Hotel body'],
+                    ['bookStayUrl', 'Book stay URL'],
+                    ['pastEventsTitle', 'Past events title'],
+                    ['pastEventsSubtitle', 'Past events subtitle'],
+                    ['audienceLine', 'Audience line (icon row)'],
+                    ['heroRegisterCta', 'Hero register button text'],
+                  ] as const
+                ).map(([key, lab]) => (
+                  <div key={key} className={key === 'hotelBody' || key === 'bookStayUrl' ? 'md:col-span-2' : ''}>
+                    <label className="admin-field-label">{lab}</label>
+                    {key === 'hotelBody' ? (
+                      <textarea
+                        className="admin-input min-h-[80px]"
+                        value={String(pageContent.events[key] ?? '')}
+                        onChange={(e) =>
+                          setPageContent((p) => ({
+                            ...p,
+                            events: { ...p.events, [key]: e.target.value },
+                          }))
+                        }
+                      />
+                    ) : (
+                      <input
+                        className="admin-input"
+                        value={String(pageContent.events[key] ?? '')}
+                        onChange={(e) =>
+                          setPageContent((p) => ({
+                            ...p,
+                            events: { ...p.events, [key]: e.target.value },
+                          }))
+                        }
+                      />
+                    )}
+                  </div>
+                ))}
+              </div>
+            ) : null}
+
+            {pageEditSection === 'contact' ? (
+              <div className="admin-card grid gap-4 md:grid-cols-2">
+                <div>
+                  <label className="admin-field-label">Form title</label>
+                  <input
+                    className="admin-input"
+                    value={pageContent.contact.formTitle ?? ''}
+                    onChange={(e) =>
+                      setPageContent((p) => ({ ...p, contact: { ...p.contact, formTitle: e.target.value } }))
+                    }
+                  />
+                </div>
+                <div>
+                  <label className="admin-field-label">Info column heading</label>
+                  <input
+                    className="admin-input"
+                    value={pageContent.contact.infoHeading ?? ''}
+                    onChange={(e) =>
+                      setPageContent((p) => ({ ...p, contact: { ...p.contact, infoHeading: e.target.value } }))
+                    }
+                  />
+                </div>
+                <div>
+                  <label className="admin-field-label">About card title</label>
+                  <input
+                    className="admin-input"
+                    value={pageContent.contact.aboutCardTitle ?? ''}
+                    onChange={(e) =>
+                      setPageContent((p) => ({ ...p, contact: { ...p.contact, aboutCardTitle: e.target.value } }))
+                    }
+                  />
+                </div>
+                <div className="md:col-span-2">
+                  <label className="admin-field-label">About card text</label>
+                  <textarea
+                    className="admin-input min-h-[100px]"
+                    value={pageContent.contact.aboutCardText ?? ''}
+                    onChange={(e) =>
+                      setPageContent((p) => ({ ...p, contact: { ...p.contact, aboutCardText: e.target.value } }))
+                    }
+                  />
+                </div>
+                <div>
+                  <label className="admin-field-label">Address line 1</label>
+                  <input
+                    className="admin-input"
+                    value={pageContent.contact.addressLine1 ?? ''}
+                    onChange={(e) =>
+                      setPageContent((p) => ({ ...p, contact: { ...p.contact, addressLine1: e.target.value } }))
+                    }
+                  />
+                </div>
+                <div>
+                  <label className="admin-field-label">Address line 2</label>
+                  <input
+                    className="admin-input"
+                    value={pageContent.contact.addressLine2 ?? ''}
+                    onChange={(e) =>
+                      setPageContent((p) => ({ ...p, contact: { ...p.contact, addressLine2: e.target.value } }))
+                    }
+                  />
+                </div>
+                <div>
+                  <label className="admin-field-label">Phone 1 display</label>
+                  <input
+                    className="admin-input"
+                    value={pageContent.contact.phone1Display ?? ''}
+                    onChange={(e) =>
+                      setPageContent((p) => ({ ...p, contact: { ...p.contact, phone1Display: e.target.value } }))
+                    }
+                  />
+                </div>
+                <div>
+                  <label className="admin-field-label">Phone 1 link (tel:…)</label>
+                  <input
+                    className="admin-input"
+                    value={pageContent.contact.phone1Href ?? ''}
+                    onChange={(e) =>
+                      setPageContent((p) => ({ ...p, contact: { ...p.contact, phone1Href: e.target.value } }))
+                    }
+                  />
+                </div>
+                <div>
+                  <label className="admin-field-label">Phone 2 display (blank = hide)</label>
+                  <input
+                    className="admin-input"
+                    value={pageContent.contact.phone2Display ?? ''}
+                    onChange={(e) =>
+                      setPageContent((p) => ({ ...p, contact: { ...p.contact, phone2Display: e.target.value } }))
+                    }
+                  />
+                </div>
+                <div>
+                  <label className="admin-field-label">Phone 2 link (tel:…)</label>
+                  <input
+                    className="admin-input"
+                    value={pageContent.contact.phone2Href ?? ''}
+                    onChange={(e) =>
+                      setPageContent((p) => ({ ...p, contact: { ...p.contact, phone2Href: e.target.value } }))
+                    }
+                  />
+                </div>
+                <div>
+                  <label className="admin-field-label">Email</label>
+                  <input
+                    className="admin-input"
+                    value={pageContent.contact.email ?? ''}
+                    onChange={(e) =>
+                      setPageContent((p) => ({ ...p, contact: { ...p.contact, email: e.target.value } }))
+                    }
+                  />
+                </div>
+                <div>
+                  <label className="admin-field-label">Website URL</label>
+                  <input
+                    className="admin-input"
+                    value={pageContent.contact.websiteUrl ?? ''}
+                    onChange={(e) =>
+                      setPageContent((p) => ({ ...p, contact: { ...p.contact, websiteUrl: e.target.value } }))
+                    }
+                  />
+                </div>
+                <div>
+                  <label className="admin-field-label">Website label (optional)</label>
+                  <input
+                    className="admin-input"
+                    value={pageContent.contact.websiteDisplay ?? ''}
+                    onChange={(e) =>
+                      setPageContent((p) => ({ ...p, contact: { ...p.contact, websiteDisplay: e.target.value } }))
+                    }
+                  />
+                </div>
+                <div>
+                  <label className="admin-field-label">Map embed URL</label>
+                  <input
+                    className="admin-input"
+                    value={pageContent.contact.mapEmbedUrl ?? ''}
+                    onChange={(e) =>
+                      setPageContent((p) => ({ ...p, contact: { ...p.contact, mapEmbedUrl: e.target.value } }))
+                    }
+                  />
+                </div>
+                <div>
+                  <label className="admin-field-label">Follow label</label>
+                  <input
+                    className="admin-input"
+                    value={pageContent.contact.followLabel ?? ''}
+                    onChange={(e) =>
+                      setPageContent((p) => ({ ...p, contact: { ...p.contact, followLabel: e.target.value } }))
+                    }
+                  />
+                </div>
+                <p className="md:col-span-2 text-xs text-black/50">
+                  Instagram, TikTok, Facebook, and YouTube buttons use your <strong>Social Links</strong> tab when
+                  those IDs are enabled.
+                </p>
+              </div>
+            ) : null}
+
+            {pageEditSection === 'donate' ? (
+              <div className="admin-card grid gap-4 md:grid-cols-2">
+                {(
+                  [
+                    ['asideTitle', 'Sidebar title'],
+                    ['asideLead', 'Sidebar intro'],
+                    ['quoteText', 'Quote (without curly quotes)'],
+                    ['quoteCite', 'Quote cite'],
+                    ['bullet1', 'Bullet 1'],
+                    ['bullet2', 'Bullet 2'],
+                    ['bullet3', 'Bullet 3'],
+                    ['sectionChooseAmount', '“Choose amount” heading'],
+                    ['sectionCustomAmount', 'Custom amount label'],
+                    ['sectionMethod', 'Method heading'],
+                    ['methodCard', 'Card / bank label'],
+                    ['methodPaypal', 'PayPal label'],
+                    ['sectionDetails', 'Details heading'],
+                    ['hintOnline', 'Hint when online URL set'],
+                    ['finePrint', 'Fine print (plain text; replaces default with contact link)'],
+                    ['featureImpactTitle', 'Feature 1 title'],
+                    ['featureImpactText', 'Feature 1 text'],
+                    ['featureStewardshipTitle', 'Feature 2 title'],
+                    ['featureStewardshipText', 'Feature 2 text'],
+                    ['featureSecureTitle', 'Feature 3 title'],
+                    ['featureSecureText', 'Feature 3 text'],
+                  ] as const
+                ).map(([key, lab]) => (
+                  <div
+                    key={key}
+                    className={
+                      key === 'asideLead' || key === 'hintOnline' || key === 'finePrint' ? 'md:col-span-2' : ''
+                    }
+                  >
+                    <label className="admin-field-label">{lab}</label>
+                    {key === 'asideLead' || key === 'hintOnline' || key === 'finePrint' ? (
+                      <textarea
+                        className="admin-input min-h-[72px]"
+                        value={String(pageContent.donate[key] ?? '')}
+                        onChange={(e) =>
+                          setPageContent((p) => ({
+                            ...p,
+                            donate: { ...p.donate, [key]: e.target.value },
+                          }))
+                        }
+                      />
+                    ) : (
+                      <input
+                        className="admin-input"
+                        value={String(pageContent.donate[key] ?? '')}
+                        onChange={(e) =>
+                          setPageContent((p) => ({
+                            ...p,
+                            donate: { ...p.donate, [key]: e.target.value },
+                          }))
+                        }
+                      />
+                    )}
+                  </div>
+                ))}
+                <div className="md:col-span-2">
+                  <label className="admin-field-label">
+                    Offline giving template (use {'{{amount}}'} and {'{{methodNote}}'})
+                  </label>
+                  <textarea
+                    className="admin-input min-h-[100px] font-mono text-[0.75rem]"
+                    value={pageContent.donate.hintOfflineTemplate ?? ''}
+                    onChange={(e) =>
+                      setPageContent((p) => ({
+                        ...p,
+                        donate: { ...p.donate, hintOfflineTemplate: e.target.value },
+                      }))
+                    }
+                  />
+                </div>
+              </div>
+            ) : null}
+
+            {pageEditSection === 'registration' ? (
+              <div className="admin-card grid gap-4 md:grid-cols-2">
+                <div>
+                  <label className="admin-field-label">Sidebar title</label>
+                  <input
+                    className="admin-input"
+                    value={pageContent.registration.asideTitle ?? ''}
+                    onChange={(e) =>
+                      setPageContent((p) => ({
+                        ...p,
+                        registration: { ...p.registration, asideTitle: e.target.value },
+                      }))
+                    }
+                  />
+                </div>
+                <div className="md:col-span-2">
+                  <label className="admin-field-label">Sidebar intro</label>
+                  <textarea
+                    className="admin-input min-h-[88px]"
+                    value={pageContent.registration.asideLead ?? ''}
+                    onChange={(e) =>
+                      setPageContent((p) => ({
+                        ...p,
+                        registration: { ...p.registration, asideLead: e.target.value },
+                      }))
+                    }
+                  />
+                </div>
+                <div>
+                  <label className="admin-field-label">Success title</label>
+                  <input
+                    className="admin-input"
+                    value={pageContent.registration.successTitle ?? ''}
+                    onChange={(e) =>
+                      setPageContent((p) => ({
+                        ...p,
+                        registration: { ...p.registration, successTitle: e.target.value },
+                      }))
+                    }
+                  />
+                </div>
+                <div className="md:col-span-2">
+                  <label className="admin-field-label">Success message (use {'{{firstName}}'})</label>
+                  <textarea
+                    className="admin-input min-h-[88px]"
+                    value={pageContent.registration.successBody ?? ''}
+                    onChange={(e) =>
+                      setPageContent((p) => ({
+                        ...p,
+                        registration: { ...p.registration, successBody: e.target.value },
+                      }))
+                    }
+                  />
+                </div>
+                {(['step0Hint', 'step1Hint', 'step2Hint', 'step3Hint'] as const).map((key, i) => (
+                  <div key={key} className="md:col-span-2">
+                    <label className="admin-field-label">Step {i + 1} hint</label>
+                    <textarea
+                      className="admin-input min-h-[64px]"
+                      value={String(pageContent.registration[key] ?? '')}
+                      onChange={(e) =>
+                        setPageContent((p) => ({
+                          ...p,
+                          registration: { ...p.registration, [key]: e.target.value },
+                        }))
+                      }
+                    />
+                  </div>
+                ))}
+              </div>
+            ) : null}
+
+            {pageEditSection === 'founder' ? (
+              <div className="admin-card grid gap-4 md:grid-cols-2">
+                <div className="md:col-span-2">
+                  <label className="admin-field-label">Pinned hero image URL</label>
+                  <input
+                    className="admin-input"
+                    value={pageContent.founder.heroBackgroundUrl ?? ''}
+                    onChange={(e) =>
+                      setPageContent((p) => ({
+                        ...p,
+                        founder: { ...p.founder, heroBackgroundUrl: e.target.value },
+                      }))
+                    }
+                  />
+                  <div
+                    className="mt-2 cursor-pointer rounded-lg border border-dashed border-black/15 bg-black/[0.02] px-3 py-6 text-center text-xs text-black/45"
+                    onDragOver={preventDragDefaults}
+                    onDrop={(e) =>
+                      dropFile(e, (file) => void uploadImage(file, (url) => setPageContent((p) => ({ ...p, founder: { ...p.founder, heroBackgroundUrl: url } }))))
+                    }
+                  >
+                    Drop an image here to upload and set the hero URL
+                  </div>
+                </div>
+                {(['storyP1', 'storyP2', 'storyP3'] as const).map((key, i) => (
+                  <div key={key} className="md:col-span-2">
+                    <label className="admin-field-label">Biography paragraph {i + 1}</label>
+                    <textarea
+                      className="admin-input min-h-[120px]"
+                      value={String(pageContent.founder[key] ?? '')}
+                      onChange={(e) =>
+                        setPageContent((p) => ({
+                          ...p,
+                          founder: { ...p.founder, [key]: e.target.value },
+                        }))
+                      }
+                    />
+                  </div>
+                ))}
+              </div>
+            ) : null}
+
+            {pageEditSection === 'about2' ? (
+              <div className="admin-card grid gap-4 md:grid-cols-2">
+                <div className="md:col-span-2">
+                  <label className="admin-field-label">Top bar line</label>
+                  <input
+                    className="admin-input"
+                    value={pageContent.about2.chromeTitle ?? ''}
+                    onChange={(e) =>
+                      setPageContent((p) => ({ ...p, about2: { ...p.about2, chromeTitle: e.target.value } }))
+                    }
+                  />
+                </div>
+                <div className="md:col-span-2">
+                  <label className="admin-field-label">Accent line after main title</label>
+                  <textarea
+                    className="admin-input min-h-[72px]"
+                    value={pageContent.about2.megaAccent ?? ''}
+                    onChange={(e) =>
+                      setPageContent((p) => ({ ...p, about2: { ...p.about2, megaAccent: e.target.value } }))
+                    }
+                  />
+                </div>
+                <div>
+                  <label className="admin-field-label">Focus bullet 1</label>
+                  <input
+                    className="admin-input"
+                    value={pageContent.about2.focusItem1 ?? ''}
+                    onChange={(e) =>
+                      setPageContent((p) => ({ ...p, about2: { ...p.about2, focusItem1: e.target.value } }))
+                    }
+                  />
+                </div>
+                <div>
+                  <label className="admin-field-label">Focus bullet 2</label>
+                  <input
+                    className="admin-input"
+                    value={pageContent.about2.focusItem2 ?? ''}
+                    onChange={(e) =>
+                      setPageContent((p) => ({ ...p, about2: { ...p.about2, focusItem2: e.target.value } }))
+                    }
+                  />
+                </div>
+                <div>
+                  <label className="admin-field-label">Focus bullet 3</label>
+                  <input
+                    className="admin-input"
+                    value={pageContent.about2.focusItem3 ?? ''}
+                    onChange={(e) =>
+                      setPageContent((p) => ({ ...p, about2: { ...p.about2, focusItem3: e.target.value } }))
+                    }
+                  />
+                </div>
+                <div className="md:col-span-2">
+                  <label className="admin-field-label">CTA bar sentence</label>
+                  <textarea
+                    className="admin-input min-h-[72px]"
+                    value={pageContent.about2.ctaBarText ?? ''}
+                    onChange={(e) =>
+                      setPageContent((p) => ({ ...p, about2: { ...p.about2, ctaBarText: e.target.value } }))
+                    }
+                  />
+                </div>
+              </div>
+            ) : null}
+
+            <div className="admin-card flex flex-wrap items-center justify-between gap-4">
+              <p className="text-sm text-black/55">Saves all sections above in one file with your other CMS data.</p>
+              <button type="button" onClick={() => void savePageContent()} className="btn-primary rounded-full px-10">
+                Save site page copy
+              </button>
+            </div>
           </div>
         ) : null}
 

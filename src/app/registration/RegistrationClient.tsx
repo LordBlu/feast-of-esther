@@ -1,11 +1,17 @@
 'use client';
 
 import { FormEvent, useState } from 'react';
+import type { RegistrationPageContent } from '@/lib/cms-types';
+import { fillTemplate } from '@/lib/fill-template';
 import styles from './RegistrationStyles.module.css';
 
 const STEPS = ['Personal Information', 'Church Details', 'Travel & lodging', 'Review & submit'] as const;
 
-export default function RegistrationClient() {
+export interface RegistrationClientProps {
+  page: RegistrationPageContent;
+}
+
+export default function RegistrationClient({ page }: RegistrationClientProps) {
   const [step, setStep] = useState(0);
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
@@ -20,6 +26,21 @@ export default function RegistrationClient() {
     country: '',
     notes: '',
   });
+
+  const asideTitle = page.asideTitle ?? 'Registration';
+  const asideLead =
+    page.asideLead ??
+    'Reserve your place for Feast of Esther North America. Complete each step — your details help us plan hospitality, seating, and follow-up.';
+  const successTitle = page.successTitle ?? "You're registered";
+  const successBodyTpl =
+    page.successBody ??
+    "Thank you, {{firstName}}. We've saved your registration and will be in touch with event updates and next steps.";
+  const stepHints: [string, string, string, string] = [
+    page.step0Hint ?? 'Tell us who you are so we can stay in touch.',
+    page.step1Hint ?? 'Help us understand your home church and region.',
+    page.step2Hint ?? 'Optional — share travel or accessibility needs.',
+    page.step3Hint ?? 'Review your details before submitting.',
+  ];
 
   async function submitRegistration() {
     const fullName = `${form.firstName} ${form.lastName}`.trim();
@@ -68,12 +89,9 @@ export default function RegistrationClient() {
     <div className={styles.page}>
       <div className={styles.card}>
         <aside className={styles.aside}>
-          <h1 className={styles.asideTitle}>Registration</h1>
+          <h1 className={styles.asideTitle}>{asideTitle}</h1>
           <div className={styles.asideRule} aria-hidden />
-          <p className={styles.asideLead}>
-            Reserve your place for Feast of Esther North America. Complete each step — your details help us plan
-            hospitality, seating, and follow-up.
-          </p>
+          <p className={styles.asideLead}>{asideLead}</p>
           <ul className={styles.stepList}>
             {STEPS.map((label, i) => (
               <li
@@ -90,24 +108,15 @@ export default function RegistrationClient() {
         <div className={styles.main}>
           {done ? (
             <div className={styles.successPanel}>
-              <h2 className={styles.successTitle}>You&apos;re registered</h2>
+              <h2 className={styles.successTitle}>{successTitle}</h2>
               <p className={styles.successText}>
-                Thank you, {form.firstName}. We&apos;ve saved your registration and will be in touch with event updates
-                and next steps.
+                {fillTemplate(successBodyTpl, { firstName: form.firstName || 'friend' })}
               </p>
             </div>
           ) : (
             <form onSubmit={handleNext}>
               <h2 className={styles.stepHeading}>{STEPS[step]}</h2>
-              <p className={styles.stepSub}>
-                {step === 0
-                  ? 'Tell us who you are so we can stay in touch.'
-                  : step === 1
-                    ? 'Help us understand your home church and region.'
-                    : step === 2
-                      ? 'Optional — share travel or accessibility needs.'
-                      : 'Review your details before submitting.'}
-              </p>
+              <p className={styles.stepSub}>{stepHints[step]}</p>
 
               {step === 0 ? (
                 <div className={`${styles.fieldGrid} ${styles.fieldGrid2}`}>

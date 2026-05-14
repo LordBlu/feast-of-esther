@@ -4,6 +4,8 @@ import type {
   AboutPageContent,
   CmsData,
   LeadershipProfile,
+  SitePageContents,
+  SocialLink,
   SiteCountdownSettings,
   SiteEvent,
 } from '@/lib/cms-types';
@@ -70,6 +72,39 @@ const defaultAbout: AboutPageContent = {
   leadershipProfiles: defaultLeadershipProfiles,
 };
 
+const emptyPageContent: SitePageContents = {
+  gallery: {},
+  events: {},
+  contact: {},
+  donate: {},
+  registration: {},
+  founder: {},
+  about2: {},
+};
+
+function mergeSitePageContents(patch: Partial<SitePageContents> | undefined): SitePageContents {
+  const p = patch ?? {};
+  return {
+    gallery: { ...emptyPageContent.gallery, ...p.gallery },
+    events: { ...emptyPageContent.events, ...p.events },
+    contact: { ...emptyPageContent.contact, ...p.contact },
+    donate: { ...emptyPageContent.donate, ...p.donate },
+    registration: { ...emptyPageContent.registration, ...p.registration },
+    founder: { ...emptyPageContent.founder, ...p.founder },
+    about2: { ...emptyPageContent.about2, ...p.about2 },
+  };
+}
+
+const defaultSocialLinks: SocialLink[] = [
+  { id: 'linkedin', label: 'LinkedIn', url: 'https://linkedin.com', enabled: true },
+  { id: 'facebook', label: 'Facebook', url: 'https://facebook.com', enabled: true },
+  { id: 'instagram', label: 'Instagram', url: 'https://instagram.com', enabled: true },
+  { id: 'x', label: 'X (Twitter)', url: 'https://x.com', enabled: true },
+  { id: 'youtube', label: 'YouTube', url: 'https://youtube.com', enabled: true },
+  { id: 'tiktok', label: 'TikTok', url: 'https://tiktok.com', enabled: true },
+  { id: 'whatsapp', label: 'WhatsApp', url: 'https://wa.me/18323720860', enabled: true },
+];
+
 const defaultData: CmsData = {
   events: [],
   popup: {
@@ -101,6 +136,8 @@ const defaultData: CmsData = {
   registrations: [],
   countdown: defaultCountdown,
   about: defaultAbout,
+  socialLinks: defaultSocialLinks,
+  pageContent: emptyPageContent,
 };
 
 async function ensureDataFile() {
@@ -134,8 +171,16 @@ export async function readCmsData(): Promise<CmsData> {
     images: { ...defaultData.images, ...parsed.images },
     countdown: { ...defaultData.countdown, ...parsed.countdown },
     about: { ...defaultData.about, ...parsed.about },
+    socialLinks:
+      parsed.socialLinks?.map((row) => ({
+        id: String(row.id ?? '').trim(),
+        label: String(row.label ?? '').trim(),
+        url: String(row.url ?? '').trim(),
+        enabled: row.enabled !== false,
+      })) ?? defaultData.socialLinks,
     events,
     registrations: parsed.registrations ?? [],
+    pageContent: mergeSitePageContents(parsed.pageContent as Partial<SitePageContents> | undefined),
   };
 }
 

@@ -35,6 +35,19 @@ export default async function EventsPage() {
   const hotelImage =
     cms.images.hotelRoomUrl ||
     'https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1778163272/Accom_x5ajjc.jpg';
+  const pe = cms.pageContent.events;
+  const hotelSectionTitle = pe.hotelSectionTitle ?? 'Official Conference Hotel';
+  const hotelSectionSubtitle = pe.hotelSectionSubtitle ?? 'Experience comfort and elegance at our designated hotel';
+  const hotelName = pe.hotelName ?? 'Dallas/Fort Worth Airport Marriott';
+  const hotelBody =
+    pe.hotelBody ??
+    'Special group rates available for Feast of Esther attendees when booking through our official link below.';
+  const bookStayUrl =
+    pe.bookStayUrl ?? 'https://app.marriott.com/reslink?id=1775501475543&key=GRP&app=resvlink';
+  const pastEventsTitle = pe.pastEventsTitle ?? 'Past Events';
+  const pastEventsSubtitle = pe.pastEventsSubtitle ?? 'View pictures from previous conferences.';
+  const audienceLine = pe.audienceLine ?? 'Women in ministry leadership';
+  const heroRegisterCta = pe.heroRegisterCta ?? 'Register Now →';
 
   return (
     <div className={styles.eventsContainer}>
@@ -44,7 +57,7 @@ export default async function EventsPage() {
           <h1>{eventTitle}</h1>
           <p>{eventDescription}</p>
           <Link href={registrationUrl} className={styles.btnPrimary}>
-            Register Now →
+            {heroRegisterCta}
           </Link>
         </div>
       </section>
@@ -52,7 +65,7 @@ export default async function EventsPage() {
       <section className={styles.infoCardSection}>
         <div className={styles.infoCard}>
           <div className={styles.infoImage}>
-            <img src={flyerImage} alt={`${eventTitle} flyer`} />
+            <img className="fx-media fx-zoom-in" src={flyerImage} alt={`${eventTitle} flyer`} />
           </div>
           <div className={styles.infoDetails}>
             <span className={styles.eyebrow}>Event Information</span>
@@ -61,7 +74,7 @@ export default async function EventsPage() {
             <div className={styles.iconList}>
               <div>📅 <span>{eventDate}</span></div>
               <div>📍 <span>{eventVenue}</span></div>
-              <div>👥 <span>Women in ministry leadership</span></div>
+              <div>👥 <span>{audienceLine}</span></div>
             </div>
             <Link href={registrationUrl} className={styles.regBtn}>
               {registrationLabel}
@@ -76,18 +89,18 @@ export default async function EventsPage() {
 
       <section className={styles.hotelSection}>
         <div className={styles.hotelHeader}>
-          <h2>Official Conference Hotel</h2>
-          <p>Experience comfort and elegance at our designated hotel</p>
+          <h2>{hotelSectionTitle}</h2>
+          <p>{hotelSectionSubtitle}</p>
         </div>
         <div className={styles.hotelGrid}>
           <div className={styles.hotelPhoto}>
-            <img src={hotelImage} alt="Official conference hotel room" />
+            <img className="fx-media fx-pan-vertical" src={hotelImage} alt="Official conference hotel room" />
           </div>
           <div className={styles.hotelDetails}>
-            <h3>Dallas/Fort Worth Airport Marriott</h3>
+            <h3>{hotelName}</h3>
             <p className={styles.hotelAddress}>{eventVenue}</p>
-            <p className={styles.hotelBody}>Special group rates available for Feast of Esther attendees when booking through our official link below.</p>
-            <Link href="https://app.marriott.com/reslink?id=1775501475543&key=GRP&app=resvlink" target="_blank" rel="noopener noreferrer" className={styles.bookBtn}>
+            <p className={styles.hotelBody}>{hotelBody}</p>
+            <Link href={bookStayUrl} target="_blank" rel="noopener noreferrer" className={styles.bookBtn}>
               Book Your Stay →
             </Link>
           </div>
@@ -95,8 +108,8 @@ export default async function EventsPage() {
       </section>
 
       <section className={styles.pastSection}>
-        <h2>Past Events</h2>
-        <p>View pictures from previous conferences.</p>
+        <h2>{pastEventsTitle}</h2>
+        <p>{pastEventsSubtitle}</p>
         <div className={styles.pastGrid}>
           {pastEvents.map((event) => {
             const galleryMatch = galleryItems.find((item) => item.slug === event.gallerySlug);

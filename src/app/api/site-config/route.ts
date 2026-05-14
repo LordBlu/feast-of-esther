@@ -11,5 +11,7 @@ export async function GET() {
     events: data.events,
     countdown,
     about: data.about,
+    socialLinks: data.socialLinks,
+    pageContent: data.pageContent,
   });
 }

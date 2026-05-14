@@ -272,9 +272,9 @@ export default function FlipClockCountdown() {
 
   return (
     <section className="flip-clock-section py-16 md:py-24" style={{ backgroundColor: 'var(--cream)' }}>
-      <div className="foe-shell">
+      <div className="foe-shell flex justify-center">
         <div
-          className="mx-auto flex max-w-5xl flex-col items-center rounded-2xl border px-6 py-10 text-center md:px-10 md:py-12"
+          className="mx-auto flex w-full max-w-5xl flex-col items-center rounded-2xl border px-6 py-10 text-center md:px-10 md:py-12"
           style={{
             borderColor: 'var(--blush-mid)',
             background: 'linear-gradient(180deg, #fff 0%, #fff9fc 100%)',
@@ -296,7 +296,7 @@ export default function FlipClockCountdown() {
         </h2>
 
         <div
-          className="mx-auto grid w-full max-w-4xl grid-cols-2 gap-6 justify-items-center md:grid-cols-4 md:gap-8 lg:gap-10"
+          className="mx-auto grid w-full max-w-4xl grid-cols-2 place-items-center gap-6 md:grid-cols-4 md:gap-8 lg:gap-10"
           role="timer"
           aria-live="polite"
           aria-atomic="true"

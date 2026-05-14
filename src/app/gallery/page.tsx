@@ -5,5 +5,5 @@ import { readCmsData } from '@/lib/cms-store';
 export default async function GalleryPage() {
   const data = await readCmsData();
   const items = resolveGalleryItems(data.images.galleryCollections);
-  return <GalleryVerticalFeed items={items} />;
+  return <GalleryVerticalFeed items={items} pageTitle={data.pageContent.gallery.pageTitle} pageSubtitle={data.pageContent.gallery.pageSubtitle} />;
 }

@@ -129,6 +129,119 @@ export interface AboutPageContent {
   leadershipProfiles: LeadershipProfile[];
 }
 
+export interface SocialLink {
+  id: string;
+  label: string;
+  url: string;
+  enabled: boolean;
+}
+
+/** Optional marketing copy for /gallery (collections still live under Imagery). */
+export interface GalleryPageContent {
+  pageTitle?: string;
+  pageSubtitle?: string;
+}
+
+/** Static strings on /events beyond the featured CMS event row. */
+export interface EventsPageContent {
+  hotelSectionTitle?: string;
+  hotelSectionSubtitle?: string;
+  hotelName?: string;
+  hotelBody?: string;
+  bookStayUrl?: string;
+  pastEventsTitle?: string;
+  pastEventsSubtitle?: string;
+  audienceLine?: string;
+  heroRegisterCta?: string;
+}
+
+/** Left column + contact strip on /contact (form labels stay in code). */
+export interface ContactPageContent {
+  formTitle?: string;
+  infoHeading?: string;
+  aboutCardTitle?: string;
+  aboutCardText?: string;
+  addressLine1?: string;
+  addressLine2?: string;
+  phone1Display?: string;
+  phone1Href?: string;
+  phone2Display?: string;
+  phone2Href?: string;
+  email?: string;
+  websiteUrl?: string;
+  websiteDisplay?: string;
+  mapEmbedUrl?: string;
+  followLabel?: string;
+}
+
+/** Sidebar + quotes + hints on /donate. Use {{amount}} in offline hint template. */
+export interface DonatePageContent {
+  asideTitle?: string;
+  asideLead?: string;
+  quoteText?: string;
+  quoteCite?: string;
+  bullet1?: string;
+  bullet2?: string;
+  bullet3?: string;
+  sectionChooseAmount?: string;
+  sectionCustomAmount?: string;
+  sectionMethod?: string;
+  methodCard?: string;
+  methodPaypal?: string;
+  sectionDetails?: string;
+  hintOnline?: string;
+  /** When no donate URL; supports {{amount}} and {{methodNote}} (e.g. PayPal). */
+  hintOfflineTemplate?: string;
+  finePrint?: string;
+  featureImpactTitle?: string;
+  featureImpactText?: string;
+  featureStewardshipTitle?: string;
+  featureStewardshipText?: string;
+  featureSecureTitle?: string;
+  featureSecureText?: string;
+}
+
+/** Sidebar + step hints + success panel on /registration. */
+export interface RegistrationPageContent {
+  asideTitle?: string;
+  asideLead?: string;
+  successTitle?: string;
+  /** Supports {{firstName}} */
+  successBody?: string;
+  step0Hint?: string;
+  step1Hint?: string;
+  step2Hint?: string;
+  step3Hint?: string;
+}
+
+/** Hero image + biography paragraphs on /founder (carousel stays under Imagery). */
+export interface FounderPageContent {
+  heroBackgroundUrl?: string;
+  storyP1?: string;
+  storyP2?: string;
+  storyP3?: string;
+}
+
+/** High-visibility strings on the About Us page (`/about`, case-study layout; deeper sections stay in code for now). */
+export interface About2PageContent {
+  chromeTitle?: string;
+  megaAccent?: string;
+  focusItem1?: string;
+  focusItem2?: string;
+  focusItem3?: string;
+  ctaBarText?: string;
+}
+
+export interface SitePageContents {
+  gallery: GalleryPageContent;
+  events: EventsPageContent;
+  contact: ContactPageContent;
+  donate: DonatePageContent;
+  registration: RegistrationPageContent;
+  founder: FounderPageContent;
+  about2: About2PageContent;
+}
+
 export interface CmsData {
   events: SiteEvent[];
   popup: PopupContent;
@@ -136,4 +249,6 @@ export interface CmsData {
   registrations: RegistrationRecord[];
   countdown: SiteCountdownSettings;
   about: AboutPageContent;
+  socialLinks: SocialLink[];
+  pageContent: SitePageContents;
 }

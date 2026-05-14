@@ -120,7 +120,7 @@ export default function EventPopup() {
           )}
         </div>
 
-        <div className={`flex flex-1 flex-col justify-center ${portraitImage ? 'p-5 sm:p-6' : 'p-8 sm:p-10'}`}>
+        <div className={`flex flex-1 flex-col justify-center ${portraitImage ? 'p-6 sm:p-7' : 'p-8 sm:p-9'}`}>
           <p
             style={{
               fontFamily: 'var(--font-body)',
@@ -129,7 +129,7 @@ export default function EventPopup() {
               letterSpacing: '0.22em',
               textTransform: 'uppercase',
               color: 'var(--primary)',
-              marginBottom: '0.75rem',
+              marginBottom: '0.95rem',
               ...popupStyleToCss(popup?.rightKickerStyle),
             }}
           >
@@ -142,8 +142,8 @@ export default function EventPopup() {
               fontSize: 'clamp(1.5rem, 3vw, 2rem)',
               fontWeight: 400,
               color: 'var(--primary-dark)',
-              lineHeight: 1.2,
-              marginBottom: '0.5rem',
+              lineHeight: 1.18,
+              marginBottom: '0.7rem',
               ...popupStyleToCss(popup?.rightTitleStyle),
             }}
           >
@@ -156,7 +156,7 @@ export default function EventPopup() {
               fontSize: '0.7rem',
               color: '#aaa',
               letterSpacing: '0.1em',
-              marginBottom: '1.25rem',
+              marginBottom: '1.45rem',
               ...popupStyleToCss(popup?.rightScriptureStyle),
             }}
           >
@@ -164,29 +164,51 @@ export default function EventPopup() {
           </p>
 
           <div
-            style={{ width: '2rem', height: '1.5px', background: 'var(--gold)', marginBottom: '1.25rem' }}
+            style={{ width: '2.2rem', height: '1.5px', background: 'var(--gold)', marginBottom: '1.45rem' }}
           />
 
           <p
-            className="mb-2 leading-relaxed text-gray-600"
-            style={{ fontSize: portraitImage ? '0.82rem' : '0.88rem', ...popupStyleToCss(popup?.rightBodyStyle) }}
+            className="mb-3 leading-relaxed text-gray-600"
+            style={{
+              fontSize: portraitImage ? '0.84rem' : '0.92rem',
+              lineHeight: 1.75,
+              maxWidth: '38ch',
+              ...popupStyleToCss(popup?.rightBodyStyle),
+            }}
           >
             {popup?.body ||
               'Three days of powerful worship, fellowship, and renewal. An annual retreat for wives of General Overseers, Senior Pastors, Heads of Ministries, and Women Leaders.'}
           </p>
           <p
-            className="mb-7 text-gray-400"
-            style={{ fontSize: portraitImage ? '0.78rem' : '0.83rem', ...popupStyleToCss(popup?.rightFooterStyle) }}
+            className="mb-8 text-gray-400"
+            style={{
+              fontSize: portraitImage ? '0.8rem' : '0.85rem',
+              lineHeight: 1.7,
+              maxWidth: '38ch',
+              ...popupStyleToCss(popup?.rightFooterStyle),
+            }}
           >
             {bodyFooter}
           </p>
 
-          <div className="flex flex-col items-start gap-3 sm:flex-row">
+          <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:gap-4">
             <Link
               href={popup?.ctaUrl || '/registration'}
               onClick={dismiss}
               className="btn-primary"
-              style={{ fontSize: '0.72rem', padding: '0.75rem 1.6rem' }}
+              style={{
+                fontSize: portraitImage ? '0.78rem' : '0.82rem',
+                fontWeight: 700,
+                letterSpacing: '0.08em',
+                textTransform: 'uppercase',
+                padding: portraitImage ? '0.82rem 1.5rem' : '0.92rem 1.8rem',
+                background: '#c1137a',
+                color: '#fff',
+                minWidth: portraitImage ? '176px' : '190px',
+                textAlign: 'center',
+                justifyContent: 'center',
+                boxShadow: '0 12px 24px rgba(193, 19, 122, 0.3)',
+              }}
             >
               {popup?.ctaLabel || 'Register Now'}
             </Link>
@@ -194,15 +216,18 @@ export default function EventPopup() {
               onClick={dismiss}
               style={{
                 fontFamily: 'var(--font-body)',
-                fontSize: '0.78rem',
-                color: '#aaa',
-                background: 'none',
-                border: 'none',
+                fontSize: portraitImage ? '0.74rem' : '0.78rem',
+                fontWeight: 600,
+                color: '#6b7280',
+                background: '#fff',
+                border: '1px solid #e5e7eb',
+                borderRadius: '999px',
                 cursor: 'pointer',
-                padding: '0.75rem 0',
-                letterSpacing: '0.04em',
+                padding: portraitImage ? '0.78rem 1.1rem' : '0.88rem 1.2rem',
+                letterSpacing: '0.03em',
+                minWidth: portraitImage ? '140px' : '152px',
               }}
-              className="transition-colors hover:text-gray-600"
+              className="transition-colors hover:border-gray-300 hover:bg-gray-50 hover:text-gray-800"
               type="button"
             >
               Maybe Later

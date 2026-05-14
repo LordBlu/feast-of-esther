@@ -13,6 +13,21 @@
       "status": "published",
       "createdAt": "2026-04-29T21:35:00.000Z",
       "updatedAt": "2026-04-29T21:35:00.000Z"
+    },
+    {
+      "id": "event-foe-2025",
+      "title": "Feast of Esther 2025",
+      "category": "past",
+      "theme": "Strengthened for Service",
+      "scripture": "Isaiah 40:31",
+      "description": "A memorable gathering marked by worship, prayer, and renewal for women in ministry across North America.",
+      "dateLabel": "June 20-22, 2025",
+      "venue": "RCCG Pavilion of Redemption, Sugar Land, Texas",
+      "registrationUrl": "/registration",
+      "imageUrl": "https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1777761752/20260219_223539_aetz6w.jpg",
+      "status": "published",
+      "createdAt": "2025-04-15T19:00:00.000Z",
+      "updatedAt": "2025-06-23T12:00:00.000Z"
     }
   ],
   "popup": {

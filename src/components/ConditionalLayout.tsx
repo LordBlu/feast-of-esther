@@ -4,6 +4,7 @@ import { Suspense } from 'react';
 import { usePathname } from 'next/navigation';
 import AnnouncementBar from '@/components/AnnouncementBar';
 import Navbar from '@/components/Navbar';
+import PageViewTransition from '@/components/PageViewTransition';
 import SiteFooter from '@/components/SiteFooter';
 import EventPopup from '@/components/EventPopup';
 import HadassahChat from '@/components/HadassahChat';
@@ -21,7 +22,9 @@ function ConditionalLayoutInner({ children }: { children: React.ReactNode }) {
       <AnnouncementBar />
       <Navbar />
       <EventPopup />
-      <main className="site-main w-full flex-1 overflow-x-hidden">{children}</main>
+      <main className="site-main w-full flex-1 overflow-x-hidden">
+        <PageViewTransition>{children}</PageViewTransition>
+      </main>
       <SiteFooter />
       <HadassahChat />
     </div>

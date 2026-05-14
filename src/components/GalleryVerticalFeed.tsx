@@ -4,6 +4,8 @@ import styles from './GalleryMosaic.module.css';
 
 interface GalleryVerticalFeedProps {
   items: GalleryItem[];
+  pageTitle?: string;
+  pageSubtitle?: string;
 }
 
 type Frame = {
@@ -21,7 +23,11 @@ type Frame = {
  * - Mixed image heights
  * - Minimal typography
  */
-export default function GalleryVerticalFeed({ items }: GalleryVerticalFeedProps) {
+export default function GalleryVerticalFeed({
+  items,
+  pageTitle = 'Moments From the Feast',
+  pageSubtitle = 'A curated wall of moments. Open any frame to view the full collection story.',
+}: GalleryVerticalFeedProps) {
   const sizePattern: Frame['size'][] = ['large', 'tall', 'wide', 'standard', 'tall', 'wide'];
   const frames: Frame[] = items.flatMap((item) =>
     item.images.slice(0, 5).map((src, index) => ({
@@ -37,18 +43,12 @@ export default function GalleryVerticalFeed({ items }: GalleryVerticalFeedProps)
   return (
     <div className="bg-white text-neutral-900">
       <header className="foe-shell pt-24 pb-12 text-center md:pt-32 md:pb-16">
-        <p
-          className="mb-4 text-[11px] font-semibold uppercase tracking-[0.4em] text-[var(--primary)]/80"
-          style={{ fontFamily: 'var(--font-body)' }}
-        >
-          Gallery
-        </p>
         <div className="mx-auto max-w-4xl">
           <h1
             className="text-[clamp(2.65rem,8vw,5.1rem)] font-light leading-[1.02] tracking-tight text-[var(--primary-dark)]"
             style={{ fontFamily: 'var(--font-display)' }}
           >
-            Moments From the Feast
+            {pageTitle}
           </h1>
           <div
             className="mt-4 h-px w-32"
@@ -56,7 +56,7 @@ export default function GalleryVerticalFeed({ items }: GalleryVerticalFeedProps)
             aria-hidden
           />
           <p className="mx-auto mt-5 max-w-2xl text-sm leading-relaxed text-neutral-600 md:text-base">
-            A curated wall of moments. Open any frame to view the full collection story.
+            {pageSubtitle}
           </p>
         </div>
       </header>

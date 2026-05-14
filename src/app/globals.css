@@ -671,6 +671,10 @@ body {
   text-wrap: balance;
 }
 
+.home-forumVerseSpacer {
+  height: clamp(2.35rem, 6.2vw, 4.55rem);
+}
+
 .home-forumSubtitle {
   margin: 0 auto 1.7rem;
   max-width: 48rem;
@@ -822,7 +826,7 @@ body {
 }
 
 .home-hotelCard {
-  box-shadow: 0 20px 48px rgba(71, 10, 63, 0.11);
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.08);
 }
 
 .home-hotelContent {
@@ -832,67 +836,65 @@ body {
 }
 
 .home-hotelName {
-  font-size: clamp(2rem, 3.3vw, 3.2rem);
-  line-height: 1.03;
+  font-size: clamp(2.05rem, 3.9vw, 3.6rem);
+  line-height: 1.08;
+  letter-spacing: 0.01em;
 }
 
 .home-hotelAddress {
-  font-size: 1.02rem;
-}
-
-.home-hotelFeatures {
-  font-size: 0.95rem;
+  font-size: 1.03rem;
+  font-weight: 600;
 }
 
 .home-hotelBody {
   font-size: 1.03rem;
+  line-height: 1.62;
+  border-left: 4px solid #d3b55e;
+  background: #fff8dd;
+  padding: 12px 14px;
+  color: #5c5f69;
 }
 
 .home-hotelActions {
   align-items: center;
 }
 
-.home-hotelPrimaryBtn,
-.home-hotelGhostBtn {
-  min-width: 11.5rem;
+.home-hotelPrimaryBtn {
+  min-width: 12.2rem;
   justify-content: center;
+  background: #e9cd56;
+  border-color: #e9cd56;
+  color: #241f16;
+  font-weight: 700;
 }
 
-.home-finalCtaWrap {
-  border-top: 1px solid #e4e5e8;
+/* Stationary image hover treatments (non-carousel / non-gallery) */
+.fx-media {
+  display: block;
+  transition: transform 1.4s cubic-bezier(0.2, 0.8, 0.2, 1), filter 0.9s ease;
+  transform-origin: center center;
+  will-change: transform;
 }
 
-.home-finalCtaCard {
-  box-shadow: 0 18px 46px rgba(74, 9, 76, 0.22);
+.fx-zoom-in:hover {
+  transform: scale(1.045) !important;
+  filter: saturate(1.03);
 }
 
-.home-finalCtaBtn {
-  min-width: 168px;
-  border-radius: 999px;
-  padding: 0.88rem 1.5rem;
-  text-decoration: none;
-  text-align: center;
-  font-size: 1.72rem;
-  font-family: var(--font-display);
-  font-weight: 600;
-  transition: transform 0.22s ease, box-shadow 0.22s ease, background-color 0.22s ease;
+.fx-zoom-out-pan:hover {
+  transform: scale(0.975) translateX(1.2%) translateY(-0.5%) !important;
 }
 
-.home-finalCtaBtnSolid {
-  color: #4f0c54;
-  background: #fff;
-  border: 1.5px solid #fff;
-  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.16);
+.fx-pan-vertical:hover {
+  transform: scale(1.04) translateY(-2%) !important;
 }
 
-.home-finalCtaBtnOutline {
-  color: #fff;
-  background: transparent;
-  border: 1.5px solid rgba(255, 255, 255, 0.82);
+.fx-soft-tilt:hover {
+  transform: scale(1.03) rotate(-0.6deg) !important;
 }
 
-.home-finalCtaBtn:hover {
-  transform: translateY(-2px);
+.home-hotelCard:hover .fx-media {
+  transform: scale(1.03) translateX(0.8%) !important;
 }
 
 .banner-section {

@@ -1,5 +1,7 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import GalleryBackUnderLogo from '@/components/GalleryBackUnderLogo';
+import GalleryImageGrid from '@/components/GalleryImageGrid';
 import { resolveGalleryItems } from '@/lib/gallery-data';
 import { readCmsData } from '@/lib/cms-store';
 
@@ -15,20 +17,8 @@ export default async function GalleryDetailPage({
 
   return (
     <div className="bg-white text-neutral-900">
+      <GalleryBackUnderLogo />
       <header className="foe-shell pt-24 pb-12 text-center md:pt-32 md:pb-16">
-        <Link
-          href="/gallery"
-          className="mb-10 inline-block text-[11px] font-semibold uppercase tracking-[0.28em] text-neutral-500 transition-colors hover:text-neutral-800"
-          style={{ fontFamily: 'var(--font-body)' }}
-        >
-          ← Gallery
-        </Link>
-        <p
-          className="mb-4 text-[11px] font-medium uppercase tracking-[0.38em] text-neutral-500"
-          style={{ fontFamily: 'var(--font-body)' }}
-        >
-          {item.year} · Collection
-        </p>
         <h1
           className="mx-auto mb-8 max-w-4xl text-[clamp(2.5rem,8vw,4.5rem)] font-light leading-[1.05] tracking-tight"
           style={{ fontFamily: 'var(--font-display)' }}
@@ -38,19 +28,9 @@ export default async function GalleryDetailPage({
         <p className="mx-auto max-w-2xl text-base leading-relaxed text-neutral-600 md:text-lg">{item.description}</p>
       </header>
 
-      <div className="flex w-full flex-col gap-1 bg-neutral-100 md:gap-2">
-        {item.images.map((imageUrl, idx) => (
-          <figure key={imageUrl} className="m-0 w-full overflow-hidden bg-white">
-            <img
-              src={imageUrl}
-              alt={`${item.title} — image ${idx + 1}`}
-              className="block h-auto w-full object-cover"
-              loading={idx < 2 ? 'eager' : 'lazy'}
-              decoding="async"
-            />
-          </figure>
-        ))}
-      </div>
+      <section className="border-t border-neutral-200 bg-neutral-50 py-10 md:py-14">
+        <GalleryImageGrid images={item.images} title={item.title} />
+      </section>
 
       <div className="foe-shell flex flex-col items-center gap-4 border-t border-neutral-200 py-16 md:flex-row md:justify-center md:py-20">
         <Link

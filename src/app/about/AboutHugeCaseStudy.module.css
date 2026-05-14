@@ -1,0 +1,656 @@
+/*
+ * About Us (`/about`) — case study layout inspired by public Huge Inc. case study patterns
+ * (split column, chrome bar, mega type, two-column “Services / Overview”, CTA bar).
+ * Original implementation; not copied from third-party source bundles.
+ */
+
+.shell {
+  --nav-top: 68px;
+  /* Match fixed rail + placeholder (viewport-based so fixed % rail lines up). */
+  --about2-rail-w: clamp(280px, 34vw, 480px);
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  min-height: 100vh;
+  background: #f5f4f8;
+  color: #0a0a0a;
+  font-family:
+    ui-sans-serif,
+    system-ui,
+    'Inter',
+    'Segoe UI',
+    'Helvetica Neue',
+    Helvetica,
+    Arial,
+    sans-serif;
+}
+
+/* Reserves horizontal space for the fixed rail (rail is out of flow). */
+.railPlaceholder {
+  display: none;
+}
+
+/* ── Left visual rail (~1/3) — sharp photography, Huge-style ── */
+.visualRail {
+  position: sticky;
+  top: var(--nav-top);
+  align-self: flex-start;
+  width: 34%;
+  min-width: 280px;
+  max-width: 480px;
+  flex-shrink: 0;
+  height: calc(100vh - var(--nav-top));
+  background: #000;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.visualRail::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 4;
+  background: linear-gradient(180deg, transparent 55%, rgba(0, 0, 0, 0.22) 100%);
+}
+
+.visualStack {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+.visualLayer {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 1.15s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.visualLayer.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.visualLayer img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .visualLayer {
+    transition: opacity 0.22s ease;
+  }
+}
+
+/* ── Right narrative column ── */
+.mainRail {
+  position: relative;
+  z-index: 11;
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+}
+
+/* Sticky chrome: logo tile + case title + Close (Huge case study header pattern) */
+.chrome {
+  position: sticky;
+  top: var(--nav-top);
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 1.15rem clamp(1.25rem, 4vw, 2.75rem);
+  border-bottom: 1px solid #e8e8e8;
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.chromeLeft {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  min-width: 0;
+}
+
+.logoTile {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  background: #0a0a0a;
+  display: grid;
+  place-items: center;
+  padding: 5px;
+}
+
+.logoTile img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.chromeTitle {
+  font-size: clamp(0.72rem, 1.1vw, 0.82rem);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  line-height: 1.35;
+  color: #111;
+}
+
+.chromeClose {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  text-decoration: none;
+  color: #111;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.chromeClose:focus-visible {
+  outline: 2px solid #0a0a0a;
+  outline-offset: 3px;
+}
+
+.closeIcon {
+  width: 40px;
+  height: 40px;
+  background: #0a0a0a;
+  color: #fff;
+  display: grid;
+  place-items: center;
+  font-size: 1.15rem;
+  line-height: 1;
+  font-weight: 300;
+}
+
+.scrollBody {
+  position: relative;
+  z-index: 2;
+  padding: clamp(1.75rem, 4vw, 3.25rem) clamp(1.25rem, 4vw, 3.5rem) 5rem;
+  max-width: 920px;
+}
+
+.sectionNav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.75rem;
+  margin: 0 0 2rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid #eee;
+}
+
+.navLink {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: #888;
+  padding: 0.3rem 0;
+  border-bottom: 2px solid transparent;
+  transition:
+    color 0.2s,
+    border-color 0.2s;
+}
+
+.navLink:hover {
+  color: #111;
+}
+
+.navLinkActive {
+  color: #111;
+  border-bottom-color: #111;
+}
+
+/* Mega headline (Huge-style case study opener) */
+.mega {
+  margin: 0 0 2.5rem;
+  font-size: clamp(2rem, 4.8vw, 3.35rem);
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  line-height: 1.08;
+  color: #0a0a0a;
+}
+
+.megaAccent {
+  font-weight: 700;
+  color: #0a0a0a;
+}
+
+/* Two-column Services / Overview */
+.dual {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(1.5rem, 4vw, 3rem);
+  margin-bottom: 3rem;
+}
+
+.colHead {
+  margin: 0 0 1rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #111;
+}
+
+.arrowList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.arrowList li {
+  position: relative;
+  padding-left: 1.35rem;
+  font-size: clamp(0.88rem, 1.2vw, 0.95rem);
+  line-height: 1.45;
+  color: #222;
+}
+
+.arrowList li::before {
+  content: '→';
+  position: absolute;
+  left: 0;
+  top: 0.05em;
+  color: #e91e8c;
+  font-weight: 700;
+  font-size: 0.95em;
+}
+
+.body {
+  margin: 0;
+  font-size: clamp(0.88rem, 1.15vw, 0.98rem);
+  line-height: 1.65;
+  color: #333;
+}
+
+/* Pink-accent CTA strip (replaces black bar) */
+.ctaBar {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.25rem;
+  margin: 3rem 0;
+  padding: 1.35rem clamp(1.25rem, 3vw, 2rem);
+  background: linear-gradient(120deg, #7a0d4a 0%, #b3125e 48%, #e91e8c 100%);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  box-shadow: 0 12px 36px rgba(120, 10, 70, 0.22);
+}
+
+.ctaBar p {
+  margin: 0;
+  font-size: clamp(0.85rem, 1.1vw, 0.95rem);
+  font-weight: 500;
+  line-height: 1.45;
+  max-width: 28rem;
+}
+
+.ctaBtn {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.65rem 1.15rem;
+  background: #fff;
+  color: #6a0f35;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-decoration: none;
+  border: 1px solid rgba(255, 255, 255, 0.95);
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+}
+
+.ctaBtn:hover {
+  background: rgba(255, 255, 255, 0.92);
+  color: #4a0a28;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.16);
+}
+
+.ctaBtn:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+}
+
+/* In-page sections */
+.section {
+  padding: 3.5rem 0;
+  border-top: 1px solid #ececec;
+}
+
+.section:first-of-type {
+  border-top: none;
+  padding-top: 0.5rem;
+}
+
+.sectionLabel {
+  margin: 0 0 0.75rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #111;
+}
+
+.sectionTitle {
+  margin: 0 0 1.25rem;
+  font-size: clamp(1.5rem, 2.8vw, 2.25rem);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.1;
+  color: #0a0a0a;
+}
+
+.bodySpaced {
+  margin: 0 0 1rem;
+}
+
+.bodySpaced:last-child {
+  margin-bottom: 0;
+}
+
+.twoColText {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.visionSub {
+  margin: 1.5rem 0 0.5rem;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0 0 1rem;
+}
+
+.pills span {
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 0.35rem 0.6rem;
+  border-radius: 999px;
+  background: #f4f4f4;
+  border: 1px solid #e0e0e0;
+  color: #222;
+}
+
+.dots {
+  display: flex;
+  gap: 0.45rem;
+  margin-top: 1rem;
+}
+
+.dot,
+.dotActive {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+.dot {
+  background: #ccc;
+}
+
+.dotActive {
+  background: #0a0a0a;
+}
+
+/* Our Chapters — outreach-style chapter grid */
+.outreachMainTitle {
+  margin: 0 0 1rem;
+  font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(2.25rem, 5.6vw, 3.7rem);
+  font-weight: 800;
+  line-height: 0.95;
+  color: #0a0a0a;
+}
+
+.outreachShowcase {
+  border: 1px solid rgba(75, 17, 107, 0.28);
+  border-radius: 14px;
+  background: linear-gradient(135deg, #43075f 0%, #8b0f5f 100%);
+  color: #fff;
+  padding: 24px 16px 20px;
+  text-align: center;
+  margin-bottom: 18px;
+}
+
+.outreachMetricIcon {
+  width: 34px;
+  height: 34px;
+  margin: 0 auto 8px;
+  border-radius: 999px;
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  display: grid;
+  place-items: center;
+  font-size: 1.05rem;
+  line-height: 1;
+}
+
+.outreachMetricValue {
+  margin: 0;
+  font-family: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(2.2rem, 5.5vw, 3.8rem);
+  font-weight: 800;
+  line-height: 0.95;
+}
+
+.outreachMetricLabel {
+  margin: 6px 0 8px;
+  font-size: clamp(1.1rem, 2.4vw, 1.8rem);
+  font-weight: 700;
+}
+
+.outreachMetricCopy {
+  margin: 0 auto;
+  max-width: 760px;
+  color: rgba(255, 255, 255, 0.92);
+  line-height: 1.6;
+  font-size: 1rem;
+}
+
+.chapterTabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 6px;
+  margin-bottom: 18px;
+  padding: 12px;
+  border: 1px solid rgba(34, 34, 34, 0.12);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.55);
+}
+
+.chapterTab,
+.chapterTabActive {
+  border: 1px solid rgba(34, 34, 34, 0.14);
+  border-radius: 10px;
+  padding: 9px 15px;
+  background: rgba(255, 255, 255, 0.85);
+  color: #374151;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 0.82rem;
+}
+
+.chapterTabActive {
+  background: #4b116b;
+  color: #fff;
+  border-color: #4b116b;
+  box-shadow: 0 8px 20px rgba(75, 17, 107, 0.2);
+}
+
+.tabDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: #d4b444;
+  flex-shrink: 0;
+}
+
+.chapterPanel {
+  border: 1px solid rgba(34, 34, 34, 0.12);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.55);
+  padding: 16px;
+}
+
+.chapterHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  border-bottom: 1px solid rgba(34, 34, 34, 0.1);
+  padding-bottom: 8px;
+}
+
+.chapterHeader h3 {
+  margin: 0;
+  font-family: var(--font-display), ui-serif, Georgia, serif;
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  color: #0a0a0a;
+}
+
+.chapterHeader span {
+  font-size: 0.82rem;
+  color: #6b7280;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(34, 34, 34, 0.1);
+  border-radius: 999px;
+  padding: 4px 9px;
+}
+
+.locationsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.locationCard {
+  border: 1px solid rgba(34, 34, 34, 0.12);
+  background: rgba(255, 255, 255, 0.65);
+  border-radius: 10px;
+  min-height: 120px;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 6px;
+}
+
+.locationIcon {
+  color: #d4b444;
+  font-size: 1.1rem;
+}
+
+.locationCard p {
+  margin: 0;
+  color: #3f3f46;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.emptyLocations {
+  border: 1px dashed rgba(34, 34, 34, 0.18);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.45);
+  min-height: 130px;
+  display: grid;
+  place-items: center;
+  color: #6b7280;
+  font-size: 0.92rem;
+}
+
+.mobileVisual {
+  display: none;
+}
+
+@media (min-width: 961px) {
+  .railPlaceholder {
+    display: block;
+    flex: 0 0 var(--about2-rail-w);
+    width: var(--about2-rail-w);
+    flex-shrink: 0;
+    pointer-events: none;
+  }
+
+  .visualRail {
+    position: fixed;
+    top: var(--nav-top);
+    left: 0;
+    width: var(--about2-rail-w);
+    min-width: unset;
+    max-width: unset;
+    height: calc(100vh - var(--nav-top));
+    z-index: 10;
+  }
+
+}
+
+@media (max-width: 960px) {
+  .shell {
+    flex-direction: column;
+  }
+
+  .railPlaceholder {
+    display: none !important;
+  }
+
+  .visualRail {
+    display: none;
+  }
+
+  .mobileVisual {
+    display: block;
+    position: sticky;
+    top: var(--nav-top);
+    z-index: 15;
+    height: 36vh;
+    min-height: 200px;
+    width: 100%;
+    background: #000;
+  }
+
+  .mobileVisual .visualStack {
+    height: 100%;
+  }
+
+  .chrome {
+    top: var(--nav-top);
+  }
+
+  .dual,
+  .twoColText,
+  .locationsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .ctaBar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

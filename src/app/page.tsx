@@ -157,9 +157,10 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="bg-white pt-20 pb-8 md:pt-24 md:pb-10">
+      <section className="bg-white pt-0 pb-8 md:pb-10">
         <div className="foe-shell">
-          <h2 className="home-forumTitle reveal">2 Kings 13:20-21</h2>
+          <h2 className="sr-only">2 Kings 13:20-21</h2>
+          <div className="home-forumVerseSpacer reveal" aria-hidden />
           <p className="home-forumSubtitle reveal">
             “A forum where women in ministry learn to accomplish their calling, stand in the gap, and impact the church for revival in the nation.”
           </p>
@@ -242,22 +243,19 @@ export default function Home() {
               className="reveal mb-2 home-hotelTitle"
               style={{ fontFamily: 'var(--font-display)', color: 'var(--primary-dark)' }}
             >
-              Reserve Your Stay
+              Official Conference Hotel
             </h2>
             <p className="home-hotelSubtitle reveal">
-              A comfortable stay, premium hospitality, and conference-ready convenience.
+              Experience comfort and elegance at our designated hotel
             </p>
           </div>
 
           <div className="home-hotelCard reveal grid grid-cols-1 lg:grid-cols-[1.05fr_1fr] overflow-hidden rounded-2xl border border-[var(--blush-mid)] bg-white shadow-sm">
             <div className="relative min-h-[300px] lg:min-h-[430px]">
-              <span className="absolute left-3 top-3 z-10 bg-[#f2e585] px-3 py-1 text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-[#202020]">
-                Official Hotel
-              </span>
               <img
                 src={managedImages.hotelRoomUrl || 'https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1778163272/Accom_x5ajjc.jpg'}
                 alt="Official hotel room"
-                className="absolute inset-0 h-full w-full object-cover"
+                className="fx-media fx-zoom-out-pan absolute inset-0 h-full w-full object-cover"
               />
             </div>
 
@@ -265,20 +263,12 @@ export default function Home() {
               <h3 className="home-hotelName text-[#2c2f3a]" style={{ fontFamily: 'var(--font-display)' }}>
                 {SITE.venueName}
               </h3>
-              <p className="home-hotelAddress mt-2 border-b border-[#e5e7eb] pb-4 text-gray-600">{SITE.venueAddress}</p>
-              <p className="home-hotelFeatures mt-4 flex flex-wrap gap-x-4 gap-y-2 text-gray-600">
-                {HOME_COPY.accommodationBullets.map((b) => (
-                  <span key={b}>★ {b}</span>
-                ))}
-              </p>
+              <p className="home-hotelAddress mt-3 text-[#b39b45]">{SITE.venueAddress}</p>
               <p className="home-hotelBody mt-5 max-w-xl leading-relaxed text-gray-600">{HOME_COPY.accommodationLead}</p>
               <div className="home-hotelActions mt-7 flex flex-wrap gap-3">
                 <Link href={SITE.hotelBookingUrl} target="_blank" rel="noreferrer" className="btn-primary home-hotelPrimaryBtn">
-                  Book Your Room
+                  Book Your Stay →
                 </Link>
-                <button type="button" className="btn-outline home-hotelGhostBtn" style={{ color: '#374151', borderColor: '#d1d5db' }}>
-                  Copy Booking Link
-                </button>
               </div>
             </div>
           </div>
@@ -316,28 +306,6 @@ export default function Home() {
           COUNTDOWN TIMER (original)
           ══════════════════════════════════════ */}
       <FlipClockCountdown />
-
-      <section className="home-finalCtaWrap bg-[#eff0f3] py-20 md:py-24">
-        <div
-          className="home-finalCtaCard foe-shell mx-auto max-w-[760px] rounded-[18px] px-8 py-11 text-center text-white md:px-12"
-          style={{ background: 'linear-gradient(135deg, #4e0b73 0%, #b11166 100%)' }}
-        >
-          <h3 className="text-[clamp(2rem,4vw,3.25rem)]" style={{ fontFamily: 'var(--font-display)', fontWeight: 600 }}>
-            Join Us at the Feast of Esther 2026
-          </h3>
-          <p className="mx-auto mt-3 max-w-2xl text-white/95 text-[1.22rem] leading-relaxed">
-            Be part of this transformative experience that combines spiritual growth, fellowship, and empowerment.
-          </p>
-          <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row sm:gap-5">
-            <Link href="/registration" className="home-finalCtaBtn home-finalCtaBtnSolid">
-              Register Now
-            </Link>
-            <Link href="/donate" className="home-finalCtaBtn home-finalCtaBtnOutline">
-              Donate
-            </Link>
-          </div>
-        </div>
-      </section>
 
     </div>
   );

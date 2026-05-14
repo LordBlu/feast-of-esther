@@ -1,10 +1,17 @@
 'use client';
 
 import { FormEvent, useState } from 'react';
+import type { ContactPageContent, SocialLink } from '@/lib/cms-types';
 import styles from './ContactStyles.module.css';
 
-const MAP_EMBED =
+const DEFAULT_MAP_EMBED =
   'https://maps.google.com/maps?q=15227+Old+Richmond+Rd,+Sugar+Land,+TX+77498&hl=en&z=15&output=embed';
+
+function pickSocialUrl(socialLinks: SocialLink[] | undefined, id: string, fallback: string): string {
+  const link = socialLinks?.find((l) => l.id === id && l.enabled);
+  const u = link?.url?.trim();
+  return u || fallback;
+}
 
 function IconPin() {
   return (
@@ -41,8 +48,40 @@ function IconGlobe() {
   );
 }
 
-export default function ContactClient() {
+export interface ContactClientProps {
+  page: ContactPageContent;
+  socialLinks: SocialLink[];
+}
+
+export default function ContactClient({ page, socialLinks }: ContactClientProps) {
   const [sent, setSent] = useState(false);
+
+  const formTitle = page.formTitle ?? 'Get In Touch';
+  const infoHeading = page.infoHeading ?? 'Contact Information';
+  const aboutCardTitle = page.aboutCardTitle ?? 'About Feast of Esther';
+  const aboutCardText =
+    page.aboutCardText ??
+    'A divine gathering of women in ministry, organized by Pastor (Mrs.) Folu Adeboye, wife of the General Overseer of the Redeemed Christian Church of God — fellowship, prayer, renewal, and kingdom impact across North America and beyond.';
+  const addressLine1 = page.addressLine1 ?? '15227 Old Richmond Rd';
+  const addressLine2 = page.addressLine2 ?? 'Sugar Land, TX 77498';
+  const phone1Display = page.phone1Display ?? '+1 (919) 885-9765';
+  const phone1Href = page.phone1Href ?? 'tel:+19198859765';
+  const phone2Display = page.phone2Display ?? '+1 (832) 372-0860';
+  const phone2Href = page.phone2Href ?? 'tel:+18323720860';
+  const showPhone2 =
+    page.phone2Display === undefined ? true : page.phone2Display.trim().length > 0;
+  const email = page.email ?? 'feastofesthernc@gmail.com';
+  const websiteUrl = page.websiteUrl ?? 'https://www.feastofestherna.com';
+  const websiteLabel =
+    page.websiteDisplay?.trim() ||
+    websiteUrl.replace(/^https?:\/\//i, '').replace(/\/$/, '');
+  const mapEmbed = page.mapEmbedUrl?.trim() || DEFAULT_MAP_EMBED;
+  const followLabel = page.followLabel ?? 'Follow Us';
+
+  const instagram = pickSocialUrl(socialLinks, 'instagram', 'https://instagram.com');
+  const tiktok = pickSocialUrl(socialLinks, 'tiktok', 'https://tiktok.com');
+  const facebook = pickSocialUrl(socialLinks, 'facebook', 'https://facebook.com');
+  const youtube = pickSocialUrl(socialLinks, 'youtube', 'https://youtube.com');
 
   function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -53,7 +92,7 @@ export default function ContactClient() {
     <div className={styles.container}>
       <div className={styles.card}>
         <form onSubmit={handleSubmit} className={styles.formPanel}>
-          <h1 className={styles.formTitle}>Get In Touch</h1>
+          <h1 className={styles.formTitle}>{formTitle}</h1>
           <div className={styles.formRule} aria-hidden />
 
           <div className={styles.group}>
@@ -82,16 +121,12 @@ export default function ContactClient() {
         </form>
 
         <div className={styles.infoPanel}>
-          <h2 className={styles.infoHeading}>Contact Information</h2>
+          <h2 className={styles.infoHeading}>{infoHeading}</h2>
           <div className={styles.infoRule} aria-hidden />
 
           <div className={styles.aboutCard}>
-            <h3 className={styles.aboutTitle}>About Feast of Esther</h3>
-            <p className={styles.aboutText}>
-              A divine gathering of women in ministry, organized by Pastor (Mrs.) Folu Adeboye, wife of the General
-              Overseer of the Redeemed Christian Church of God — fellowship, prayer, renewal, and kingdom impact across
-              North America and beyond.
-            </p>
+            <h3 className={styles.aboutTitle}>{aboutCardTitle}</h3>
+            <p className={styles.aboutText}>{aboutCardText}</p>
           </div>
 
           <div className={styles.infoRow}>
@@ -99,8 +134,8 @@ export default function ContactClient() {
               <IconPin />
             </span>
             <div>
-              <p className={styles.infoRowText}>15227 Old Richmond Rd</p>
-              <p className={styles.infoRowText}>Sugar Land, TX 77498</p>
+              <p className={styles.infoRowText}>{addressLine1}</p>
+              <p className={styles.infoRowText}>{addressLine2}</p>
             </div>
           </div>
 
@@ -109,9 +144,13 @@ export default function ContactClient() {
               <IconPhone />
             </span>
             <p className={styles.infoRowText}>
-              <a href="tel:+19198859765">+1 (919) 885-9765</a>
-              <span className={styles.infoOr}> or </span>
-              <a href="tel:+18323720860">+1 (832) 372-0860</a>
+              <a href={phone1Href}>{phone1Display}</a>
+              {showPhone2 ? (
+                <>
+                  <span className={styles.infoOr}> or </span>
+                  <a href={phone2Href}>{phone2Display}</a>
+                </>
+              ) : null}
             </p>
           </div>
 
@@ -120,7 +159,7 @@ export default function ContactClient() {
               <IconMail />
             </span>
             <p className={styles.infoRowText}>
-              <a href="mailto:feastofesthernc@gmail.com">feastofesthernc@gmail.com</a>
+              <a href={`mailto:${email}`}>{email}</a>
             </p>
           </div>
 
@@ -129,16 +168,16 @@ export default function ContactClient() {
               <IconGlobe />
             </span>
             <p className={styles.infoRowText}>
-              <a href="https://www.feastofestherna.com" target="_blank" rel="noopener noreferrer">
-                www.feastofestherna.com
+              <a href={websiteUrl} target="_blank" rel="noopener noreferrer">
+                {websiteLabel}
               </a>
             </p>
           </div>
 
-          <p className={styles.followLabel}>Follow Us</p>
+          <p className={styles.followLabel}>{followLabel}</p>
           <div className={styles.socialRow}>
             <a
-              href="https://instagram.com"
+              href={instagram}
               target="_blank"
               rel="noopener noreferrer"
               className={`${styles.socialBtn} ${styles.socialInstagram}`}
@@ -149,7 +188,7 @@ export default function ContactClient() {
               </svg>
             </a>
             <a
-              href="https://tiktok.com"
+              href={tiktok}
               target="_blank"
               rel="noopener noreferrer"
               className={`${styles.socialBtn} ${styles.socialTiktok}`}
@@ -160,7 +199,7 @@ export default function ContactClient() {
               </svg>
             </a>
             <a
-              href="https://facebook.com"
+              href={facebook}
               target="_blank"
               rel="noopener noreferrer"
               className={`${styles.socialBtn} ${styles.socialFacebook}`}
@@ -171,7 +210,7 @@ export default function ContactClient() {
               </svg>
             </a>
             <a
-              href="https://youtube.com"
+              href={youtube}
               target="_blank"
               rel="noopener noreferrer"
               className={`${styles.socialBtn} ${styles.socialYoutube}`}
@@ -186,7 +225,7 @@ export default function ContactClient() {
           <div className={styles.mapWrap}>
             <iframe
               title="Feast of Esther North America — Sugar Land"
-              src={MAP_EMBED}
+              src={mapEmbed}
               className={styles.mapFrame}
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
