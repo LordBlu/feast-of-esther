@@ -46,7 +46,7 @@ export default function Navbar() {
   }, []);
 
   useEffect(() => {
-    setOpen(false);
+    queueMicrotask(() => setOpen(false));
   }, [pathname]);
 
   return (
@@ -58,8 +58,8 @@ export default function Navbar() {
         boxShadow: scrolled ? '0 2px 20px rgba(106,15,53,0.07)' : 'none',
       }}
     >
-      <div className="mx-auto flex h-[68px] max-w-7xl items-center justify-between px-6 lg:px-10">
-        <Link href="/" className="inline-flex items-center">
+      <div className="mx-auto flex h-[68px] max-w-7xl items-stretch justify-between px-6 lg:px-10">
+        <Link href="/" className="inline-flex items-center self-center">
           <img
             src="https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1778153398/foe_logo_mlmi16.jpg"
             alt="Feast of Esther North America logo"
@@ -67,30 +67,23 @@ export default function Navbar() {
           />
         </Link>
 
-        <div className="hidden items-center gap-7 md:flex">
-          {links.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              aria-current={linkIsCurrent(pathname, link.href) ? 'page' : undefined}
-              style={{
-                fontFamily: 'var(--font-body)',
-                fontSize: '0.78rem',
-                fontWeight: 500,
-                letterSpacing: '0.06em',
-                color: linkIsCurrent(pathname, link.href) ? 'var(--primary)' : '#555',
-                textDecoration: 'none',
-                textTransform: 'uppercase',
-                transition: 'color 0.2s',
-              }}
-              className="hover:text-[var(--primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary-light)] focus-visible:ring-offset-2"
-            >
-              {link.label}
-            </Link>
-          ))}
+        <div className="hidden items-stretch gap-1 self-stretch md:flex">
+          {links.map((link) => {
+            const isCurrent = linkIsCurrent(pathname, link.href);
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                aria-current={isCurrent ? 'page' : undefined}
+                className={`navbar-link focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary-light)] focus-visible:ring-offset-2 ${isCurrent ? 'navbar-link--active' : ''}`}
+              >
+                {link.label}
+              </Link>
+            );
+          })}
         </div>
 
-        <div className="hidden items-center gap-3 md:flex">
+        <div className="hidden items-center gap-3 self-center md:flex">
           <Link href="/registration" className="btn-primary" style={{ padding: '0.72rem 1.65rem', fontSize: '0.78rem' }}>
             Register
           </Link>
@@ -117,7 +110,7 @@ export default function Navbar() {
 
         <button
           type="button"
-          className="flex items-center justify-center p-2 md:hidden"
+          className="flex items-center justify-center self-center p-2 md:hidden"
           onClick={() => setOpen(!open)}
           aria-expanded={open}
           aria-label="Toggle menu"
@@ -133,25 +126,19 @@ export default function Navbar() {
           style={{ backgroundColor: '#fff' }}
         >
           <div className="flex flex-col gap-4 pt-2">
-            {links.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                aria-current={linkIsCurrent(pathname, link.href) ? 'page' : undefined}
-                style={{
-                  fontFamily: 'var(--font-body)',
-                  fontSize: '0.82rem',
-                  fontWeight: 500,
-                  letterSpacing: '0.08em',
-                  textTransform: 'uppercase',
-                  color: linkIsCurrent(pathname, link.href) ? 'var(--primary)' : '#444',
-                  textDecoration: 'none',
-                }}
-                className="focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary-light)] focus-visible:ring-offset-2 rounded-sm"
-              >
-                {link.label}
-              </Link>
-            ))}
+            {links.map((link) => {
+              const isCurrent = linkIsCurrent(pathname, link.href);
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  aria-current={isCurrent ? 'page' : undefined}
+                  className={`navbar-link-mobile focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary-light)] focus-visible:ring-offset-2 ${isCurrent ? 'navbar-link-mobile--active' : ''}`}
+                >
+                  {link.label}
+                </Link>
+              );
+            })}
             <div className="flex gap-3 pt-2">
               <Link
                 href="/registration"

@@ -14,11 +14,11 @@ export default function FounderHero({ backgroundSrc }: FounderHeroProps) {
       className="relative isolate flex h-full min-h-screen w-full flex-col justify-end overflow-hidden md:justify-center"
       aria-labelledby="founder-hero-heading"
     >
-      <div className="absolute inset-0">
+      <div className="founder-hero-media" aria-hidden>
         <img
           src={backgroundSrc}
           alt=""
-          className="h-full w-full object-cover object-[center_28%]"
+          className="founder-hero-img"
           fetchPriority="high"
           decoding="async"
         />

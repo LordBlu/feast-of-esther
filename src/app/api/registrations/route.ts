@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
     };
 
     data.registrations.unshift(registration);
-    await writeCmsData(data);
+    await writeCmsData(data, { recordHistory: false });
 
     return NextResponse.json({ success: true });
   } catch {

@@ -107,7 +107,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 1.5rem;
-  padding: 1.15rem clamp(1.25rem, 4vw, 2.75rem);
+  padding: clamp(0.6rem, 1.6vw, 0.95rem) clamp(1.25rem, 4vw, 2.75rem);
   border-bottom: 1px solid #e8e8e8;
   background: rgba(255, 255, 255, 0.94);
   backdrop-filter: blur(12px);
@@ -123,8 +123,8 @@
 
 .logoTile {
   flex-shrink: 0;
-  width: 40px;
-  height: 40px;
+  width: clamp(3.5rem, 8vw, 4.5rem);
+  height: clamp(3.5rem, 8vw, 4.5rem);
   background: #0a0a0a;
   display: grid;
   place-items: center;
@@ -138,10 +138,10 @@
 }
 
 .chromeTitle {
-  font-size: clamp(0.72rem, 1.1vw, 0.82rem);
+  font-size: clamp(1.44rem, 2.2vw, 1.64rem);
   font-weight: 600;
-  letter-spacing: 0.01em;
-  line-height: 1.35;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
   color: #111;
 }
 
@@ -176,8 +176,99 @@
 .scrollBody {
   position: relative;
   z-index: 2;
-  padding: clamp(1.75rem, 4vw, 3.25rem) clamp(1.25rem, 4vw, 3.5rem) 5rem;
+  padding: clamp(1.35rem, 3vw, 2.25rem) clamp(1.25rem, 4vw, 3.5rem) 5rem;
   max-width: 920px;
+}
+
+.leaderRow {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(1rem, 3vw, 2rem);
+  margin-top: clamp(2rem, 4vw, 2.75rem);
+  padding-top: clamp(1.5rem, 3vw, 2rem);
+  border-top: 1px solid #ece8ef;
+}
+
+.leaderCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  cursor: default;
+}
+
+.leaderCard:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 4px;
+  border-radius: 8px;
+}
+
+.leaderAvatar {
+  --leader-avatar-size: 165px;
+  width: var(--leader-avatar-size);
+  height: var(--leader-avatar-size);
+  min-width: var(--leader-avatar-size);
+  min-height: var(--leader-avatar-size);
+  max-width: var(--leader-avatar-size);
+  max-height: var(--leader-avatar-size);
+  flex-shrink: 0;
+  margin-bottom: 0.65rem;
+  border-radius: 50%;
+  overflow: hidden;
+  background: linear-gradient(145deg, #ebe6ef 0%, #d8d0dc 100%);
+  border: 2.5px solid var(--primary);
+  box-shadow:
+    0 0 0 2px #fff,
+    0 0 0 3px var(--primary-light);
+}
+
+.leaderAvatar img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: cover;
+  object-position: center top;
+}
+
+.leaderCardName {
+  margin: 0;
+  font-size: clamp(0.92rem, 1.35vw, 1.05rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+  color: #0a0a0a;
+}
+
+.leaderCardRole {
+  margin: 0.4rem 0 0;
+  font-size: 0.72rem;
+  line-height: 1.45;
+  color: #5f6774;
+}
+
+@media (max-width: 720px) {
+  .leaderRow {
+    grid-template-columns: repeat(3, minmax(72px, 1fr));
+    gap: 0.65rem;
+  }
+
+  .leaderAvatar {
+    --leader-avatar-size: 135px;
+    margin-bottom: 0.55rem;
+  }
+
+  .leaderCardName {
+    font-size: 0.78rem;
+  }
+
+  .leaderCardRole {
+    font-size: 0.62rem;
+  }
 }
 
 .sectionNav {
@@ -352,6 +443,15 @@
   font-weight: 700;
   letter-spacing: -0.025em;
   line-height: 1.1;
+  color: #0a0a0a;
+}
+
+.leaderName {
+  margin: 0 0 0.75rem;
+  font-size: clamp(1.25rem, 2.2vw, 1.65rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
   color: #0a0a0a;
 }
 

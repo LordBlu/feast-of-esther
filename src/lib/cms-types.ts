@@ -222,7 +222,7 @@ export interface FounderPageContent {
   storyP3?: string;
 }
 
-/** High-visibility strings on the About Us page (`/about`, case-study layout; deeper sections stay in code for now). */
+/** High-visibility strings + sidebar photography on the About Us case-study page (`/about`). */
 export interface About2PageContent {
   chromeTitle?: string;
   megaAccent?: string;
@@ -230,6 +230,14 @@ export interface About2PageContent {
   focusItem2?: string;
   focusItem3?: string;
   ctaBarText?: string;
+  /** Sidebar image per scroll section (Cloudinary or any HTTPS URL). */
+  visualAbout?: string;
+  visualOurJourney?: string;
+  visualWhoWeAre?: string;
+  visualOurVision?: string;
+  visualMission?: string;
+  visualLeadership?: string;
+  visualOutreach?: string;
 }
 
 export interface SitePageContents {

@@ -2,6 +2,7 @@
 
 import { DragEvent, FormEvent, useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import AdminVersionsPanel from '@/components/admin/AdminVersionsPanel';
 import {
   AboutPageContent,
   EventCategory,
@@ -191,7 +192,15 @@ function PopupTypoFields({
 export default function AdminDashboardPage() {
   const router = useRouter();
   const [tab, setTab] = useState<
-    'events' | 'countdown' | 'popup' | 'images' | 'social' | 'about' | 'pages' | 'registrations'
+    | 'events'
+    | 'countdown'
+    | 'popup'
+    | 'images'
+    | 'social'
+    | 'about'
+    | 'pages'
+    | 'registrations'
+    | 'versions'
   >('events');
   const [events, setEvents] = useState<SiteEvent[]>([]);
   const [eventFilter, setEventFilter] = useState<'all' | EventStatus>('all');
@@ -297,6 +306,11 @@ export default function AdminDashboardPage() {
     setRegTotalPages(data.totalPages ?? 1);
   }, [regPage, regSearch, router]);
 
+  const reloadAll = useCallback(async () => {
+    await Promise.all([loadEvents(), loadCore()]);
+    if (tab === 'registrations') await loadRegistrations();
+  }, [loadEvents, loadCore, loadRegistrations, tab]);
+
   useEffect(() => {
     async function boot() {
       setLoading(true);
@@ -308,7 +322,9 @@ export default function AdminDashboardPage() {
 
   useEffect(() => {
     if (tab !== 'registrations') return;
-    loadRegistrations();
+    queueMicrotask(() => {
+      void loadRegistrations();
+    });
   }, [tab, loadRegistrations]);
 
   async function addEvent(event: FormEvent) {
@@ -586,7 +602,9 @@ export default function AdminDashboardPage() {
         </header>
 
         <nav className="admin-tabs" aria-label="Dashboard sections">
-          {(['events', 'countdown', 'popup', 'images', 'social', 'about', 'pages', 'registrations'] as const).map((key) => (
+          {(
+            ['events', 'countdown', 'popup', 'images', 'social', 'about', 'pages', 'registrations', 'versions'] as const
+          ).map((key) => (
             <button
               key={key}
               type="button"
@@ -601,6 +619,7 @@ export default function AdminDashboardPage() {
               {key === 'about' && 'About Page'}
               {key === 'pages' && 'Site pages'}
               {key === 'registrations' && 'Registrations'}
+              {key === 'versions' && 'Versions'}
             </button>
           ))}
         </nav>
@@ -1984,6 +2003,38 @@ export default function AdminDashboardPage() {
                     }
                   />
                 </div>
+                <div className="md:col-span-2 border-t border-black/10 pt-4">
+                  <p className="mb-3 text-sm text-black/55">
+                    Sidebar photos (one per scroll section). Each leader&apos;s portrait is set under{' '}
+                    <strong>About</strong> → Leadership profiles JSON (<code>imageUrl</code>).
+                  </p>
+                </div>
+                {(
+                  [
+                    ['visualAbout', 'Intro (About)'],
+                    ['visualOurJourney', 'Our Journey'],
+                    ['visualWhoWeAre', 'Who We Are'],
+                    ['visualOurVision', 'Our Vision'],
+                    ['visualMission', 'Mission'],
+                    ['visualLeadership', 'Leadership (fallback)'],
+                    ['visualOutreach', 'Chapters / Outreach'],
+                  ] as const
+                ).map(([key, label]) => (
+                  <div key={key} className="md:col-span-2">
+                    <label className="admin-field-label">Sidebar image — {label}</label>
+                    <input
+                      className="admin-input font-mono text-[0.72rem]"
+                      value={pageContent.about2[key] ?? ''}
+                      onChange={(e) =>
+                        setPageContent((p) => ({
+                          ...p,
+                          about2: { ...p.about2, [key]: e.target.value },
+                        }))
+                      }
+                      placeholder="https://…"
+                    />
+                  </div>
+                ))}
               </div>
             ) : null}
 
@@ -1994,6 +2045,10 @@ export default function AdminDashboardPage() {
               </button>
             </div>
           </div>
+        ) : null}
+
+        {tab === 'versions' ? (
+          <AdminVersionsPanel onReload={reloadAll} onMessage={setMessage} />
         ) : null}
 
         {tab === 'registrations' ? (

@@ -27,41 +27,90 @@ Your personality:
 - Never make up event details beyond what's listed above
 `;
 
+type ChatRole = 'user' | 'assistant' | 'system';
+
+type ChatMessage = { role: ChatRole; content: string };
+
+function isChatMessage(row: unknown): row is ChatMessage {
+  if (!row || typeof row !== 'object') return false;
+  const r = row as Record<string, unknown>;
+  const role = r.role;
+  const content = r.content;
+  if (role !== 'user' && role !== 'assistant' && role !== 'system') return false;
+  return typeof content === 'string' && content.length > 0;
+}
+
+function errMessage(error: unknown): string {
+  if (error instanceof Error) return error.message;
+  return String(error);
+}
+
 export async function POST(req: NextRequest) {
+  const apiKey = process.env.OLLAMA_API_KEY?.trim();
+  if (!apiKey) {
+    return NextResponse.json(
+      { error: 'Chat is not configured (missing OLLAMA_API_KEY on the server).' },
+      { status: 503 },
+    );
+  }
+
+  const model =
+    process.env.OLLAMA_CHAT_MODEL?.trim() || 'qwen3-coder:480b-cloud';
+
   try {
-    const { messages } = await req.json();
+    const body: unknown = await req.json();
+    const rawMessages = (body as { messages?: unknown }).messages;
+    if (!Array.isArray(rawMessages)) {
+      return NextResponse.json({ error: 'Expected { messages: [...] }' }, { status: 400 });
+    }
+
+    const messages = rawMessages
+      .filter(isChatMessage)
+      .filter((m) => m.role === 'user' || m.role === 'assistant')
+      .map((m) => ({
+        role: m.role,
+        content: m.content,
+      }));
+
+    if (!messages.length) {
+      return NextResponse.json({ error: 'No valid messages to send.' }, { status: 400 });
+    }
 
     const response = await fetch('https://ollama.com/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${process.env.OLLAMA_API_KEY}`,
+        Authorization: `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'qwen3-coder:480b-cloud',
-        messages: [
-          { role: 'system', content: SITE_CONTEXT },
-          ...messages,
-        ],
+        model,
+        messages: [{ role: 'system' as const, content: SITE_CONTEXT }, ...messages],
         max_tokens: 500,
         temperature: 0.7,
       }),
     });
 
-    const data = await response.json();
+    const data: unknown = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.error?.message || 'Ollama API error');
+      const msg =
+        typeof data === 'object' &&
+        data !== null &&
+        'error' in data &&
+        typeof (data as { error?: { message?: string } }).error?.message === 'string'
+          ? (data as { error: { message: string } }).error.message
+          : `Ollama API error (${response.status})`;
+      throw new Error(msg);
     }
 
-    return NextResponse.json({
-      message: data.choices[0].message.content,
-    });
+    const choices = (data as { choices?: { message?: { content?: string } }[] }).choices;
+    const content = choices?.[0]?.message?.content;
+    if (typeof content !== 'string' || !content.trim()) {
+      throw new Error('Empty response from assistant.');
+    }
 
-  } catch (error: any) {
-    return NextResponse.json(
-      { error: error.message || 'Something went wrong' },
-      { status: 500 }
-    );
+    return NextResponse.json({ message: content });
+  } catch (error: unknown) {
+    return NextResponse.json({ error: errMessage(error) || 'Something went wrong' }, { status: 500 });
   }
 }

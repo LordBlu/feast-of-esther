@@ -1,5 +1,12 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## Feast of Esther — North America
+
+- **Run locally:** `npm run dev` → [http://localhost:3000](http://localhost:3000)
+- **Content:** JSON-backed CMS in `data/cms-data.json` (events, popup, imagery, about, social, registrations, **`pageContent`** for per-route marketing copy). **Admin:** `/admin` (set `ADMIN_DASHBOARD_PASSWORD` / token in `.env` per your setup).
+- **Hadassah (AI chat):** Requires **`OLLAMA_API_KEY`** on the server (e.g. Vercel). Optional **`OLLAMA_CHAT_MODEL`** — defaults to `qwen3-coder:480b-cloud` for Ollama Cloud’s OpenAI-compatible API (`POST /api/hadassah`).
+- **Agent / maintainer notes:** See **`FUTURE_NOTES.md`** (routes, CMS, deployment caveats, `tsc` vs `.next/types`).
+
 ## Getting Started
 
 First, run the development server:

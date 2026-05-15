@@ -29,6 +29,22 @@
   box-shadow: 0 1px 0 rgba(0, 0, 0, 0.06);
 }
 
+.cellButton {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: none;
+  cursor: zoom-in;
+  text-align: inherit;
+  font: inherit;
+  color: inherit;
+}
+
+.cellButton:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 3px;
+}
+
 .cell img {
   display: block;
   width: 100%;

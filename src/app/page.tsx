@@ -4,7 +4,8 @@ import Link from 'next/link';
 import { useState, useEffect, useMemo } from 'react';
 import { SiteImages } from '@/lib/cms-types';
 import FlipClockCountdown from '@/components/FlipClockCountdown';
-import { EVENT_HIGHLIGHTS, HERO_CLOUDINARY_SLIDES, HOME_COPY, SITE } from '@/lib/site-content';
+import HomeReserveStay from '@/components/HomeReserveStay';
+import { HERO_CLOUDINARY_SLIDES, HOME_COPY, SITE } from '@/lib/site-content';
 
 /* ── Scroll-reveal hook ── */
 function useReveal() {
@@ -105,15 +106,19 @@ export default function Home() {
         style={{ backgroundColor: 'var(--primary-dark)' }}
       >
         {heroSlides.length > 0 && (
-          <div className="hero-track absolute inset-0 z-0" style={{ transform: `translateX(-${activeSlideIndex * 100}%)` }}>
+          <div className="hero-carousel absolute inset-0 z-0" aria-hidden>
             {heroSlides.map((imageUrl, idx) => (
-              <img
+              <div
                 key={`${imageUrl}-${idx}`}
-                src={imageUrl}
-                alt=""
-                aria-hidden
-                className="hero-slide"
-              />
+                className={`hero-slide-frame ${idx === activeSlideIndex ? 'is-active' : ''}`}
+              >
+                <img
+                  src={imageUrl}
+                  alt=""
+                  className={`hero-slide-img ${idx % 2 === 1 ? 'hero-slide-img--alt' : ''}`}
+                  decoding={idx === activeSlideIndex ? 'sync' : 'async'}
+                />
+              </div>
             ))}
           </div>
         )}
@@ -140,7 +145,7 @@ export default function Home() {
           >
             <Link
               href="/registration"
-              className="btn-primary"
+              className="btn-primary home-hero-cta"
               style={{
                 backgroundColor: '#fff',
                 borderColor: '#fff',
@@ -150,47 +155,41 @@ export default function Home() {
             >
               Register Now
             </Link>
-            <Link href="/donate" className="btn-outline btn-outline-light">
+            <Link href="/donate" className="btn-outline btn-outline-light home-hero-cta">
               Donate
             </Link>
           </div>
         </div>
       </section>
 
-      <section className="bg-white pt-0 pb-8 md:pb-10">
+      <section className="home-forumVideoStrip bg-white">
         <div className="foe-shell">
-          <h2 className="sr-only">2 Kings 13:20-21</h2>
-          <div className="home-forumVerseSpacer reveal" aria-hidden />
-          <p className="home-forumSubtitle reveal">
-            “A forum where women in ministry learn to accomplish their calling, stand in the gap, and impact the church for revival in the nation.”
-          </p>
+          <h2 className="sr-only">Mission statement and experience video</h2>
+          <div className="home-forumVideoGrid reveal">
+            <p className="home-forumSubtitle">&ldquo;{HOME_COPY.mission}&rdquo;</p>
+            <div className="home-forumVideoWrap">
+              <iframe
+                src={homeVideoSrc}
+                title="Feast of Esther Experience"
+                frameBorder="0"
+                referrerPolicy="strict-origin-when-cross-origin"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+              />
+            </div>
+          </div>
         </div>
       </section>
 
-      <section className="video-spotlight">
-        <div className="video-container">
-          <iframe
-            src={homeVideoSrc}
-            title="Feast of Esther Experience"
-            frameBorder="0"
-            referrerPolicy="strict-origin-when-cross-origin"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            allowFullScreen
-          />
-        </div>
-      </section>
 
       {/* ══════════════════════════════════════
           PURPOSE + DISCOVER MISSION
           ══════════════════════════════════════ */}
-      <section className="home-purposeSection bg-white py-16 md:py-20">
+      <section className="home-purposeSection bg-white">
         <div className="foe-shell">
           <div className="home-purposeIntro reveal">
             <h2 className="home-purposeTitle">Our Purpose</h2>
-            <p className="home-purposeSubtitle">
-              There are always fresh ways to participate in what God is doing through Feast of Esther.
-              Explore key pathways below.
-            </p>
+            <p className="home-purposeSubtitle">{HOME_COPY.vision}</p>
           </div>
 
           <div className="home-ministryGrid">
@@ -232,75 +231,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ══════════════════════════════════════
-          OFFICIAL ACCOMMODATION
-          ══════════════════════════════════════ */}
-      <section className="home-hotelSection border-t border-[var(--blush-mid)] bg-[var(--cream)] py-14 md:py-18">
-        <div className="foe-shell">
-          <div className="home-hotelHeader text-center mb-10">
-            <p className="eyebrow reveal mb-3">Official Accommodation</p>
-            <h2
-              className="reveal mb-2 home-hotelTitle"
-              style={{ fontFamily: 'var(--font-display)', color: 'var(--primary-dark)' }}
-            >
-              Official Conference Hotel
-            </h2>
-            <p className="home-hotelSubtitle reveal">
-              Experience comfort and elegance at our designated hotel
-            </p>
-          </div>
-
-          <div className="home-hotelCard reveal grid grid-cols-1 lg:grid-cols-[1.05fr_1fr] overflow-hidden rounded-2xl border border-[var(--blush-mid)] bg-white shadow-sm">
-            <div className="relative min-h-[300px] lg:min-h-[430px]">
-              <img
-                src={managedImages.hotelRoomUrl || 'https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1778163272/Accom_x5ajjc.jpg'}
-                alt="Official hotel room"
-                className="fx-media fx-zoom-out-pan absolute inset-0 h-full w-full object-cover"
-              />
-            </div>
-
-            <div className="home-hotelContent px-6 py-7 md:px-8 md:py-9">
-              <h3 className="home-hotelName text-[#2c2f3a]" style={{ fontFamily: 'var(--font-display)' }}>
-                {SITE.venueName}
-              </h3>
-              <p className="home-hotelAddress mt-3 text-[#b39b45]">{SITE.venueAddress}</p>
-              <p className="home-hotelBody mt-5 max-w-xl leading-relaxed text-gray-600">{HOME_COPY.accommodationLead}</p>
-              <div className="home-hotelActions mt-7 flex flex-wrap gap-3">
-                <Link href={SITE.hotelBookingUrl} target="_blank" rel="noreferrer" className="btn-primary home-hotelPrimaryBtn">
-                  Book Your Stay →
-                </Link>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-
-      <section className="home-container bg-[var(--cream)]">
-        <header className="banner-section reveal">
-          <span className="calendar-tag">Mark Your Calendar</span>
-          <h1 className="main-title">Feast of Esther 2026</h1>
-          <p className="event-details">
-            <strong>Feast of Esther 2026. Date: {SITE.dateRange}.</strong>
-            <br />
-            Venue: {SITE.venueName}, {SITE.venueAddress}
-          </p>
-        </header>
-
-        <div className="pillar-grid reveal">
-          {EVENT_HIGHLIGHTS.map((item) => (
-            <div className="pillar-card" key={item.title}>
-              <h3>{item.title}</h3>
-              <p>{item.desc}</p>
-            </div>
-          ))}
-        </div>
-
-        <Link href="/registration" className="register-now-btn reveal">
-          Register Now
-        </Link>
-
-      </section>
+      <HomeReserveStay hotelRoomUrl={managedImages.hotelRoomUrl} />
 
       {/* ══════════════════════════════════════
           COUNTDOWN TIMER (original)

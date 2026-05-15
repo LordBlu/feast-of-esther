@@ -2,15 +2,17 @@
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  gap: 10px 18px;
-  max-width: 1200px;
+  gap: 8px 24px;
+  width: 100%;
+  max-width: 80rem;
   margin: 0 auto;
 }
 
 .rightsReservedText {
   margin: 0;
   color: rgba(255, 255, 255, 0.72);
-  font-size: 0.78rem;
+  font-family: var(--font-body);
+  font-size: 0.75rem;
   line-height: 1.35;
   text-align: left;
 }
@@ -18,48 +20,46 @@
 .socialRow {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 10px;
   justify-content: center;
 }
 
 .socialLink {
   display: inline-flex;
-  height: 42px;
-  width: 42px;
+  height: 36px;
+  width: 36px;
   align-items: center;
   justify-content: center;
   border-radius: 999px;
-  background: #15171c;
-  color: #6b7280;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.55);
   text-decoration: none;
   transition:
-    color 0.3s ease,
-    transform 0.25s ease,
-    background 0.25s ease;
+    color 0.25s ease,
+    transform 0.2s ease;
 }
 
 .socialLink:hover {
   color: #fff;
-  transform: translateX(8px);
-  background: #111;
+  transform: translateY(-1px);
 }
 
 .socialLink:focus-visible {
   outline: 2px solid rgba(255, 255, 255, 0.55);
   outline-offset: 3px;
   color: #fff;
-  background: #111;
 }
 
 .socialLink svg {
-  width: 18px;
-  height: 18px;
+  width: 17px;
+  height: 17px;
 }
 
 .copyrightText {
   margin: 0;
   color: rgba(255, 255, 255, 0.72);
-  font-size: 0.78rem;
+  font-family: var(--font-body);
+  font-size: 0.75rem;
   line-height: 1.35;
   text-align: right;
 }
@@ -69,10 +69,13 @@
     grid-template-columns: 1fr;
     justify-items: center;
     text-align: center;
+    gap: 12px;
   }
+
   .socialRow {
     justify-content: center;
   }
+
   .rightsReservedText,
   .copyrightText {
     width: 100%;

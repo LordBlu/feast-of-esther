@@ -22,32 +22,32 @@ const defaultCountdown: SiteCountdownSettings = {
 const defaultLeadershipProfiles: LeadershipProfile[] = [
   {
     name: 'Pastor Mrs. Grace Okonrende',
-    role: 'Country Coordinator Feast of Esther USA',
+    role: 'Country Coordinator Feast of Esther USA · Continental Evangelist RCCG America',
     imageUrl:
-      'https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1778084218/founder_m47pqn.jpg',
+      'https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1777761734/20260219_131617_ocrby8.jpg',
     blurb:
-      'Continental Evangelist RCCG America and a seasoned ministry leader with global impact across evangelism, revival, and women mentorship.',
+      'Pastor Grace Okonrende is a dynamic evangelist and Deliverance Minister; she and her husband are gifted marriage counselors, serving the Lord from her youthful days.\n\nShe pioneered churches in Nigeria and the UK, took RCCG to Ireland, and established RCCG in Sacramento, Oakland, and Stockton, California. She co-pastors the Pavilion of Redemption in Sugar Land, Texas.',
   },
   {
-    name: 'Regional Leadership Team',
-    role: 'Chapter Leadership',
+    name: 'Pastor Mabel Odigie',
+    role: 'Chapter Coordinator — Richmond, Virginia',
+    imageUrl:
+      'https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1777761505/20250221_200317_el9dzk.jpg',
+    blurb: '',
+  },
+  {
+    name: 'Rev. Dr. Felicia Ajayi',
+    role: 'Maryland',
+    imageUrl:
+      'https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1777761510/20250221_200448_xfsekz.jpg',
+    blurb: '',
+  },
+  {
+    name: 'Dr. Banks',
+    role: 'Virginia Chapter',
     imageUrl:
       'https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1777761835/20260221_002014_nethgk.jpg',
-    blurb: 'Women across chapters serving with unity, grace, and conviction.',
-  },
-  {
-    name: 'Feast of Esther Fellowship',
-    role: 'Women in Ministry Network',
-    imageUrl:
-      'https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1777761813/20260220_131948_hjl3jz.jpg',
-    blurb: 'A faith-forward community building women for kingdom impact.',
-  },
-  {
-    name: 'Conference Leadership Circle',
-    role: 'Event and Care Team',
-    imageUrl:
-      'https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1777761762/20260219_223755_odcohd.jpg',
-    blurb: 'Supporting hospitality, prayer, and leadership formation at every gathering.',
+    blurb: '',
   },
 ];
 
@@ -66,7 +66,7 @@ const defaultAbout: AboutPageContent = {
   missionIntro:
     'A forum where women in ministry learn to accomplish their calling, stand in the gap, and impact the church for revival in the nation.',
   missionBody:
-    'We develop excellent ministry skills in women called to support and impact the church of God for nation building, helping them stand as pillars in the house of God.',
+    'To develop excellent Ministry Skills in women who are called to support and impact the church of God for nation building and stand as pillars in the house of God to accomplish great things for the kingdom.',
   leadershipEyebrow: 'Our Leadership',
   leadershipTitle: 'Leading with grace and conviction',
   leadershipProfiles: defaultLeadershipProfiles,
@@ -184,7 +184,21 @@ export async function readCmsData(): Promise<CmsData> {
   };
 }
 
-export async function writeCmsData(data: CmsData): Promise<void> {
+export type WriteCmsDataOptions = {
+  /** When false, skips undo history (public registration, version restore). Default true. */
+  recordHistory?: boolean;
+};
+
+export async function writeCmsData(data: CmsData, options?: WriteCmsDataOptions): Promise<void> {
+  if (options?.recordHistory !== false) {
+    try {
+      const current = await readCmsData();
+      const { recordUndoBeforeWrite } = await import('@/lib/cms-history');
+      await recordUndoBeforeWrite(current);
+    } catch {
+      /* history must not block saves */
+    }
+  }
   await ensureDataFile();
   await writeFile(dataFilePath, JSON.stringify(data, null, 2), 'utf8');
 }

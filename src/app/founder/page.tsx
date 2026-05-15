@@ -26,31 +26,29 @@ export default async function FounderPage() {
         Dockers-style pin: tall scroll track keeps the hero in view (sticky) while the user
         moves through this segment, then the rest of the page scrolls normally.
       */}
-      <div className="relative h-[120vh] w-full md:h-[112vh]">
+      <div className="founder-pin-track relative w-full">
         <div className="sticky top-0 z-0 h-screen w-full">
           <FounderHero backgroundSrc={heroBg} />
         </div>
       </div>
 
       <div className="relative z-10 bg-[#faf8fc]">
-        <div className="foe-shell py-14 md:py-20">
+        <div className="foe-shell founder-body">
           <div
             id="founder-story"
-            className="mx-auto mb-0 grid w-full max-w-6xl scroll-mt-28 gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:gap-10 lg:items-start"
+            className="founder-story mx-auto mb-0 grid w-full max-w-6xl scroll-mt-28 lg:grid-cols-[1.1fr_0.9fr] lg:items-start"
           >
-            <div className="mx-auto w-full max-w-3xl text-left text-[1.06rem] leading-[1.82] text-[#303845] md:text-[1.08rem]">
-              <div className="space-y-5 md:space-y-6">
-                <p>{storyP1}</p>
-                <p>{storyP2}</p>
-                <p>{storyP3}</p>
-              </div>
+            <div className="founder-story-copy mx-auto w-full max-w-3xl text-left text-[1.06rem] leading-[1.82] text-[#303845] md:text-[1.08rem]">
+              <p>{storyP1}</p>
+              <p>{storyP2}</p>
+              <p>{storyP3}</p>
             </div>
             <div className="flex w-full justify-center lg:justify-end">
               <FounderCarousel urls={slides} />
             </div>
           </div>
 
-          <div className="mx-auto mt-14 mb-[72px] w-full max-w-[1100px] px-[28px] md:mt-16 md:mb-[96px] md:px-[56px] lg:px-[72px]">
+          <div className="founder-ministry-zone mx-auto w-full max-w-[1100px]">
             <FounderMinistryCards />
           </div>
         </div>

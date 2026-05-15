@@ -7,8 +7,12 @@ export default function AnnouncementBar() {
   const [visible, setVisible] = useState(true);
 
   useEffect(() => {
-    if (sessionStorage.getItem('foe-announcement-dismissed')) {
-      setVisible(false);
+    try {
+      if (sessionStorage.getItem('foe-announcement-dismissed')) {
+        queueMicrotask(() => setVisible(false));
+      }
+    } catch {
+      /* private / restricted storage */
     }
   }, []);
 

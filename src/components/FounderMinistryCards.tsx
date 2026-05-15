@@ -51,9 +51,9 @@ export default function FounderMinistryCards() {
   }, [prefersReducedMotion]);
 
   return (
-    <section className="grid gap-6 md:grid-cols-[240px_1fr] md:gap-10 md:pt-2">
+    <section className="mx-auto grid w-full max-w-4xl gap-6 md:grid-cols-[minmax(200px,240px)_1fr] md:gap-10 md:pt-2">
       <div className="p-1 md:p-0">
-        <ul className="flex flex-col gap-2">
+        <ul className="mx-auto flex w-full max-w-xs flex-col gap-2 md:max-w-none">
           {CARDS.map((card, idx) => {
             const active = idx === activeIndex;
             return (

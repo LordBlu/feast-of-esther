@@ -98,7 +98,7 @@ export default function SiteFooter() {
   const enabledLinks = socialLinks.filter((item) => item.enabled !== false && item.url?.trim());
 
   return (
-    <footer className="mt-auto bg-[#15171c] px-4 py-12 md:py-14">
+    <footer className="site-footer mt-auto bg-[#15171c] px-6 lg:px-10">
       <div className={styles.footerInline}>
         <p className={styles.rightsReservedText}>All rights reserved.</p>
         <div className={styles.socialRow} aria-label="Follow us">

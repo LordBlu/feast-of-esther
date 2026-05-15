@@ -54,7 +54,7 @@ export const HOME_COPY = {
   aboutBridge:
     'Feast of Esther North America is a branch of Feast of Esther Worldwide — a gathering for wives of General Overseers, Senior Pastors, Heads of Ministries, and Women Leaders: worship, fellowship, prayer, and renewal.',
   vision:
-    'To develop excellent ministry skills in women who are called to support and impact the church of God for nation building and stand as pillars in the house of God to accomplish great things for the kingdom.',
+    'To develop excellent Ministry Skills in women who are called to support and impact the church of God for nation building and stand as pillars in the house of God to accomplish great things for the kingdom.',
   mission:
     'A forum where women in ministry learn to accomplish their calling, stand in the gap, and impact the church for revival in the nation.',
   joinBlurb:

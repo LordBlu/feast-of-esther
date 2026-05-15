@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import GalleryBackUnderLogo from '@/components/GalleryBackUnderLogo';
+import GalleryPageBack from '@/components/GalleryPageBack';
 import GalleryImageGrid from '@/components/GalleryImageGrid';
 import { resolveGalleryItems } from '@/lib/gallery-data';
 import { readCmsData } from '@/lib/cms-store';
@@ -17,19 +17,17 @@ export default async function GalleryDetailPage({
 
   return (
     <div className="bg-white text-neutral-900">
-      <GalleryBackUnderLogo />
-      <header className="foe-shell pt-24 pb-12 text-center md:pt-32 md:pb-16">
-        <h1
-          className="mx-auto mb-8 max-w-4xl text-[clamp(2.5rem,8vw,4.5rem)] font-light leading-[1.05] tracking-tight"
-          style={{ fontFamily: 'var(--font-display)' }}
-        >
-          {item.title}
-        </h1>
-        <p className="mx-auto max-w-2xl text-base leading-relaxed text-neutral-600 md:text-lg">{item.description}</p>
+      <GalleryPageBack href="/gallery" />
+      <header className="gallery-page-header foe-shell">
+        <div className="gallery-page-header-inner">
+          <h1 className="gallery-page-title">{item.title}</h1>
+          <div className="gallery-page-rule" aria-hidden />
+          <p className="gallery-page-subtitle">{item.description}</p>
+        </div>
       </header>
 
       <section className="border-t border-neutral-200 bg-neutral-50 py-10 md:py-14">
-        <GalleryImageGrid images={item.images} title={item.title} />
+        <GalleryImageGrid images={item.images} title={item.title} year={item.year} slug={item.slug} />
       </section>
 
       <div className="foe-shell flex flex-col items-center gap-4 border-t border-neutral-200 py-16 md:flex-row md:justify-center md:py-20">

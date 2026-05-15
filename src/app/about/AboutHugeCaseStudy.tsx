@@ -1,13 +1,10 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import styles from './AboutHugeCaseStudy.module.css';
-import type { About2PageContent, AboutPageContent } from '@/lib/cms-types';
-import { CAROUSEL_IMAGES, CHAPTERS, type ChapterKey } from '@/lib/about-chapters';
-
-const LOGO_SRC =
-  'https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1778153398/foe_logo_mlmi16.jpg';
+import type { About2PageContent, AboutPageContent, LeadershipProfile } from '@/lib/cms-types';
+import { CHAPTERS, type ChapterKey } from '@/lib/about-chapters';
 
 const defaultAbout: AboutPageContent = {
   heroEyebrow: 'About',
@@ -29,10 +26,7 @@ const defaultAbout: AboutPageContent = {
   leadershipProfiles: [],
 };
 
-const VISUALS: Record<
-  'about' | 'our-journey' | 'who-we-are' | 'our-vision' | 'mission' | 'leadership' | 'outreach',
-  string
-> = {
+const VISUALS: Record<SectionId, string> = {
   about: 'https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1778152795/foe_group_2_q6pcp8.jpg',
   'our-journey':
     'https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1777761752/20260219_223539_aetz6w.jpg',
@@ -42,7 +36,8 @@ const VISUALS: Record<
     'https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1778153398/foe_logo_mlmi16.jpg',
   mission:
     'https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1777761505/20250221_200317_el9dzk.jpg',
-  leadership: CAROUSEL_IMAGES[0],
+  leadership:
+    'https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1777761734/20260219_131617_ocrby8.jpg',
   outreach:
     'https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1778132653/foe_Group_foto_twphtz.png',
 };
@@ -59,34 +54,37 @@ const SECTION_IDS = [
 
 type SectionId = (typeof SECTION_IDS)[number];
 
-const sectionNav: { id: SectionId; label: string }[] = [
-  { id: 'about', label: 'Intro' },
-  { id: 'our-journey', label: 'Journey' },
-  { id: 'who-we-are', label: 'Who we are' },
-  { id: 'our-vision', label: 'Vision' },
-  { id: 'mission', label: 'Mission' },
-  { id: 'leadership', label: 'Leadership' },
-  { id: 'outreach', label: 'Chapters' },
-];
-
 const FOCUS_ITEMS = [
   'Women in senior ministry and leadership across denominations.',
   'Fellowship, prayer, renewal, and equipping for kingdom impact.',
   'A sacred annual gathering rooted in Scripture and calling.',
 ];
 
+function sectionImagesFromAbout2(about2: About2PageContent): Record<SectionId, string> {
+  return {
+    about: about2.visualAbout?.trim() || VISUALS.about,
+    'our-journey': about2.visualOurJourney?.trim() || VISUALS['our-journey'],
+    'who-we-are': about2.visualWhoWeAre?.trim() || VISUALS['who-we-are'],
+    'our-vision': about2.visualOurVision?.trim() || VISUALS['our-vision'],
+    mission: about2.visualMission?.trim() || VISUALS.mission,
+    leadership: about2.visualLeadership?.trim() || VISUALS.leadership,
+    outreach: about2.visualOutreach?.trim() || VISUALS.outreach,
+  };
+}
+
 function VisualStack({
   activeSection,
-  carouselIndex,
+  sectionImages,
+  leadershipImage,
 }: {
   activeSection: SectionId;
-  carouselIndex: number;
+  sectionImages: Record<SectionId, string>;
+  leadershipImage: string;
 }) {
   return (
     <div className={styles.visualStack}>
       {SECTION_IDS.map((id) => {
-        const src =
-          id === 'leadership' ? CAROUSEL_IMAGES[carouselIndex % CAROUSEL_IMAGES.length] : VISUALS[id];
+        const src = id === 'leadership' ? leadershipImage : sectionImages[id];
         return (
           <figure key={id} className={`${styles.visualLayer} ${activeSection === id ? styles.active : ''}`}>
             <img src={src} alt="" role="presentation" decoding="async" />
@@ -97,20 +95,42 @@ function VisualStack({
   );
 }
 
+function LeaderBlurb({ text }: { text: string }) {
+  const parts = text.split(/\n\n+/).filter(Boolean);
+  if (!parts.length) return null;
+  return (
+    <>
+      {parts.map((paragraph) => (
+        <p key={paragraph} className={`${styles.body} ${styles.bodySpaced}`}>
+          {paragraph}
+        </p>
+      ))}
+    </>
+  );
+}
+
 export default function AboutHugeCaseStudy() {
   const [about, setAbout] = useState<AboutPageContent>(defaultAbout);
   const [about2, setAbout2] = useState<About2PageContent>({});
   const [activeSection, setActiveSection] = useState<SectionId>('about');
+  const [activeLeaderIndex, setActiveLeaderIndex] = useState(0);
   const [chapter, setChapter] = useState<ChapterKey>('Texas');
-  const [carouselIndex, setCarouselIndex] = useState(0);
 
-  useEffect(() => {
-    if (activeSection !== 'leadership') return;
-    const timer = window.setInterval(() => {
-      setCarouselIndex((prev) => (prev + 1) % CAROUSEL_IMAGES.length);
-    }, 5200);
-    return () => window.clearInterval(timer);
-  }, [activeSection]);
+  const sectionImages = useMemo(() => sectionImagesFromAbout2(about2), [about2]);
+
+  const leadershipProfiles = useMemo(() => {
+    const rows = about.leadershipProfiles?.filter((p) => p.name?.trim());
+    return rows?.length ? rows : [];
+  }, [about.leadershipProfiles]);
+
+  const featuredLeader = leadershipProfiles[0] ?? null;
+  const regionalLeaders = leadershipProfiles.slice(1, 4);
+
+  const leadershipImage = useMemo(() => {
+    const profile = leadershipProfiles[activeLeaderIndex];
+    const url = profile?.imageUrl?.trim();
+    return url || sectionImages.leadership;
+  }, [leadershipProfiles, activeLeaderIndex, sectionImages.leadership]);
 
   useEffect(() => {
     fetch('/api/site-config')
@@ -123,6 +143,9 @@ export default function AboutHugeCaseStudy() {
           storyParagraphs: Array.isArray(data.about.storyParagraphs)
             ? data.about.storyParagraphs.filter((s: unknown) => typeof s === 'string')
             : defaultAbout.storyParagraphs,
+          leadershipProfiles: Array.isArray(data.about.leadershipProfiles)
+            ? data.about.leadershipProfiles
+            : defaultAbout.leadershipProfiles,
         });
         if (data.pageContent?.about2 && typeof data.pageContent.about2 === 'object') {
           setAbout2({ ...data.pageContent.about2 });
@@ -151,6 +174,27 @@ export default function AboutHugeCaseStudy() {
     return () => observer.disconnect();
   }, []);
 
+  useEffect(() => {
+    if (!leadershipProfiles.length) return;
+    const blocks = document.querySelectorAll<HTMLElement>('[data-leader-profile]');
+    if (!blocks.length) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
+        if (!visible.length) return;
+        const idx = Number(visible[0].target.getAttribute('data-leader-profile'));
+        if (!Number.isNaN(idx)) setActiveLeaderIndex(idx);
+      },
+      { rootMargin: '-28% 0px -48% 0px', threshold: [0.12, 0.35, 0.55] },
+    );
+
+    blocks.forEach((block) => observer.observe(block));
+    return () => observer.disconnect();
+  }, [leadershipProfiles]);
+
   const locations = CHAPTERS[chapter];
   const overviewText = about.storyParagraphs.join(' ');
   const focusItems = [
@@ -158,7 +202,6 @@ export default function AboutHugeCaseStudy() {
     about2.focusItem2?.trim() || FOCUS_ITEMS[1],
     about2.focusItem3?.trim() || FOCUS_ITEMS[2],
   ];
-  const chromeTitle = about2.chromeTitle?.trim() || 'Woman-led ministry gathering — North America';
   const megaAccent =
     about2.megaAccent?.trim() ||
     '— A global gathering of women in ministry for worship, renewal, and structural impact.';
@@ -168,167 +211,161 @@ export default function AboutHugeCaseStudy() {
 
   return (
     <div className={styles.shell}>
-      {/* In-flow width so the right column clears the rail; `overflow-x-hidden` on <main> breaks sticky, so the rail is `position: fixed`. */}
       <div className={styles.railPlaceholder} aria-hidden />
       <aside className={styles.visualRail} aria-hidden>
-        <VisualStack activeSection={activeSection} carouselIndex={carouselIndex} />
+        <VisualStack
+          activeSection={activeSection}
+          sectionImages={sectionImages}
+          leadershipImage={leadershipImage}
+        />
       </aside>
 
       <div className={styles.mobileVisual} aria-hidden>
-        <VisualStack activeSection={activeSection} carouselIndex={carouselIndex} />
+        <VisualStack
+          activeSection={activeSection}
+          sectionImages={sectionImages}
+          leadershipImage={leadershipImage}
+        />
       </div>
 
       <div className={styles.mainRail}>
-        <header className={styles.chrome}>
-          <div className={styles.chromeLeft}>
-            <div className={styles.logoTile}>
-              <img src={LOGO_SRC} alt="" width={40} height={40} decoding="async" />
-            </div>
-            <p className={styles.chromeTitle}>{chromeTitle}</p>
-          </div>
-          <Link href="/" className={styles.chromeClose} aria-label="Close and return home">
-            <span>Close</span>
-            <span className={styles.closeIcon} aria-hidden>
-              ×
-            </span>
-          </Link>
-        </header>
-
         <div className={styles.scrollBody}>
-          <nav className={styles.sectionNav} aria-label="On this page">
-            {sectionNav.map((item) => (
-              <a
-                key={item.id}
-                href={`#${item.id}`}
-                className={`${styles.navLink} ${activeSection === item.id ? styles.navLinkActive : ''}`}
-              >
-                {item.label}
-              </a>
-            ))}
-          </nav>
-
           <section id="about" className={styles.section}>
-              <h1 className={styles.mega}>
-                {about.heroTitle}{' '}
-                <span className={styles.megaAccent}>{megaAccent}</span>
-              </h1>
+            <h1 className={styles.mega}>
+              {about.heroTitle} <span className={styles.megaAccent}>{megaAccent}</span>
+            </h1>
 
-              <div className={styles.dual}>
-                <div>
-                  <h2 className={styles.colHead}>Gathering focus —</h2>
-                  <ul className={styles.arrowList}>
-                    {focusItems.map((line, idx) => (
-                      <li key={idx}>{line}</li>
-                    ))}
-                  </ul>
-                </div>
-                <div>
-                  <h2 className={styles.colHead}>Overview —</h2>
-                  <p className={styles.body}>
-                    A divine gathering organized by Pastor (Mrs.) Folu Adeboye, wife of the General Overseer of the
-                    Redeemed Christian Church of God. {overviewText}
-                  </p>
-                </div>
+            <div className={styles.dual}>
+              <div>
+                <h2 className={styles.colHead}>Gathering focus —</h2>
+                <ul className={styles.arrowList}>
+                  {focusItems.map((line, idx) => (
+                    <li key={idx}>{line}</li>
+                  ))}
+                </ul>
               </div>
+              <div>
+                <h2 className={styles.colHead}>Overview —</h2>
+                <p className={styles.body}>
+                  A divine gathering organized by Pastor (Mrs.) Folu Adeboye, wife of the General Overseer of the
+                  Redeemed Christian Church of God. {overviewText}
+                </p>
+              </div>
+            </div>
 
-              <div className={styles.ctaBar}>
-                <p>{ctaBarText}</p>
-                <Link href="/registration" className={styles.ctaBtn}>
-                  Register ↗
-                </Link>
-              </div>
+            <div className={styles.ctaBar}>
+              <p>{ctaBarText}</p>
+              <Link href="/registration" className={styles.ctaBtn}>
+                Register ↗
+              </Link>
+            </div>
           </section>
 
           <section id="our-journey" className={styles.section}>
-              <p className={styles.sectionLabel}>Our Journey —</p>
-              <h2 className={styles.sectionTitle}>From one camp to many nations.</h2>
-              <div className={styles.twoColText}>
-                {about.storyParagraphs.map((paragraph) => (
-                  <p key={paragraph} className={`${styles.body} ${styles.bodySpaced}`}>
-                    {paragraph}
-                  </p>
-                ))}
-              </div>
+            <p className={styles.sectionLabel}>Our Journey —</p>
+            <h2 className={styles.sectionTitle}>From one camp to many nations.</h2>
+            <div className={styles.twoColText}>
+              {about.storyParagraphs.map((paragraph) => (
+                <p key={paragraph} className={`${styles.body} ${styles.bodySpaced}`}>
+                  {paragraph}
+                </p>
+              ))}
+            </div>
           </section>
 
           <section id="who-we-are" className={styles.section}>
-              <p className={styles.sectionLabel}>Who we are —</p>
-              <h2 className={styles.sectionTitle}>Leaders called to stand in the gap.</h2>
-              <div className={styles.dual}>
-                <div>
-                  <h2 className={styles.colHead}>Community —</h2>
-                  <ul className={styles.arrowList}>
-                    <li>General Overseers and heads of ministries.</li>
-                    <li>Wives of General Overseers, Prelates, and Archbishops.</li>
-                    <li>Women leaders across denominations.</li>
-                  </ul>
-                </div>
-                <div>
-                  <h2 className={styles.colHead}>Purpose —</h2>
-                  <p className={styles.body}>
-                    This sacred gathering creates space for fellowship, prayer, renewal, and growth—empowering women
-                    to stand in the gap for their churches, ministries, and nations.
-                  </p>
-                </div>
+            <p className={styles.sectionLabel}>Who we are —</p>
+            <h2 className={styles.sectionTitle}>Leaders called to stand in the gap.</h2>
+            <div className={styles.dual}>
+              <div>
+                <h2 className={styles.colHead}>Community —</h2>
+                <ul className={styles.arrowList}>
+                  <li>General Overseers and heads of ministries.</li>
+                  <li>Wives of General Overseers, Prelates, and Archbishops.</li>
+                  <li>Women leaders across denominations.</li>
+                </ul>
               </div>
+              <div>
+                <h2 className={styles.colHead}>Purpose —</h2>
+                <p className={styles.body}>
+                  This sacred gathering creates space for fellowship, prayer, renewal, and growth—empowering women to
+                  stand in the gap for their churches, ministries, and nations.
+                </p>
+              </div>
+            </div>
           </section>
 
           <section id="our-vision" className={styles.section}>
-              <p className={styles.sectionLabel}>Our Vision —</p>
-              <h2 className={styles.sectionTitle}>Pillars in God&apos;s house—equipped for what&apos;s next.</h2>
-              <p className={styles.body}>
-                We exist so that women in ministry are raised as pillars—globally equipped, united, and empowered for
-                spiritual leadership, ministry skills, and prophetic intercession.
-              </p>
-              <p className={styles.visionSub}>Beliefs —</p>
-              <p className={styles.body}>
-                To develop excellent ministry skills in women called to support and impact the church of God for nation
-                building.
-              </p>
-              <p className={styles.visionSub}>Values —</p>
-              <p className={styles.body}>
-                We empower women in ministry to stand as pillars in the house of God, equipping them for structural
-                impact in the church and in society.
-              </p>
+            <p className={styles.sectionLabel}>Our Vision —</p>
+            <h2 className={styles.sectionTitle}>Pillars in God&apos;s house—equipped for what&apos;s next.</h2>
+            <p className={styles.body}>
+              We exist so that women in ministry are raised as pillars—globally equipped, united, and empowered for
+              spiritual leadership, ministry skills, and prophetic intercession.
+            </p>
+            <p className={styles.visionSub}>Beliefs —</p>
+            <p className={styles.body}>
+              To develop excellent ministry skills in women called to support and impact the church of God for nation
+              building.
+            </p>
+            <p className={styles.visionSub}>Values —</p>
+            <p className={styles.body}>
+              We empower women in ministry to stand as pillars in the house of God, equipping them for structural
+              impact in the church and in society.
+            </p>
           </section>
 
           <section id="mission" className={styles.section}>
-              <p className={styles.sectionLabel}>Mission —</p>
-              <ul className={styles.arrowList}>
-                <li>Accomplish their divine calling in ministry.</li>
-                <li>Stand in the gap for churches, ministries and nations.</li>
-                <li>Build purposeful fellowship and spiritual connection.</li>
-                <li>Catalyze revival through effective church leadership.</li>
-                <li>Ensure the maximum harvest of souls for the kingdom.</li>
-              </ul>
+            <p className={styles.sectionLabel}>Mission —</p>
+            <ul className={styles.arrowList}>
+              <li>Accomplish their divine calling in ministry.</li>
+              <li>Stand in the gap for churches, ministries and nations.</li>
+              <li>Build purposeful fellowship and spiritual connection.</li>
+              <li>Catalyze revival through effective church leadership.</li>
+              <li>Ensure the maximum harvest of souls for the kingdom.</li>
+            </ul>
           </section>
 
           <section id="leadership" className={styles.section}>
-              <p className={styles.sectionLabel}>Leadership —</p>
-              <h2 className={styles.sectionTitle}>Pastor Mrs. Grace Okonrende</h2>
-              <div className={styles.pills}>
-                <span>Country Coordinator Feast of Esther USA</span>
-                <span>Continental Evangelist RCCG America</span>
+            <p className={styles.sectionLabel}>{about.leadershipEyebrow || 'Leadership'} —</p>
+            <h2 className={styles.sectionTitle}>{about.leadershipTitle || 'Our Leadership'}</h2>
+
+            {featuredLeader ? (
+              <article data-leader-profile={0} className={styles.leaderBlock}>
+                <h3 className={styles.leaderName}>{featuredLeader.name}</h3>
+                <div className={styles.pills}>
+                  <span>{featuredLeader.role}</span>
+                </div>
+                <LeaderBlurb text={featuredLeader.blurb?.trim() ?? ''} />
+              </article>
+            ) : null}
+
+            {regionalLeaders.length > 0 ? (
+              <div className={styles.leaderRow} role="list">
+                {regionalLeaders.map((profile: LeadershipProfile, idx) => {
+                  const profileIndex = idx + 1;
+                  const imageUrl = profile.imageUrl?.trim();
+                  return (
+                    <article
+                      key={`${profile.name}-${profileIndex}`}
+                      role="listitem"
+                      tabIndex={0}
+                      data-leader-profile={profileIndex}
+                      className={styles.leaderCard}
+                      onMouseEnter={() => setActiveLeaderIndex(profileIndex)}
+                      onFocus={() => setActiveLeaderIndex(profileIndex)}
+                    >
+                      <div className={styles.leaderAvatar}>
+                        {imageUrl ? (
+                          <img src={imageUrl} alt={profile.name} decoding="async" />
+                        ) : null}
+                      </div>
+                      <h3 className={styles.leaderCardName}>{profile.name}</h3>
+                      <p className={styles.leaderCardRole}>{profile.role}</p>
+                    </article>
+                  );
+                })}
               </div>
-              <p className={`${styles.body} ${styles.bodySpaced}`}>
-                Pastor Grace Okonrende is a dynamic evangelist and Deliverance Minister; she and her husband are
-                gifted marriage counselors, serving the Lord from her youthful days.
-              </p>
-              <p className={`${styles.body} ${styles.bodySpaced}`}>
-                She pioneered churches in Nigeria and the UK, took RCCG to Ireland, and established RCCG in Sacramento,
-                Oakland, and Stockton, California. She co-pastors the Pavilion of Redemption in Sugar Land, Texas.
-              </p>
-              <div className={styles.dots}>
-                {CAROUSEL_IMAGES.map((img, idx) => (
-                  <button
-                    type="button"
-                    key={img}
-                    aria-label={`Leadership photo ${idx + 1}`}
-                    className={idx === carouselIndex ? styles.dotActive : styles.dot}
-                    onClick={() => setCarouselIndex(idx)}
-                  />
-                ))}
-              </div>
+            ) : null}
           </section>
 
           <section id="outreach" className={styles.section}>

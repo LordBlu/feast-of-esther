@@ -1,6 +1,11 @@
+'use client';
+
 import Link from 'next/link';
 import type { GalleryItem } from '@/lib/gallery-data';
 import styles from './GalleryMosaic.module.css';
+
+const DEFAULT_GALLERY_SUBTITLE =
+  'Stories of worship, prayer, and renewal from our gatherings—open a collection to see how God has moved among women in ministry.';
 
 interface GalleryVerticalFeedProps {
   items: GalleryItem[];
@@ -8,80 +13,54 @@ interface GalleryVerticalFeedProps {
   pageSubtitle?: string;
 }
 
-type Frame = {
-  key: string;
-  src: string;
-  title: string;
-  year: string;
-  slug: string;
-  size: 'large' | 'tall' | 'wide' | 'standard';
-};
+const sizePattern = ['large', 'tall', 'wide', 'standard', 'tall', 'wide'] as const;
 
-/**
- * Detroit-inspired gallery wall:
- * - Tight masonry grid
- * - Mixed image heights
- * - Minimal typography
- */
 export default function GalleryVerticalFeed({
   items,
-  pageTitle = 'Moments From the Feast',
-  pageSubtitle = 'A curated wall of moments. Open any frame to view the full collection story.',
+  pageTitle,
+  pageSubtitle,
 }: GalleryVerticalFeedProps) {
-  const sizePattern: Frame['size'][] = ['large', 'tall', 'wide', 'standard', 'tall', 'wide'];
-  const frames: Frame[] = items.flatMap((item) =>
-    item.images.slice(0, 5).map((src, index) => ({
-      key: `${item.slug}-${index}`,
-      src,
-      title: item.title,
-      year: item.year,
-      slug: item.slug,
-      size: sizePattern[(index + item.slug.length) % sizePattern.length],
-    })),
-  );
+  const title = pageTitle?.trim() || 'Moments From the Feast';
+  const subtitle = pageSubtitle?.trim() || DEFAULT_GALLERY_SUBTITLE;
 
   return (
     <div className="bg-white text-neutral-900">
-      <header className="foe-shell pt-24 pb-12 text-center md:pt-32 md:pb-16">
-        <div className="mx-auto max-w-4xl">
-          <h1
-            className="text-[clamp(2.65rem,8vw,5.1rem)] font-light leading-[1.02] tracking-tight text-[var(--primary-dark)]"
-            style={{ fontFamily: 'var(--font-display)' }}
-          >
-            {pageTitle}
-          </h1>
-          <div
-            className="mt-4 h-px w-32"
-            style={{ background: 'linear-gradient(90deg, var(--gold), rgba(201,168,76,0.1))' }}
-            aria-hidden
-          />
-          <p className="mx-auto mt-5 max-w-2xl text-sm leading-relaxed text-neutral-600 md:text-base">
-            {pageSubtitle}
-          </p>
+      <header className="gallery-page-header gallery-page-header--index foe-shell">
+        <div className="gallery-page-header-inner">
+          <h1 className="gallery-page-title">{title}</h1>
+          <div className="gallery-page-rule" aria-hidden />
+          <p className="gallery-page-subtitle gallery-page-subtitle--index">{subtitle}</p>
         </div>
       </header>
 
       <section className="foe-shell pb-20 md:pb-28">
         <div className={styles.mosaicContainer}>
-          {frames.map((frame, index) => (
-            <Link
-              key={frame.key}
-              href={`/gallery/${frame.slug}`}
-              className={`${styles.mosaicItem} ${styles[frame.size]}`}
-            >
-              <img
-                src={frame.src}
-                alt={`${frame.title} — image`}
-                className={styles.mosaicImage}
-                loading={index < 8 ? 'eager' : 'lazy'}
-                decoding="async"
-              />
-              <div className={styles.overlay}>
-                <span className={styles.overlayTitle}>{frame.title}</span>
-                <span className={styles.overlaySub}>{frame.year} Collection</span>
-              </div>
-            </Link>
-          ))}
+          {items.map((item, index) => {
+            const size = sizePattern[index % sizePattern.length];
+            const cover = item.coverImage || item.images[0];
+            if (!cover) return null;
+
+            return (
+              <Link
+                key={item.slug}
+                href={`/gallery/${item.slug}`}
+                className={`${styles.mosaicItem} ${styles.mosaicItemLink} ${styles[size]}`}
+                aria-label={`Open collection: ${item.title}`}
+              >
+                <img
+                  src={cover}
+                  alt={item.title}
+                  className={styles.mosaicImage}
+                  loading={index < 6 ? 'eager' : 'lazy'}
+                  decoding="async"
+                />
+                <div className={styles.overlay}>
+                  <span className={styles.overlayTitle}>{item.title}</span>
+                  <span className={styles.overlaySub}>{item.year} Collection</span>
+                </div>
+              </Link>
+            );
+          })}
         </div>
       </section>
     </div>

@@ -1,89 +1,237 @@
 .mosaicContainer {
+
   display: grid;
+
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+
   grid-auto-rows: 190px;
+
   grid-auto-flow: dense;
+
   gap: 14px;
+
 }
+
+
 
 .mosaicItem {
+
   position: relative;
+
   display: block;
+
   overflow: hidden;
+
   background: #f3f4f6;
+
 }
+
+
+
+.mosaicItemButton {
+
+  width: 100%;
+
+  height: 100%;
+
+  padding: 0;
+
+  border: none;
+
+  cursor: zoom-in;
+
+  text-align: inherit;
+
+  font: inherit;
+
+  color: inherit;
+
+}
+
+
+
+.mosaicItemButton:focus-visible {
+
+  outline: 2px solid var(--primary);
+
+  outline-offset: 3px;
+
+}
+
+
+
+.mosaicItemLink {
+
+  width: 100%;
+
+  height: 100%;
+
+  text-decoration: none;
+
+  color: inherit;
+
+  cursor: pointer;
+
+}
+
+
+
+.mosaicItemLink:focus-visible {
+
+  outline: 2px solid var(--primary);
+
+  outline-offset: 3px;
+
+}
+
+
 
 .tall {
+
   grid-row: span 2;
+
 }
+
+
 
 .wide {
+
   grid-column: span 2;
+
 }
+
+
 
 .large {
+
   grid-column: span 2;
+
   grid-row: span 2;
+
 }
+
+
 
 .standard {
+
   grid-column: span 1;
+
   grid-row: span 1;
+
 }
+
+
 
 .mosaicImage {
+
   width: 100%;
+
   height: 100%;
+
   object-fit: cover;
+
   transition: transform 0.5s ease;
+
 }
+
+
 
 .mosaicItem:hover .mosaicImage {
+
   transform: scale(1.05);
+
 }
+
+
 
 .overlay {
+
   position: absolute;
+
   inset: 0;
+
   display: flex;
+
   flex-direction: column;
+
   justify-content: flex-end;
+
   padding: 18px;
+
   color: #fff;
+
   background: linear-gradient(to top, rgba(0, 0, 0, 0.68), rgba(0, 0, 0, 0.08) 45%, transparent 72%);
+
   opacity: 0;
+
   transition: opacity 0.3s ease;
+
   pointer-events: none;
+
 }
+
+
 
 .mosaicItem:hover .overlay {
+
   opacity: 1;
+
 }
+
+
 
 .overlayTitle {
+
   font-family: var(--font-display);
+
   font-size: clamp(1.45rem, 2.6vw, 2.2rem);
+
   line-height: 1.05;
+
 }
+
+
 
 .overlaySub {
+
   margin-top: 6px;
+
   font-family: var(--font-body);
+
   font-size: 0.68rem;
+
   text-transform: uppercase;
+
   letter-spacing: 0.2em;
+
   color: rgba(255, 255, 255, 0.85);
+
 }
+
+
 
 @media (max-width: 768px) {
+
   .mosaicContainer {
+
     grid-template-columns: 1fr 1fr;
+
     grid-auto-rows: 160px;
+
     gap: 10px;
+
   }
 
+
+
   .wide,
+
   .large {
+
     grid-column: span 2;
+
   }
+
 }
+
+
