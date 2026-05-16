@@ -2,6 +2,7 @@
 
 import { DragEvent, FormEvent, useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import AdminGuidePanel from '@/components/admin/AdminGuidePanel';
 import AdminVersionsPanel from '@/components/admin/AdminVersionsPanel';
 import {
   AboutPageContent,
@@ -27,6 +28,7 @@ const emptySitePageContents = (): SitePageContents => ({
   registration: {},
   founder: {},
   about2: {},
+  home: {},
 });
 
 const emptyEvent: Omit<SiteEvent, 'id' | 'createdAt' | 'updatedAt'> = {
@@ -192,6 +194,7 @@ function PopupTypoFields({
 export default function AdminDashboardPage() {
   const router = useRouter();
   const [tab, setTab] = useState<
+    | 'guide'
     | 'events'
     | 'countdown'
     | 'popup'
@@ -201,7 +204,7 @@ export default function AdminDashboardPage() {
     | 'pages'
     | 'registrations'
     | 'versions'
-  >('events');
+  >('guide');
   const [events, setEvents] = useState<SiteEvent[]>([]);
   const [eventFilter, setEventFilter] = useState<'all' | EventStatus>('all');
   const [eventForm, setEventForm] = useState(emptyEvent);
@@ -286,6 +289,7 @@ export default function AdminDashboardPage() {
       },
       founder: { ...emptySitePageContents().founder, ...(pagesData.pageContent?.founder ?? {}) },
       about2: { ...emptySitePageContents().about2, ...(pagesData.pageContent?.about2 ?? {}) },
+      home: { ...emptySitePageContents().home, ...(pagesData.pageContent?.home ?? {}) },
     });
   }, [router]);
 
@@ -512,6 +516,7 @@ export default function AdminDashboardPage() {
       registration: { ...emptySitePageContents().registration, ...next.registration },
       founder: { ...emptySitePageContents().founder, ...next.founder },
       about2: { ...emptySitePageContents().about2, ...next.about2 },
+      home: { ...emptySitePageContents().home, ...next.home },
     });
     setMessage('Site page copy saved.');
   }
@@ -593,7 +598,7 @@ export default function AdminDashboardPage() {
             </p>
             <h1 className="admin-title">Feast of Esther</h1>
             <p className="admin-sub">
-              Curate events, imagery, and the welcome popup — all in one calm, editorial workspace.
+              Curate events, imagery, and the welcome popup. New here? Open the <strong>Guide</strong> tab first.
             </p>
           </div>
           <button type="button" onClick={logout} className="admin-btn-ghost shrink-0">
@@ -603,7 +608,18 @@ export default function AdminDashboardPage() {
 
         <nav className="admin-tabs" aria-label="Dashboard sections">
           {(
-            ['events', 'countdown', 'popup', 'images', 'social', 'about', 'pages', 'registrations', 'versions'] as const
+            [
+              'guide',
+              'events',
+              'countdown',
+              'popup',
+              'images',
+              'social',
+              'about',
+              'pages',
+              'registrations',
+              'versions',
+            ] as const
           ).map((key) => (
             <button
               key={key}
@@ -611,6 +627,7 @@ export default function AdminDashboardPage() {
               onClick={() => setTab(key)}
               className={`admin-tab ${tab === key ? 'admin-tab-active' : ''}`}
             >
+              {key === 'guide' && 'Guide'}
               {key === 'events' && 'Events'}
               {key === 'countdown' && 'Countdown'}
               {key === 'popup' && 'Popup'}
@@ -625,6 +642,8 @@ export default function AdminDashboardPage() {
         </nav>
 
         {message ? <div className="admin-toast">{message}</div> : null}
+
+        {tab === 'guide' ? <AdminGuidePanel /> : null}
 
         {tab === 'events' ? (
           <div className="grid gap-8 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">

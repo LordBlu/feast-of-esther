@@ -18,6 +18,10 @@ export const SITE = {
     'https://app.marriott.com/reslink?id=1775501475543&key=GRP&app=resvlink',
 } as const;
 
+/** Navbar / watermark logo (Cloudinary). */
+export const SITE_LOGO_URL =
+  'https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1778153398/foe_logo_mlmi16.jpg';
+
 /** Hero background rotation — Cloudinary (q_auto / f_auto). */
 export const HERO_CLOUDINARY_SLIDES = [
   'https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1777728541/20250220_221435_szxzfr.jpg',

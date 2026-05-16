@@ -43,12 +43,12 @@ export default async function FounderPage() {
               <p>{storyP2}</p>
               <p>{storyP3}</p>
             </div>
-            <div className="flex w-full justify-center lg:justify-end">
+            <div className="flex w-full justify-center">
               <FounderCarousel urls={slides} />
             </div>
           </div>
 
-          <div className="founder-ministry-zone mx-auto w-full max-w-[1100px]">
+          <div className="founder-ministry-zone mx-auto w-full max-w-6xl">
             <FounderMinistryCards />
           </div>
         </div>

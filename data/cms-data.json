@@ -12,7 +12,8 @@
       "imageUrl": "https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1778244638/Save_thedate_mkpbnu.jpg",
       "status": "published",
       "createdAt": "2026-04-29T21:35:00.000Z",
-      "updatedAt": "2026-04-29T21:35:00.000Z"
+      "updatedAt": "2026-04-29T21:35:00.000Z",
+      "category": "upcoming"
     },
     {
       "id": "event-foe-2025",
@@ -35,15 +36,24 @@
     "title": "\"...the anointing that endures\"",
     "scripture": "2 Kings 13:20-21",
     "body": "Feast of Esther 2026 is now open for registration. Reserve your seat and join us for an unforgettable encounter.",
+    "bodyFooter": "Seats are limited — secure your place today.",
     "ctaLabel": "Register Now",
     "ctaUrl": "/registration",
-    "imageUrl": "https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1778244638/Save_thedate_mkpbnu.jpg"
+    "imageUrl": "https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1778244638/Save_thedate_mkpbnu.jpg",
+    "rightKicker": "Upcoming Event",
+    "leftEyebrow": "Save the Date",
+    "leftSubtitle": "",
+    "leftFootline": "North America",
+    "leftShowLogo": true
   },
   "images": {
     "heroPosterUrl": "/generated/hero-poster.svg",
     "homeVideoEmbedUrl": "https://www.youtube.com/embed/UVRoPXdUSC8?si=C8U1Ia-5ceios_e1",
     "founderImageUrl": "/generated/founder-placeholder.svg",
-    "popupImageUrl": "https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1778244638/Save_thedate_mkpbnu.jpg"
+    "popupImageUrl": "https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1778244638/Save_thedate_mkpbnu.jpg",
+    "hotelRoomUrl": "",
+    "founderCarouselUrls": [],
+    "galleryCollections": []
   },
   "registrations": [],
   "countdown": {
@@ -92,5 +102,61 @@
         "blurb": ""
       }
     ]
+  },
+  "socialLinks": [
+    {
+      "id": "linkedin",
+      "label": "LinkedIn",
+      "url": "https://linkedin.com",
+      "enabled": true
+    },
+    {
+      "id": "facebook",
+      "label": "Facebook",
+      "url": "https://facebook.com",
+      "enabled": true
+    },
+    {
+      "id": "instagram",
+      "label": "Instagram",
+      "url": "https://instagram.com",
+      "enabled": true
+    },
+    {
+      "id": "x",
+      "label": "X (Twitter)",
+      "url": "https://x.com",
+      "enabled": true
+    },
+    {
+      "id": "youtube",
+      "label": "YouTube",
+      "url": "https://youtube.com",
+      "enabled": true
+    },
+    {
+      "id": "tiktok",
+      "label": "TikTok",
+      "url": "https://tiktok.com",
+      "enabled": true
+    },
+    {
+      "id": "whatsapp",
+      "label": "WhatsApp",
+      "url": "https://wa.me/18323720860",
+      "enabled": true
+    }
+  ],
+  "pageContent": {
+    "gallery": {
+      "pageTitle": "Memories From The Feast",
+      "pageSubtitle": ""
+    },
+    "events": {},
+    "contact": {},
+    "donate": {},
+    "registration": {},
+    "founder": {},
+    "about2": {}
   }
 }

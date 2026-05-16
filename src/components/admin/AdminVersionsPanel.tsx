@@ -34,7 +34,15 @@ export default function AdminVersionsPanel({ onReload, onMessage }: AdminVersion
   }, []);
 
   useEffect(() => {
-    void loadSummary();
+    let cancelled = false;
+    const id = window.setTimeout(() => {
+      if (cancelled) return;
+      void loadSummary();
+    }, 0);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(id);
+    };
   }, [loadSummary]);
 
   async function runAction(

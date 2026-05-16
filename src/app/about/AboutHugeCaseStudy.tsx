@@ -17,7 +17,7 @@ const defaultAbout: AboutPageContent = {
     'Since its inception in February 2002, this gathering has grown from the Redemption Camp Nigeria to reaching across Africa and Europe, impacting the lives of women in ministry.',
   ],
   missionEyebrow: 'Mission',
-  missionTitle: 'Our mission',
+  missionTitle: 'Our Mission',
   missionIntro: 'To create a forum where female ministry leaders learn to:',
   missionBody:
     'A divine gathering of women in ministry, organized by Pastor (Mrs.) Folu Adeboye, wife of the General Overseer of the Redeemed Christian Church of God.',
@@ -316,6 +316,7 @@ export default function AboutHugeCaseStudy() {
 
           <section id="mission" className={styles.section}>
             <p className={styles.sectionLabel}>Mission —</p>
+            <h2 className={styles.sectionTitle}>Our Mission</h2>
             <ul className={styles.arrowList}>
               <li>Accomplish their divine calling in ministry.</li>
               <li>Stand in the gap for churches, ministries and nations.</li>

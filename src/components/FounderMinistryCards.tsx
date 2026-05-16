@@ -1,6 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import styles from './FounderMinistryCards.module.css';
+
+const ROTATE_MS = 15_000;
 
 const CARDS = [
   {
@@ -41,87 +44,78 @@ function usePrefersReducedMotion() {
 export default function FounderMinistryCards() {
   const prefersReducedMotion = usePrefersReducedMotion();
   const [activeIndex, setActiveIndex] = useState(0);
+  const [progressKey, setProgressKey] = useState(0);
 
   useEffect(() => {
     if (prefersReducedMotion) return;
     const id = window.setInterval(() => {
       setActiveIndex((prev) => (prev + 1) % CARDS.length);
-    }, 5200);
+      setProgressKey((k) => k + 1);
+    }, ROTATE_MS);
     return () => window.clearInterval(id);
   }, [prefersReducedMotion]);
 
+  function selectTab(idx: number) {
+    setActiveIndex(idx);
+    setProgressKey((k) => k + 1);
+  }
+
   return (
-    <section className="mx-auto grid w-full max-w-4xl gap-6 md:grid-cols-[minmax(200px,240px)_1fr] md:gap-10 md:pt-2">
-      <div className="p-1 md:p-0">
-        <ul className="mx-auto flex w-full max-w-xs flex-col gap-2 md:max-w-none">
+    <section className={styles.section} aria-labelledby="founder-ministry-heading">
+      <header className={styles.header}>
+        <p className={styles.eyebrow}>Ministry</p>
+        <h2 id="founder-ministry-heading" className={styles.title}>
+          Her Ministry Worldwide
+        </h2>
+      </header>
+
+      <div className={styles.layout}>
+        <ul className={styles.tabList}>
           {CARDS.map((card, idx) => {
             const active = idx === activeIndex;
             return (
               <li key={card.title}>
                 <button
                   type="button"
-                  onClick={() => setActiveIndex(idx)}
-                  className="w-full rounded-none px-4 py-3 text-left transition-all md:px-5 md:py-3.5"
-                  style={{
-                    color: active ? '#fff' : '#6b7280',
-                    background: active ? 'var(--primary)' : 'transparent',
-                    border: active ? '1.5px solid var(--primary)' : '1.5px solid transparent',
-                    boxShadow: 'none',
-                  }}
+                  onClick={() => selectTab(idx)}
+                  className={`${styles.tabBtn} ${active ? styles.tabActive : ''}`}
                   aria-pressed={active}
                 >
-                  <span
-                    className="block text-[1.24rem] leading-tight md:text-[1.34rem]"
-                    style={{ fontFamily: 'var(--font-display)' }}
-                  >
-                    {card.title}
-                  </span>
+                  <span className={styles.tabLabel}>{card.title}</span>
+                  {active && !prefersReducedMotion ? (
+                    <span key={progressKey} className={styles.tabProgress} aria-hidden />
+                  ) : null}
                 </button>
               </li>
             );
           })}
         </ul>
-      </div>
 
-      <div className="relative min-h-[330px] overflow-hidden rounded-2xl bg-white/75 shadow-[0_12px_36px_rgba(106,15,53,0.09)] md:min-h-[360px]">
-        {CARDS.map((card, idx) => {
-          const active = idx === activeIndex;
-          return (
-            <article
-              key={card.title}
-              className={`absolute inset-0 transition-opacity duration-700 ${
-                active ? 'opacity-100' : 'pointer-events-none opacity-0'
-              }`}
-              aria-hidden={!active}
-            >
-              <div
-                className="absolute inset-0 bg-cover bg-center"
-                style={{ backgroundImage: `url(${card.image})`, opacity: 0.11 }}
-                aria-hidden
-              />
-              <div className="relative z-[1] flex h-full flex-col justify-center p-7 md:p-10">
-                <p className="mb-3 text-left text-[12px] font-semibold uppercase tracking-[0.24em] text-[var(--primary)]">
-                  Ministry Focus
-                </p>
-                <h2
-                  className="mb-4 text-left text-[clamp(2rem,3vw,2.6rem)]"
-                  style={{
-                    fontFamily: 'var(--font-display)',
-                    color: 'var(--primary-dark)',
-                    fontStyle: 'italic',
-                    lineHeight: 1.1,
-                  }}
-                >
-                  {card.title}
-                </h2>
-                <div className="mb-6 h-px w-14 bg-[var(--gold)]" />
-                <p className="max-w-3xl whitespace-pre-line text-left text-[15px] leading-relaxed text-gray-700 md:text-[17px] md:leading-[1.7]">
-                  {card.text}
-                </p>
-              </div>
-            </article>
-          );
-        })}
+        <div className={styles.panel}>
+          {CARDS.map((card, idx) => {
+            const active = idx === activeIndex;
+            return (
+              <article
+                key={card.title}
+                className={`${styles.slide} ${active ? styles.slideActive : ''}`}
+                aria-hidden={!active}
+              >
+                <div
+                  className={styles.slideBg}
+                  style={{ backgroundImage: `url(${card.image})` }}
+                  aria-hidden
+                />
+                <div className={styles.slideVeil} aria-hidden />
+                <div className={styles.slideInner}>
+                  <p className={styles.kicker}>Ministry Focus</p>
+                  <h3 className={styles.slideTitle}>{card.title}</h3>
+                  <div className={styles.rule} aria-hidden />
+                  <p className={styles.slideCopy}>{card.text}</p>
+                </div>
+              </article>
+            );
+          })}
+        </div>
       </div>
     </section>
   );

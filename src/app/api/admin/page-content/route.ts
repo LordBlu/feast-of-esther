@@ -26,6 +26,7 @@ export async function PUT(request: NextRequest) {
     registration: { ...data.pageContent.registration, ...patch.registration },
     founder: { ...data.pageContent.founder, ...patch.founder },
     about2: { ...data.pageContent.about2, ...patch.about2 },
+    home: { ...data.pageContent.home, ...patch.home },
   };
   await writeCmsData(data);
   return NextResponse.json({ pageContent: data.pageContent });

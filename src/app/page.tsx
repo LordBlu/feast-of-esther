@@ -2,10 +2,13 @@
 
 import Link from 'next/link';
 import { useState, useEffect, useMemo } from 'react';
-import { SiteImages } from '@/lib/cms-types';
 import FlipClockCountdown from '@/components/FlipClockCountdown';
+import HomeReliveFeast from '@/components/HomeReliveFeast';
 import HomeReserveStay from '@/components/HomeReserveStay';
-import { HERO_CLOUDINARY_SLIDES, HOME_COPY, SITE } from '@/lib/site-content';
+import HomeTestimonialsMarquee from '@/components/HomeTestimonialsMarquee';
+import type { HomePageContent, SiteImages } from '@/lib/cms-types';
+import { resolveHomeTestimonials, resolveReliveFeastImages } from '@/lib/home-content';
+import { HERO_CLOUDINARY_SLIDES, HOME_COPY, SITE, SITE_LOGO_URL } from '@/lib/site-content';
 
 /* ── Scroll-reveal hook ── */
 function useReveal() {
@@ -67,14 +70,29 @@ function buildAutoplayEmbedUrl(rawUrl: string | undefined): string {
 export default function Home() {
   useReveal();
   const [managedImages, setManagedImages] = useState<SiteImages>({});
+  const [homeContent, setHomeContent] = useState<HomePageContent>({});
   const [activeSlideIndex, setActiveSlideIndex] = useState(0);
 
   useEffect(() => {
     fetch('/api/site-config')
       .then((res) => res.json())
-      .then((data) => setManagedImages(data.images ?? {}))
-      .catch(() => setManagedImages({}));
+      .then((data) => {
+        setManagedImages(data.images ?? {});
+        setHomeContent(data.pageContent?.home ?? {});
+      })
+      .catch(() => {
+        setManagedImages({});
+        setHomeContent({});
+      });
   }, []);
+
+  const reliveImages = useMemo(
+    () => resolveReliveFeastImages(homeContent, managedImages.galleryCollections),
+    [homeContent, managedImages.galleryCollections]
+  );
+  const testimonials = useMemo(() => resolveHomeTestimonials(homeContent), [homeContent]);
+  const showRelive = homeContent.showReliveFeast !== false;
+  const showTestimonials = homeContent.showTestimonials !== false;
 
   const heroSlides = useMemo(
     () =>
@@ -217,13 +235,22 @@ export default function Home() {
               },
             ].map((card) => (
               <article key={card.title} className="home-ministryCard reveal">
-                <div className="home-ministryTopline" />
-                <p className="home-ministryTag">{card.tag}</p>
-                <h3>{card.title}</h3>
-                <p className="home-ministryCopy">{card.copy}</p>
-                <Link href={card.href} className="home-ministryLink">
-                  Learn More →
-                </Link>
+                <div className="home-ministryCardMark" aria-hidden>
+                  <div
+                    className="home-ministryCardMarkBg"
+                    style={{ backgroundImage: `url(${card.image})` }}
+                  />
+                  <img src={SITE_LOGO_URL} alt="" className="home-ministryCardMarkLogo" decoding="async" />
+                </div>
+                <div className="home-ministryCardBody">
+                  <div className="home-ministryTopline" />
+                  <p className="home-ministryTag">{card.tag}</p>
+                  <h3>{card.title}</h3>
+                  <p className="home-ministryCopy">{card.copy}</p>
+                  <Link href={card.href} className="home-ministryLink">
+                    Learn More →
+                  </Link>
+                </div>
               </article>
             ))}
           </div>
@@ -231,12 +258,21 @@ export default function Home() {
         </div>
       </section>
 
+      {showRelive ? (
+        <HomeReliveFeast
+          title={homeContent.reliveFeastTitle}
+          subtitle={homeContent.reliveFeastSubtitle}
+          images={reliveImages}
+        />
+      ) : null}
+
       <HomeReserveStay hotelRoomUrl={managedImages.hotelRoomUrl} />
 
-      {/* ══════════════════════════════════════
-          COUNTDOWN TIMER (original)
-          ══════════════════════════════════════ */}
       <FlipClockCountdown />
+
+      {showTestimonials ? (
+        <HomeTestimonialsMarquee title={homeContent.testimonialsTitle} items={testimonials} />
+      ) : null}
 
     </div>
   );

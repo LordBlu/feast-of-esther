@@ -706,7 +706,7 @@
     min-width: unset;
     max-width: unset;
     height: calc(100vh - var(--nav-top));
-    z-index: 10;
+    z-index: 5;
   }
 
 }

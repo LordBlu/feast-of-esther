@@ -214,6 +214,24 @@ export interface RegistrationPageContent {
   step3Hint?: string;
 }
 
+export interface HomeTestimonial {
+  quote: string;
+  name: string;
+  role?: string;
+  imageUrl?: string;
+}
+
+/** Homepage: Relive the Feast mosaic + testimonials marquee. */
+export interface HomePageContent {
+  reliveFeastTitle?: string;
+  reliveFeastSubtitle?: string;
+  reliveFeastImageUrls?: string[];
+  showReliveFeast?: boolean;
+  testimonialsTitle?: string;
+  testimonials?: HomeTestimonial[];
+  showTestimonials?: boolean;
+}
+
 /** Hero image + biography paragraphs on /founder (carousel stays under Imagery). */
 export interface FounderPageContent {
   heroBackgroundUrl?: string;
@@ -248,6 +266,7 @@ export interface SitePageContents {
   registration: RegistrationPageContent;
   founder: FounderPageContent;
   about2: About2PageContent;
+  home: HomePageContent;
 }
 
 export interface CmsData {

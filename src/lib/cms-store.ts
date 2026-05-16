@@ -80,6 +80,7 @@ const emptyPageContent: SitePageContents = {
   registration: {},
   founder: {},
   about2: {},
+  home: {},
 };
 
 function mergeSitePageContents(patch: Partial<SitePageContents> | undefined): SitePageContents {
@@ -92,6 +93,7 @@ function mergeSitePageContents(patch: Partial<SitePageContents> | undefined): Si
     registration: { ...emptyPageContent.registration, ...p.registration },
     founder: { ...emptyPageContent.founder, ...p.founder },
     about2: { ...emptyPageContent.about2, ...p.about2 },
+    home: { ...emptyPageContent.home, ...p.home },
   };
 }
 

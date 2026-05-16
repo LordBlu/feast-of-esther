@@ -1,0 +1,244 @@
+.section {
+  width: 100%;
+  padding: clamp(2rem, 4vw, 3rem) 0 clamp(2.5rem, 5vw, 4rem);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.header {
+  width: 100%;
+  text-align: center;
+  max-width: 44rem;
+  margin: 0 auto clamp(1.75rem, 3.5vw, 2.5rem);
+  padding-inline: clamp(1rem, 3vw, 1.5rem);
+}
+
+.eyebrow {
+  margin: 0 0 0.5rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--primary);
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(2.1rem, 4.5vw, 3.25rem);
+  font-style: italic;
+  line-height: 1.05;
+  color: var(--primary-dark);
+}
+
+.layout {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(1.25rem, 2.5vw, 1.75rem);
+  width: 100%;
+  max-width: 100%;
+  margin-inline: auto;
+  padding-inline: clamp(0.75rem, 2vw, 1.25rem);
+  box-sizing: border-box;
+}
+
+.tabList {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  width: 100%;
+}
+
+.tabBtn {
+  position: relative;
+  width: auto;
+  overflow: hidden;
+  border: 1.5px solid transparent;
+  border-radius: 12px;
+  padding: 0.85rem 1.15rem;
+  text-align: center;
+  cursor: pointer;
+  transition:
+    background 0.35s ease,
+    color 0.35s ease,
+    border-color 0.35s ease,
+    transform 0.25s ease;
+}
+
+.tabBtn:hover:not(.tabActive) {
+  background: rgba(252, 228, 236, 0.55);
+  border-color: rgba(194, 24, 91, 0.15);
+}
+
+.tabActive {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+  box-shadow: 0 14px 36px rgba(106, 15, 53, 0.22);
+}
+
+.tabLabel {
+  display: block;
+  font-family: var(--font-display);
+  font-size: clamp(1.15rem, 2vw, 1.45rem);
+  line-height: 1.15;
+}
+
+.tabProgress {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 3px;
+  width: 100%;
+  background: var(--gold);
+  transform-origin: left;
+  transform: scaleX(0);
+}
+
+.tabActive .tabProgress {
+  animation: ministryTabProgress 15s linear forwards;
+}
+
+@keyframes ministryTabProgress {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.panel {
+  position: relative;
+  display: grid;
+  overflow: hidden;
+  border-radius: 20px;
+  background: #fff;
+  box-shadow:
+    0 24px 60px rgba(106, 15, 53, 0.12),
+    0 0 0 1px rgba(194, 24, 91, 0.08);
+  width: 100%;
+  min-height: 0;
+}
+
+.slide {
+  grid-area: 1 / 1;
+  position: relative;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.85s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.slideActive {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.slideBg {
+  position: absolute;
+  inset: -8%;
+  background-size: cover;
+  background-position: center;
+  opacity: 0.2;
+  transform: scale(1.05);
+}
+
+.slideActive .slideBg {
+  animation: ministryKenBurns 15s ease-out forwards;
+}
+
+@keyframes ministryKenBurns {
+  from {
+    transform: scale(1.05);
+  }
+  to {
+    transform: scale(1.14);
+  }
+}
+
+.slideVeil {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.97) 0%,
+    rgba(255, 255, 255, 0.9) 50%,
+    rgba(253, 248, 252, 0.82) 100%
+  );
+}
+
+.slideInner {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  max-width: min(52rem, 100%);
+  margin-inline: auto;
+  padding: clamp(1.75rem, 3.5vw, 2.75rem) clamp(1.25rem, 3vw, 2.75rem)
+    clamp(2rem, 4vw, 3rem);
+  box-sizing: border-box;
+  text-align: center;
+}
+
+.kicker {
+  margin: 0 0 0.65rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--primary);
+}
+
+.slideTitle {
+  margin: 0 0 0.85rem;
+  font-family: var(--font-display);
+  font-size: clamp(2.25rem, 4vw, 3.1rem);
+  font-style: italic;
+  line-height: 1.05;
+  color: var(--primary-dark);
+}
+
+.rule {
+  width: 4.5rem;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--gold);
+  margin: 0 auto 1.35rem;
+}
+
+.slideCopy {
+  margin: 0;
+  width: 100%;
+  max-width: none;
+  font-size: clamp(1rem, 1.35vw, 1.15rem);
+  line-height: 1.68;
+  color: #3f4654;
+  white-space: pre-line;
+  text-align: left;
+  text-wrap: pretty;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tabActive .tabProgress {
+    animation: none;
+    transform: scaleX(1);
+  }
+
+  .slideActive .slideBg {
+    animation: none;
+  }
+
+  .slide {
+    transition-duration: 0.2s;
+  }
+}

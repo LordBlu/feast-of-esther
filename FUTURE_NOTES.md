@@ -11,17 +11,23 @@
 
 ## Progress so far
 
-- **Handoff (Cursor / maintainer resting):** About Us is a **single** route — **`/about`** serves the Huge-style case study (`AboutHugeCaseStudy`). **`/about-2`** **`permanentRedirect`s** to **`/about`** for old links. Navbar shows one **About Us** item. **Site pages** CMS tab edits `pageContent` (gallery copy, events hotel block, contact, donate, registration, founder hero + bio, About headline tweaks). Original **AboutSleek** layout removed. *Update this file when you ship more.*
+- **Handoff (May 2026):** Maintainer resting — resume from **`FUTURE_NOTES.md`** + **`ADMIN_GUIDE.md`**. Recent session: **`HomeReliveFeast`** (3×3 rotating grid), **`HomeTestimonialsMarquee`**, **`FounderMinistryCards`** (“Her Ministry Worldwide”, 15s tabs, centered + wide copy panel), About **“Our Mission”** under mission line, admin **Guide** tab + undo actions, **`ADMIN_GUIDE.md`**. **QA:** `tsc`, `lint` (0 errors), `build` pass; `AdminVersionsPanel` mount fetch deferred with `setTimeout(0)` for `react-hooks/set-state-in-effect`. **Not from this app:** MetaMask `inpage.js` = browser extension. *Update this file when you ship more.*
 - **Events page — Programme block:** Replaced the old alternating “Event Schedule” timeline with a **Programme** section modeled on the Alamein-style layout: three clickable **day cards** (18–20 June 2026), **Next →** cycles days, **time | status dot | title/details** timeline, accent `#006699`, responsive stacking on small screens. Implementation: `src/components/events/ProgrammeSection.tsx` + `ProgrammeSection.module.css`, wired from `src/app/events/page.tsx`. Schedule copy in the component is **placeholder** until final programme is confirmed.
 - **Events page:** Still includes hero, info card, hotel block, past events grid; programme sits between info card and hotel.
-- **Gallery — index (`/gallery`):** Removed the small eyebrow “Gallery” above “Moments From the Feast” (`GalleryVerticalFeed.tsx`); top nav **GALLERY** link unchanged.
-- **Gallery — collection detail (`/gallery/[slug]`):** Responsive **image grid** with hover enlarge + blur siblings (`GalleryImageGrid.tsx` + `.module.css`). **Back** control: `GalleryBackUnderLogo.tsx` — fixed under the 68px nav, aligned with `max-w-7xl` / logo padding; label is **“Back”** (not “Gallery”).
-- **About Us (`/about`):** Huge-inspired **sticky left visual rail** + scroll narrative (`AboutHugeCaseStudy.tsx` + `AboutHugeCaseStudy.module.css` under `src/app/about/`). **Chrome bar** (woman-led gathering title + Close) **removed** for now. **Leadership:** first profile = featured bio block; **regional row** (3 names, one line) with **circular portraits** (~165px desktop / ~135px mobile, pink double ring border) + name/role; sidebar photo follows scroll/hover per leader (`data-leader-profile`). No auto-rotating carousel. **CMS:** `about.leadershipProfiles` JSON (name, role, imageUrl, blurb) on Admin **About** tab; `pageContent.about2` for mega/focus/CTA + **per-section sidebar image URLs** (Site pages → About Us).
+- **Homepage (`/`):** Hero crossfade + CTAs. **Forum + video:** mission quote (`HOME_COPY` in `site-content.ts`). **Our Purpose** vision block. **Ministry cards** with in-card watermark images. **Then:** `HomeReliveFeast` → `HomeReserveStay` → `FlipClockCountdown` → `HomeTestimonialsMarquee`. CMS hook: `pageContent.home` (`reliveImageUrls`, `testimonials` JSON) merged in `page-content` API — **no Admin Home UI tab yet**. Copy defaults in `src/lib/home-content.ts`.
+- **Gallery — index (`/gallery`):** **No Back** control (Back only on collection pages). **Header** top padding **halved** vs old layout. Title + **left-aligned** gospel-style subtitle (`gallery-page-header--index`, default in `GalleryVerticalFeed.tsx`); editable via **Site pages → Gallery**. **Mosaic tiles** link to **`/gallery/[slug]`** (folders) — **not** lightbox on index. Default **9** collections in `gallery-data.ts` (2025–2023); more via Admin **Imagery → gallery collections JSON**.
+- **Gallery — collection detail (`/gallery/[slug]`):** **Lightbox** on individual photos (`GalleryImageLightbox.tsx`) with prev/next + keyboard. Grid hover enlarge + blur siblings (`GalleryImageGrid.tsx`). **Back:** `GalleryPageBack.tsx` — **sticky** under nav (`top: 68px`), links to `/gallery`. Re-export: `GalleryBackUnderLogo.tsx`.
+- **About Us (`/about`):** Huge-inspired **sticky left visual rail** + scroll narrative. **Chrome bar** (woman-led gathering + Close) **removed**. **Leadership:** featured leader (Grace Okonrende) + **3-up row** (Mabel Odigie, Rev. Dr. Felicia Ajayi, Dr. Banks) — circular portraits **~165px** desktop / **~135px** mobile, pink ring border; sidebar image on scroll/hover (`data-leader-profile`). No carousel. **CMS:** `about.leadershipProfiles` + `pageContent.about2` sidebar image URLs.
+- **Global UI:** Nav active link = **full bar height** fill (no lift/glow). **Footer** compact padding on all pages (`.site-footer` in `globals.css`). **Hadassah:** launcher/window title **“Hadassah”** only (no portrait image).
+- **Admin — Versions:** Undo stack + named save slots (`src/lib/cms-history.ts`, `AdminVersionsPanel.tsx`); constants in `cms-history-constants.ts` (do not import `cms-history.ts` from client — uses `node:fs`).
 - **Global route transitions:** Public `<main>` content wrapped in **`PageViewTransition`** (Framer Motion `AnimatePresence` keyed by pathname) — see **Route transitions** section. **`/admin`** is excluded (no animation wrapper).
 - **This file:** Living context for agents and follow-up sessions — **update it** when you ship meaningful UX or infra changes.
 
 ## Likely next steps (“the rest”)
 
+- **Admin → Site pages → Home** UI for Relive URLs + testimonials (data model exists).
+- **Founder ministry cards** → CMS or Site pages → Founder (still hardcoded in `FounderMinistryCards.tsx`).
+- **Hotel block** off toggle on homepage post-event.
 - Final **programme copy** (times, titles, bullets) in `ProgrammeSection.tsx` or move data to CMS if editors need to change it without deploys.
 - **README** — starter section replaced with project pointers; extend with env var table / deploy checklist when useful.
 - **Production hardening:** `ADMIN_DASHBOARD_PASSWORD` / `ADMIN_DASHBOARD_TOKEN` set on host; understand JSON file persistence on serverless (Vercel: use persistent storage or external DB if registrations must survive).
@@ -58,7 +64,7 @@ You do **not** need a custom domain to give them a link. You need a **hosted dep
 
 | Route | Role |
 |-------|------|
-| `/about` | **Huge-style case study:** ~34% **left** sticky **sharp** full-bleed imagery (stacked crossfade by scroll section; leadership rail uses active leader `imageUrl`). **Right:** **no top chrome bar** (removed); **mega headline** + **Gathering focus / Overview** + **black CTA bar**, then sections (Journey, Who we are, Vision, Mission, **Leadership**, Chapters). **Leadership:** Grace-style featured leader + **3-up row** (Mabel, Felicia, Banks) with tiny circular headshots. Files: `src/app/about/page.tsx`, `AboutHugeCaseStudy.tsx`, `AboutHugeCaseStudy.module.css`. |
+| `/about` | **Huge-style case study:** left sticky imagery (per section + per leader); **no chrome bar**; mega headline + focus/overview + CTA bar; Leadership with featured bio + **3-up** regional row (~165px avatars). Files: `src/app/about/page.tsx`, `AboutHugeCaseStudy.tsx`, `AboutHugeCaseStudy.module.css`. |
 | `/about-2` | **Legacy URL only:** `permanentRedirect('/about')` in `src/app/about-2/page.tsx` — no duplicate layout. |
 
 **Shared data:** `src/lib/about-chapters.ts` — `CHAPTERS`, `ChapterKey` (chapter locations for Outreach section).
@@ -73,12 +79,16 @@ You do **not** need a custom domain to give them a link. You need a **hosted dep
 
 | Area | Files |
 |------|--------|
-| Layout shell | `src/components/ConditionalLayout.tsx`, `PageViewTransition.tsx` |
-| Top nav | `src/components/Navbar.tsx` |
-| About Us | `src/app/about/page.tsx`, `AboutHugeCaseStudy.tsx`, `AboutHugeCaseStudy.module.css`; redirect stub `src/app/about-2/page.tsx` |
+| Layout shell | `src/components/ConditionalLayout.tsx`, `PageViewTransition.tsx`, `SiteFooter.tsx` |
+| Top nav | `src/components/Navbar.tsx` (`globals.css` `.navbar-link*`) |
+| Homepage | `src/app/page.tsx`, `HomeReliveFeast.tsx`, `HomeTestimonialsMarquee.tsx`, `HomeReserveStay.tsx`, `FlipClockCountdown.tsx`, `src/lib/site-content.ts`, `src/lib/home-content.ts` |
+| Founder | `src/app/founder/page.tsx`, `FounderHero.tsx`, `FounderCarousel.tsx`, `FounderMinistryCards.tsx` + `.module.css` |
+| About Us | `src/app/about/page.tsx`, `AboutHugeCaseStudy.tsx`, `AboutHugeCaseStudy.module.css`; redirect `src/app/about-2/page.tsx` |
 | Shared chapter map | `src/lib/about-chapters.ts` |
 | Gallery index | `src/components/GalleryVerticalFeed.tsx`, `GalleryMosaic.module.css` |
-| Gallery detail | `src/app/gallery/[slug]/page.tsx`, `GalleryImageGrid.tsx`, `GalleryBackUnderLogo.tsx` |
+| Gallery detail | `src/app/gallery/[slug]/page.tsx`, `GalleryImageGrid.tsx`, `GalleryImageLightbox.tsx`, `GalleryPageBack.tsx` |
+| Hadassah | `src/components/HadassahChat.tsx`, `POST /api/hadassah` |
+| CMS history | `src/lib/cms-history.ts`, `cms-snapshot.ts`, `src/app/api/admin/history/*`, `AdminVersionsPanel.tsx` |
 
 ---
 
@@ -130,7 +140,7 @@ useEffect(() => {
 
 ## CMS — Site pages (`pageContent`)
 
-- **Storage:** Merged into `data/cms-data.json` under `pageContent` (nested keys: `gallery`, `events`, `contact`, `donate`, `registration`, `founder`, `about2`).
+- **Storage:** Merged into `data/cms-data.json` under `pageContent` (nested keys: `gallery`, `events`, `contact`, `donate`, `registration`, `founder`, `about2`, **`home`**).
 - **Admin:** Dashboard tab **Site pages** — save calls **`PUT /api/admin/page-content`** (auth required).
 - **Public:** **`GET /api/site-config`** returns `pageContent` for client pages that fetch it; server pages use `readCmsData()` from `src/lib/cms-store.ts`.
 - **Typecheck note:** `tsconfig.json` includes `.next/types/**`. Run **`next build`** or **`next dev`** once so those files exist before **`npx tsc --noEmit`** on a clean tree.
