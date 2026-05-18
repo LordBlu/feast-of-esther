@@ -5,6 +5,92 @@
   padding: 1rem;
 }
 
+.collectionDraft {
+  border-color: rgba(160, 7, 90, 0.35);
+  background: linear-gradient(145deg, #fff9fc 0%, #fff5f8 100%);
+}
+
+.draftBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: rgba(160, 7, 90, 0.12);
+  color: var(--primary-dark);
+  border: 1px solid rgba(160, 7, 90, 0.25);
+}
+
+.draftHint {
+  margin: 0 0 0.75rem;
+  font-size: 0.68rem;
+  color: rgba(58, 26, 45, 0.62);
+}
+
+.liveBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: rgba(34, 120, 70, 0.12);
+  color: #1a5c38;
+  border: 1px solid rgba(34, 120, 70, 0.25);
+}
+
+.typeRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.typeBtn {
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 0.45rem 0.85rem;
+  border-radius: 999px;
+  border: 1px solid rgba(194, 24, 91, 0.2);
+  background: #fff;
+  color: rgba(58, 26, 45, 0.65);
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    color 0.15s,
+    border-color 0.15s;
+}
+
+.typeBtnActive {
+  background: linear-gradient(120deg, var(--primary-dark), var(--primary));
+  border-color: transparent;
+  color: #fff;
+}
+
+.eventBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: rgba(160, 7, 90, 0.1);
+  color: var(--primary-dark);
+  border: 1px solid rgba(160, 7, 90, 0.22);
+}
+
+.collectionEvent {
+  border-color: rgba(160, 7, 90, 0.28);
+  background: linear-gradient(145deg, #fffafc 0%, #fff0f6 100%);
+}
+
 .collectionHeader {
   display: flex;
   flex-wrap: wrap;

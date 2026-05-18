@@ -1,7 +1,9 @@
+import { revalidatePath } from 'next/cache';
 import { NextRequest, NextResponse } from 'next/server';
 import { isAdminAuthenticated } from '@/lib/admin-auth';
 import { readCmsData, writeCmsData } from '@/lib/cms-store';
 import { SiteEvent } from '@/lib/cms-types';
+import { slugifyPathSegment } from '@/lib/slugify';
 
 function unauthorized() {
   return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -59,7 +61,7 @@ export async function POST(request: NextRequest) {
     ctaLabel: body.ctaLabel ?? '',
     heroImageUrl: body.heroImageUrl ?? '',
     imageUrl: body.imageUrl ?? '',
-    gallerySlug: body.gallerySlug ?? '',
+    gallerySlug: slugifyPathSegment(String(body.gallerySlug ?? '')),
     countdownTargetAt,
     status,
     createdAt: previous?.createdAt ?? now,
@@ -70,6 +72,8 @@ export async function POST(request: NextRequest) {
   else data.events.unshift(event);
 
   await writeCmsData(data);
+  revalidatePath('/events');
+  revalidatePath('/gallery', 'layout');
   return NextResponse.json({ event });
 }
 

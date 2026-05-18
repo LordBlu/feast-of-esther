@@ -9,11 +9,19 @@ import { AdminImagePreviewList } from '@/components/admin/AdminImagePreview';
 import AdminImageUrlField from '@/components/admin/AdminImageUrlField';
 import AdminLeadershipEditor from '@/components/admin/AdminLeadershipEditor';
 import AdminPagePreview from '@/components/admin/AdminPagePreview';
+import AdminSlugField from '@/components/admin/AdminSlugField';
 import AdminStoryParagraphsEditor from '@/components/admin/AdminStoryParagraphsEditor';
 import AdminUrlListEditor from '@/components/admin/AdminUrlListEditor';
 import AdminVersionsPanel from '@/components/admin/AdminVersionsPanel';
 import type { AdminPreviewDraft } from '@/lib/admin-preview-draft';
-import { getDefaultGalleryCollections } from '@/lib/gallery-data';
+import {
+  getDefaultGalleryCollections,
+  getGalleryCollectionValidationErrors,
+  isGalleryCollectionComplete,
+  normalizeGalleryCollection,
+  slugifyGallerySlug,
+} from '@/lib/gallery-data';
+import { slugifyPathSegment } from '@/lib/slugify';
 import {
   AboutPageContent,
   EventCategory,
@@ -271,11 +279,12 @@ export default function AdminDashboardPage() {
     ]);
     setPopup({ ...emptyPopup, ...(popupData.popup ?? {}) });
     const loadedImages = imagesData.images ?? {};
-    const savedCollections = loadedImages.galleryCollections ?? [];
     setImages({
       ...loadedImages,
       galleryCollections:
-        savedCollections.length > 0 ? savedCollections : getDefaultGalleryCollections(),
+        loadedImages.galleryCollections !== undefined && loadedImages.galleryCollections !== null
+          ? loadedImages.galleryCollections
+          : getDefaultGalleryCollections(),
     });
     const cd = countdownData.countdown ?? emptyCountdown;
     setCountdown({ ...emptyCountdown, ...cd });
@@ -346,11 +355,14 @@ export default function AdminDashboardPage() {
     event.preventDefault();
     setMessage('');
 
+    const gallerySlug = slugifyPathSegment(eventForm.gallerySlug ?? '');
+
     const response = await fetch('/api/admin/events', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         ...eventForm,
+        gallerySlug,
         id: editingEventId ?? undefined,
         countdownTargetAt: eventForm.countdownTargetAt?.trim()
           ? new Date(eventForm.countdownTargetAt).toISOString()
@@ -447,21 +459,25 @@ export default function AdminDashboardPage() {
     if (response.ok) setMessage('Images updated.');
   }
 
-  function sanitizeGalleryCollections(collections: GalleryCollection[]): GalleryCollection[] {
-    return collections
-      .map((item) => ({
-        slug: String(item.slug ?? '').trim(),
-        title: String(item.title ?? '').trim(),
-        year: String(item.year ?? '').trim(),
-        description: String(item.description ?? '').trim(),
-        imageUrls: (item.imageUrls ?? []).map((url) => String(url).trim()).filter(Boolean),
-      }))
-      .filter((item) => item.slug && item.title && item.year && item.description && item.imageUrls.length > 0);
-  }
-
   async function saveGallery() {
-    const sanitized = sanitizeGalleryCollections(images.galleryCollections ?? []);
-    const payload = { ...images, galleryCollections: sanitized };
+    const raw = images.galleryCollections ?? [];
+    const normalized = raw.map(normalizeGalleryCollection);
+
+    const slugCounts = new Map<string, number>();
+    for (const row of normalized) {
+      if (!row.slug) continue;
+      slugCounts.set(row.slug, (slugCounts.get(row.slug) ?? 0) + 1);
+    }
+    const duplicateSlug = [...slugCounts.entries()].find(([, count]) => count > 1)?.[0];
+    if (duplicateSlug) {
+      setMessage(`Could not save: duplicate URL slug "${duplicateSlug}". Each collection needs a unique slug.`);
+      return;
+    }
+
+    const liveCount = normalized.filter(isGalleryCollectionComplete).length;
+    const draftCount = normalized.length - liveCount;
+
+    const payload = { ...images, galleryCollections: normalized };
     const response = await fetch('/api/admin/images', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
@@ -473,7 +489,33 @@ export default function AdminDashboardPage() {
     }
     const data = await response.json();
     setImages(data.images ?? payload);
-    setMessage(`Gallery saved (${sanitized.length} collection${sanitized.length === 1 ? '' : 's'}).`);
+    if (Array.isArray(data.events)) {
+      setEvents(data.events);
+    } else {
+      await loadEvents();
+    }
+
+    const eventCollectionCount = (data.images?.galleryCollections ?? normalized).filter(
+      (c: GalleryCollection) => c.collectionType === 'event' && isGalleryCollectionComplete(c)
+    ).length;
+
+    if (draftCount > 0) {
+      const firstDraft = normalized.find((row) => !isGalleryCollectionComplete(row));
+      const missing = firstDraft ? getGalleryCollectionValidationErrors(firstDraft).join(', ') : '';
+      setMessage(
+        `Gallery saved. ${liveCount} collection${liveCount === 1 ? '' : 's'} live on /gallery. ${draftCount} still need: ${missing} (fill every field + one photo, then save again).`
+      );
+      return;
+    }
+    const eventNote =
+      eventCollectionCount > 0
+        ? ` ${eventCollectionCount} also synced to the Events page (past events).`
+        : '';
+    setMessage(
+      liveCount === 0
+        ? 'Gallery saved (no collections on the public gallery yet — add one with all fields filled).'
+        : `Gallery saved. ${liveCount} collection${liveCount === 1 ? '' : 's'} are live on /gallery.${eventNote}`
+    );
   }
 
   async function saveAbout() {
@@ -586,6 +628,14 @@ export default function AdminDashboardPage() {
     setRegPage(1);
     setRegSearch(regSearchInput);
   }
+
+  const gallerySlugSuggestions = useMemo(
+    () =>
+      (images.galleryCollections ?? [])
+        .map((c) => slugifyGallerySlug(c.slug || c.title || ''))
+        .filter(Boolean),
+    [images.galleryCollections]
+  );
 
   const previewDraft = useMemo<AdminPreviewDraft>(
     () => ({
@@ -777,12 +827,14 @@ export default function AdminDashboardPage() {
                   />
                 </div>
                 <div>
-                  <label className="admin-field-label">Past event gallery slug</label>
-                  <input
-                    className="admin-input"
-                    placeholder="feast-2025-opening-night"
+                  <AdminSlugField
+                    label="Past event gallery slug"
                     value={eventForm.gallerySlug ?? ''}
-                    onChange={(e) => setEventForm((p) => ({ ...p, gallerySlug: e.target.value }))}
+                    onChange={(gallerySlug) => setEventForm((p) => ({ ...p, gallerySlug }))}
+                    pathPrefix="/gallery/"
+                    placeholder="feast-2025-opening-night"
+                    hint="Optional: link a manually created event to a gallery page. Prefer marking the collection as Past event under Gallery — it syncs automatically."
+                    suggestions={gallerySlugSuggestions}
                   />
                 </div>
               </div>

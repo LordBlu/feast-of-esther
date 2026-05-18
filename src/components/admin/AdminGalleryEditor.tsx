@@ -1,9 +1,15 @@
 'use client';
 
 import type { DragEvent } from 'react';
-import type { GalleryCollection } from '@/lib/cms-types';
-import { isGalleryPlaceholderUrl } from '@/lib/gallery-data';
+import type { GalleryCollection, GalleryCollectionType } from '@/lib/cms-types';
+import {
+  getGalleryCollectionValidationErrors,
+  isGalleryCollectionComplete,
+  isGalleryPlaceholderUrl,
+  slugifyGallerySlug,
+} from '@/lib/gallery-data';
 import AdminImageUrlField from '@/components/admin/AdminImageUrlField';
+import AdminSlugField from '@/components/admin/AdminSlugField';
 import styles from './AdminGalleryEditor.module.css';
 
 const emptyCollection = (): GalleryCollection => ({
@@ -12,6 +18,7 @@ const emptyCollection = (): GalleryCollection => ({
   year: new Date().getFullYear().toString(),
   description: '',
   imageUrls: [''],
+  collectionType: 'general',
 });
 
 interface AdminGalleryEditorProps {
@@ -56,16 +63,29 @@ export default function AdminGalleryEditor({
   return (
     <div className="space-y-5">
       <p className="text-xs text-black/55">
-        Each collection is one folder on the Gallery page.{' '}
-        <strong className="text-[#7a5a00]">Yellow-highlighted</strong> images are demo placeholders — replace or
-        delete them when you have real photos.
+        Each collection becomes its own page at <strong>/gallery/your-slug</strong>. Choose{' '}
+        <strong>Past event</strong> to also list it on the Events page — no need to add it again under Events.{' '}
+        <strong className="text-[#7a5a00]">Yellow-highlighted</strong> images are demo placeholders.
       </p>
-      {rows.map((collection, cIndex) => (
-        <section key={`gallery-c-${cIndex}`} className={styles.collection}>
+      {rows.map((collection, cIndex) => {
+        const complete = isGalleryCollectionComplete(collection);
+        const missing = getGalleryCollectionValidationErrors(collection);
+        const isEvent = collection.collectionType === 'event';
+        return (
+        <section
+          key={`gallery-c-${cIndex}`}
+          className={`${styles.collection} ${isEvent ? styles.collectionEvent : ''} ${complete ? '' : styles.collectionDraft}`}
+        >
           <header className={styles.collectionHeader}>
             <h3 className={styles.collectionTitle}>
               Collection {cIndex + 1}
               {collection.title.trim() ? ` · ${collection.title.trim()}` : ''}
+              {complete ? (
+                <span className={`${styles.liveBadge} ml-2`}>Live on site</span>
+              ) : (
+                <span className={`${styles.draftBadge} ml-2`}>Draft</span>
+              )}
+              {isEvent ? <span className={`${styles.eventBadge} ml-2`}>Past event</span> : null}
             </h3>
             {rows.length > 1 ? (
               <button
@@ -77,16 +97,61 @@ export default function AdminGalleryEditor({
               </button>
             ) : null}
           </header>
-          <div className="grid gap-3 sm:grid-cols-2">
-            <div>
-              <label className="admin-field-label">URL slug</label>
-              <input
-                className="admin-input"
-                placeholder="feast-2025-opening-night"
-                value={collection.slug}
-                onChange={(e) => updateCollection(cIndex, { slug: e.target.value })}
-              />
+          {!complete && missing.length > 0 ? (
+            <p className={styles.draftHint}>Still needed: {missing.join(', ')}.</p>
+          ) : null}
+          <div className={styles.typeRow}>
+            <span className="admin-field-label mb-0 self-center">Collection type</span>
+            {(
+              [
+                ['general', 'General photos'],
+                ['event', 'Past event'],
+              ] as const
+            ).map(([type, label]) => (
+              <button
+                key={type}
+                type="button"
+                className={`${styles.typeBtn} ${(collection.collectionType ?? 'general') === type ? styles.typeBtnActive : ''}`}
+                onClick={() =>
+                  updateCollection(cIndex, {
+                    collectionType: type as GalleryCollectionType,
+                  })
+                }
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+          {isEvent ? (
+            <div className="mb-3 grid gap-3 sm:grid-cols-2">
+              <div>
+                <label className="admin-field-label">Event dates (Events page)</label>
+                <input
+                  className="admin-input"
+                  placeholder="June 18–20, 2025"
+                  value={collection.eventDateLabel ?? ''}
+                  onChange={(e) => updateCollection(cIndex, { eventDateLabel: e.target.value })}
+                />
+              </div>
+              <div>
+                <label className="admin-field-label">Venue (optional)</label>
+                <input
+                  className="admin-input"
+                  placeholder="City, State"
+                  value={collection.eventVenue ?? ''}
+                  onChange={(e) => updateCollection(cIndex, { eventVenue: e.target.value })}
+                />
+              </div>
             </div>
+          ) : null}
+          <div className="grid gap-3 sm:grid-cols-2">
+            <AdminSlugField
+              label="URL slug"
+              value={collection.slug}
+              onChange={(slug) => updateCollection(cIndex, { slug })}
+              pathPrefix="/gallery/"
+              placeholder="feast-2025-opening-night"
+            />
             <div>
               <label className="admin-field-label">Year</label>
               <input
@@ -102,6 +167,12 @@ export default function AdminGalleryEditor({
               className="admin-input"
               value={collection.title}
               onChange={(e) => updateCollection(cIndex, { title: e.target.value })}
+              onBlur={(e) => {
+                const title = e.target.value.trim();
+                if (!collection.slug.trim() && title) {
+                  updateCollection(cIndex, { title, slug: slugifyGallerySlug(title) });
+                }
+              }}
             />
           </div>
           <div className="mt-3">
@@ -176,7 +247,8 @@ export default function AdminGalleryEditor({
             </button>
           </div>
         </section>
-      ))}
+      );
+      })}
       <button type="button" className="admin-btn-ghost" onClick={() => onChange([...rows, emptyCollection()])}>
         Add collection
       </button>

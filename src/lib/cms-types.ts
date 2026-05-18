@@ -87,12 +87,21 @@ export interface SiteImages {
   galleryCollections?: GalleryCollection[];
 }
 
+export type GalleryCollectionType = 'general' | 'event';
+
 export interface GalleryCollection {
   slug: string;
   title: string;
   year: string;
   description: string;
   imageUrls: string[];
+  /** `event` = also appears on /events as a past event (synced on save). */
+  collectionType?: GalleryCollectionType;
+  /** CMS event row id — set automatically when collectionType is event. */
+  linkedEventId?: string;
+  /** Past event card date line (e.g. June 18–20, 2025). */
+  eventDateLabel?: string;
+  eventVenue?: string;
 }
 
 export interface RegistrationRecord {

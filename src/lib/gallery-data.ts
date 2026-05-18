@@ -1,4 +1,5 @@
 import type { GalleryCollection } from '@/lib/cms-types';
+import { slugifyPathSegment } from '@/lib/slugify';
 
 export interface GalleryItem {
   slug: string;
@@ -121,6 +122,42 @@ export function isGalleryPlaceholderUrl(url: string): boolean {
     const sampleBase = sample.split('?')[0] ?? sample;
     return normalized === sampleBase || normalized.endsWith(sampleBase.split('/').pop() ?? '');
   });
+}
+
+/** URL-safe slug for /gallery/[slug] (auto-filled from title in Admin when empty). */
+export function slugifyGallerySlug(input: string): string {
+  return slugifyPathSegment(input);
+}
+
+export function normalizeGalleryCollection(item: GalleryCollection): GalleryCollection {
+  const title = String(item.title ?? '').trim();
+  const rawSlug = String(item.slug ?? '').trim();
+  return {
+    slug: slugifyGallerySlug(rawSlug || title),
+    title,
+    year: String(item.year ?? '').trim(),
+    description: String(item.description ?? '').trim(),
+    imageUrls: (item.imageUrls ?? []).map((u) => String(u).trim()).filter(Boolean),
+    collectionType: item.collectionType === 'event' ? 'event' : 'general',
+    linkedEventId: item.linkedEventId?.trim() || undefined,
+    eventDateLabel: String(item.eventDateLabel ?? '').trim(),
+    eventVenue: String(item.eventVenue ?? '').trim(),
+  };
+}
+
+export function getGalleryCollectionValidationErrors(item: GalleryCollection): string[] {
+  const n = normalizeGalleryCollection(item);
+  const errors: string[] = [];
+  if (!n.slug) errors.push('URL slug');
+  if (!n.title) errors.push('title');
+  if (!n.year) errors.push('year');
+  if (!n.description) errors.push('description');
+  if (n.imageUrls.length === 0) errors.push('at least one photo');
+  return errors;
+}
+
+export function isGalleryCollectionComplete(item: GalleryCollection): boolean {
+  return getGalleryCollectionValidationErrors(item).length === 0;
 }
 
 /** Starter collections for Admin when CMS has none saved yet (matches public fallback). */

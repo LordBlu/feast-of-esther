@@ -37,7 +37,6 @@ export default function AdminPagePreview({
     : null;
 
   const liveSrc = path ? `${path}?preview=1&k=${refreshKey}` : null;
-
   const iframeSrc = mode === 'draft' ? draftSrc : liveSrc;
 
   if (!path) {
