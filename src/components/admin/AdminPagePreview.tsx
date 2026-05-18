@@ -1,68 +1,105 @@
 'use client';
 
-import { useMemo, useState } from 'react';
-
-const TAB_PREVIEW_PATH: Record<string, string | null> = {
-  guide: '/',
-  events: '/events',
-  countdown: '/',
-  popup: '/',
-  images: '/',
-  gallery: '/gallery',
-  social: '/',
-  about: '/about',
-  pages: '/gallery',
-  donations: '/donate',
-  registrations: null,
-  versions: null,
-};
+import { useEffect, useMemo, useState } from 'react';
+import {
+  type AdminPreviewDraft,
+  resolveAdminPreviewPath,
+  writeAdminPreviewDraft,
+} from '@/lib/admin-preview-draft';
 
 interface AdminPagePreviewProps {
   tab: string;
   pageSection?: string;
+  draft: AdminPreviewDraft;
+  registrationsCount?: number;
 }
 
-export default function AdminPagePreview({ tab, pageSection }: AdminPagePreviewProps) {
+type PreviewMode = 'draft' | 'live';
+
+export default function AdminPagePreview({
+  tab,
+  pageSection,
+  draft,
+  registrationsCount = 0,
+}: AdminPagePreviewProps) {
+  const [mode, setMode] = useState<PreviewMode>('draft');
   const [refreshKey, setRefreshKey] = useState(0);
 
-  const path = useMemo(() => {
-    if (tab === 'pages' && pageSection) {
-      const map: Record<string, string> = {
-        gallery: '/gallery',
-        events: '/events',
-        contact: '/contact',
-        donate: '/donate',
-        registration: '/registration',
-        founder: '/founder',
-        about2: '/about-2',
-      };
-      return map[pageSection] ?? '/';
-    }
-    return TAB_PREVIEW_PATH[tab] ?? '/';
-  }, [tab, pageSection]);
+  const path = useMemo(() => resolveAdminPreviewPath(tab, pageSection), [tab, pageSection]);
+
+  useEffect(() => {
+    const id = window.setTimeout(() => writeAdminPreviewDraft(draft), 200);
+    return () => window.clearTimeout(id);
+  }, [draft]);
+
+  const draftSrc = path
+    ? `/admin/preview?view=${encodeURIComponent(path)}&t=${draft.updatedAt}`
+    : null;
+
+  const liveSrc = path ? `${path}?preview=1&k=${refreshKey}` : null;
+
+  const iframeSrc = mode === 'draft' ? draftSrc : liveSrc;
 
   if (!path) {
     return (
-      <aside className="admin-preview-panel" aria-label="Live preview">
-        <p className="admin-preview-label">Preview</p>
-        <p className="text-xs text-black/45 p-4">No live preview for this section.</p>
+      <aside className="admin-preview-panel" aria-label="Preview">
+        <div className="admin-preview-toolbar">
+          <p className="admin-preview-label">Summary</p>
+        </div>
+        <div className="px-4 py-5 text-sm text-black/60 space-y-2">
+          {tab === 'registrations' ? (
+            <p>
+              <strong>{registrationsCount}</strong> registration{registrationsCount === 1 ? '' : 's'} on file.
+            </p>
+          ) : null}
+          {tab === 'versions' ? <p>Version history has no page preview.</p> : null}
+          {tab !== 'registrations' && tab !== 'versions' ? (
+            <p>Edit the form on the left; use another tab for a page preview.</p>
+          ) : null}
+        </div>
       </aside>
     );
   }
 
-  const src = `${path}?preview=1&k=${refreshKey}`;
-
   return (
-    <aside className="admin-preview-panel" aria-label="Live preview">
+    <aside className="admin-preview-panel" aria-label="Preview">
       <div className="admin-preview-toolbar">
-        <p className="admin-preview-label">Live preview</p>
-        <button type="button" className="admin-btn-ghost text-xs" onClick={() => setRefreshKey((k) => k + 1)}>
-          Refresh
-        </button>
+        <p className="admin-preview-label">Preview</p>
+        <div className="admin-preview-mode">
+          <button
+            type="button"
+            className={mode === 'draft' ? 'admin-preview-mode-active' : ''}
+            onClick={() => setMode('draft')}
+          >
+            Draft
+          </button>
+          <button
+            type="button"
+            className={mode === 'live' ? 'admin-preview-mode-active' : ''}
+            onClick={() => setMode('live')}
+          >
+            Live site
+          </button>
+        </div>
+        {mode === 'live' ? (
+          <button type="button" className="admin-btn-ghost text-xs" onClick={() => setRefreshKey((k) => k + 1)}>
+            Refresh
+          </button>
+        ) : null}
       </div>
-      <p className="admin-preview-path">{path}</p>
+      <p className="admin-preview-path">
+        {path}
+        {mode === 'draft' ? ' · unsaved edits' : ' · saved on site'}
+      </p>
       <div className="admin-preview-frame-wrap">
-        <iframe title={`Preview of ${path}`} src={src} className="admin-preview-iframe" />
+        {iframeSrc ? (
+          <iframe
+            key={iframeSrc}
+            title={mode === 'draft' ? `Draft preview of ${path}` : `Live preview of ${path}`}
+            src={iframeSrc}
+            className="admin-preview-iframe"
+          />
+        ) : null}
       </div>
     </aside>
   );

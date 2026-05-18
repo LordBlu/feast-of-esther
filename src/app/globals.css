@@ -417,6 +417,33 @@ body {
   background: #fff;
 }
 
+.admin-preview-mode {
+  display: flex;
+  gap: 0.25rem;
+  padding: 0.15rem;
+  border-radius: 999px;
+  background: rgba(194, 24, 91, 0.08);
+}
+
+.admin-preview-mode button {
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0.25rem 0.55rem;
+  border-radius: 999px;
+  border: none;
+  background: transparent;
+  color: rgba(58, 26, 45, 0.55);
+  cursor: pointer;
+}
+
+.admin-preview-mode-active {
+  background: #fff !important;
+  color: var(--primary-dark) !important;
+  box-shadow: 0 1px 4px rgba(194, 24, 91, 0.15);
+}
+
 .admin-hero {
   display: flex;
   flex-wrap: wrap;

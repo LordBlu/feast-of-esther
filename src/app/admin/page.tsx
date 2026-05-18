@@ -1,6 +1,6 @@
 'use client';
 
-import { DragEvent, FormEvent, useCallback, useEffect, useState } from 'react';
+import { DragEvent, FormEvent, useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import AdminDonationsPanel from '@/components/admin/AdminDonationsPanel';
 import AdminGalleryEditor from '@/components/admin/AdminGalleryEditor';
@@ -10,7 +10,9 @@ import AdminImageUrlField from '@/components/admin/AdminImageUrlField';
 import AdminLeadershipEditor from '@/components/admin/AdminLeadershipEditor';
 import AdminPagePreview from '@/components/admin/AdminPagePreview';
 import AdminStoryParagraphsEditor from '@/components/admin/AdminStoryParagraphsEditor';
+import AdminUrlListEditor from '@/components/admin/AdminUrlListEditor';
 import AdminVersionsPanel from '@/components/admin/AdminVersionsPanel';
+import type { AdminPreviewDraft } from '@/lib/admin-preview-draft';
 import { getDefaultGalleryCollections } from '@/lib/gallery-data';
 import {
   AboutPageContent,
@@ -584,6 +586,23 @@ export default function AdminDashboardPage() {
     setRegPage(1);
     setRegSearch(regSearchInput);
   }
+
+  const previewDraft = useMemo<AdminPreviewDraft>(
+    () => ({
+      version: 1,
+      updatedAt: Date.now(),
+      tab,
+      pageSection: pageEditSection,
+      about,
+      images,
+      popup,
+      pageContent,
+      events,
+      socialLinks,
+      countdown,
+    }),
+    [tab, pageEditSection, about, images, popup, pageContent, events, socialLinks, countdown]
+  );
 
   if (loading) {
     return (
@@ -1220,25 +1239,20 @@ export default function AdminDashboardPage() {
               />
             </div>
             <div className="rounded-xl border border-[rgba(194,24,91,0.12)] bg-white/65 p-4">
-              <label className="admin-field-label">Founder page — carousel (one URL per line)</label>
-              <p className="mb-2 text-xs text-black/50">
-                Auto-advances on /founder. Leave empty to use the default Cloudinary images from the site. Paste new
-                Cloudinary links here when ready.
-              </p>
-              <textarea
-                rows={6}
-                className="admin-input font-mono text-[0.7rem] leading-relaxed"
-                placeholder="https://res.cloudinary.com/..."
-                value={(images.founderCarouselUrls ?? []).join('\n')}
-                onChange={(e) => {
-                  const lines = e.target.value
-                    .split(/\r?\n/)
-                    .map((s) => s.trim())
-                    .filter(Boolean);
-                  setImages((p) => ({ ...p, founderCarouselUrls: lines }));
-                }}
+              <AdminUrlListEditor
+                label="Founder page — carousel images"
+                hint="Auto-advances on /founder. Add one Cloudinary URL per slot, or upload below."
+                urls={images.founderCarouselUrls ?? []}
+                onChange={(founderCarouselUrls) =>
+                  setImages((p) => ({
+                    ...p,
+                    founderCarouselUrls: founderCarouselUrls.map((s) => s.trim()).filter(Boolean),
+                  }))
+                }
+                onUpload={uploadImage}
+                onDragOver={preventDragDefaults}
+                addLabel="Add carousel slide"
               />
-              <AdminImagePreviewList urls={images.founderCarouselUrls ?? []} />
             </div>
             <p className="text-xs text-black/50">
               Gallery collections are managed on the <strong>Gallery</strong> tab.
@@ -2011,7 +2025,7 @@ export default function AdminDashboardPage() {
                 <div className="md:col-span-2 border-t border-black/10 pt-4">
                   <p className="mb-3 text-sm text-black/55">
                     Sidebar photos (one per scroll section). Each leader&apos;s portrait is set under{' '}
-                    <strong>About</strong> → Leadership profiles JSON (<code>imageUrl</code>).
+                    <strong>About</strong> → Leadership profiles (photo per leader).
                   </p>
                 </div>
                 {(
@@ -2140,7 +2154,12 @@ export default function AdminDashboardPage() {
           </div>
         ) : null}
           </div>
-          <AdminPagePreview tab={tab} pageSection={pageEditSection} />
+          <AdminPagePreview
+            tab={tab}
+            pageSection={pageEditSection}
+            draft={previewDraft}
+            registrationsCount={regTotal}
+          />
         </div>
       </div>
     </div>
