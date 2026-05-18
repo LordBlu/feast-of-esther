@@ -2,14 +2,21 @@
 
 import { DragEvent, FormEvent, useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import AdminDonationsPanel from '@/components/admin/AdminDonationsPanel';
+import AdminGalleryEditor from '@/components/admin/AdminGalleryEditor';
 import AdminGuidePanel from '@/components/admin/AdminGuidePanel';
+import { AdminImagePreviewList } from '@/components/admin/AdminImagePreview';
+import AdminImageUrlField from '@/components/admin/AdminImageUrlField';
+import AdminLeadershipEditor from '@/components/admin/AdminLeadershipEditor';
+import AdminPagePreview from '@/components/admin/AdminPagePreview';
+import AdminStoryParagraphsEditor from '@/components/admin/AdminStoryParagraphsEditor';
 import AdminVersionsPanel from '@/components/admin/AdminVersionsPanel';
+import { getDefaultGalleryCollections } from '@/lib/gallery-data';
 import {
   AboutPageContent,
   EventCategory,
   EventStatus,
   GalleryCollection,
-  LeadershipProfile,
   PopupContent,
   PopupTextStyle,
   RegistrationRecord,
@@ -199,9 +206,11 @@ export default function AdminDashboardPage() {
     | 'countdown'
     | 'popup'
     | 'images'
+    | 'gallery'
     | 'social'
     | 'about'
     | 'pages'
+    | 'donations'
     | 'registrations'
     | 'versions'
   >('guide');
@@ -213,10 +222,7 @@ export default function AdminDashboardPage() {
   const [countdown, setCountdown] = useState<SiteCountdownSettings>(emptyCountdown);
   const [countdownFallbackLocal, setCountdownFallbackLocal] = useState('');
   const [images, setImages] = useState<SiteImages>({});
-  const [galleryCollectionsRaw, setGalleryCollectionsRaw] = useState('[]');
   const [about, setAbout] = useState<AboutPageContent>(emptyAbout);
-  const [aboutStoryRaw, setAboutStoryRaw] = useState('[]');
-  const [aboutLeadersRaw, setAboutLeadersRaw] = useState('[]');
   const [socialLinks, setSocialLinks] = useState<SocialLink[]>(defaultSocialLinks);
   const [pageContent, setPageContent] = useState<SitePageContents>(emptySitePageContents);
   const [pageEditSection, setPageEditSection] = useState<keyof SitePageContents>('gallery');
@@ -262,15 +268,18 @@ export default function AdminDashboardPage() {
       pagesRes.json(),
     ]);
     setPopup({ ...emptyPopup, ...(popupData.popup ?? {}) });
-    setImages(imagesData.images ?? {});
-    setGalleryCollectionsRaw(JSON.stringify(imagesData.images?.galleryCollections ?? [], null, 2));
+    const loadedImages = imagesData.images ?? {};
+    const savedCollections = loadedImages.galleryCollections ?? [];
+    setImages({
+      ...loadedImages,
+      galleryCollections:
+        savedCollections.length > 0 ? savedCollections : getDefaultGalleryCollections(),
+    });
     const cd = countdownData.countdown ?? emptyCountdown;
     setCountdown({ ...emptyCountdown, ...cd });
     setCountdownFallbackLocal(toDatetimeLocalValue(cd.fallbackTargetAt));
     const aboutNext = { ...emptyAbout, ...(aboutData.about ?? {}) };
     setAbout(aboutNext);
-    setAboutStoryRaw(JSON.stringify(aboutNext.storyParagraphs ?? [], null, 2));
-    setAboutLeadersRaw(JSON.stringify(aboutNext.leadershipProfiles ?? [], null, 2));
     setSocialLinks(
       Array.isArray(socialData.socialLinks) && socialData.socialLinks.length > 0
         ? socialData.socialLinks
@@ -428,12 +437,6 @@ export default function AdminDashboardPage() {
   }
 
   async function saveImages() {
-    try {
-      JSON.parse(galleryCollectionsRaw);
-    } catch {
-      setMessage('Gallery JSON is invalid. Please fix it before saving.');
-      return;
-    }
     const response = await fetch('/api/admin/images', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
@@ -442,40 +445,45 @@ export default function AdminDashboardPage() {
     if (response.ok) setMessage('Images updated.');
   }
 
-  async function saveAbout() {
-    let parsedStory: string[] = [];
-    let parsedLeaders: LeadershipProfile[] = [];
-    try {
-      const story = JSON.parse(aboutStoryRaw) as unknown;
-      if (!Array.isArray(story) || story.some((item) => typeof item !== 'string')) {
-        throw new Error('story');
-      }
-      parsedStory = story.map((item) => item.trim()).filter(Boolean);
-    } catch {
-      setMessage('About story JSON must be an array of strings.');
-      return;
-    }
-    try {
-      const leaders = JSON.parse(aboutLeadersRaw) as unknown;
-      if (!Array.isArray(leaders)) throw new Error('leaders');
-      parsedLeaders = leaders.map((item) => {
-        const row = item as Partial<LeadershipProfile>;
-        return {
-          name: String(row.name ?? '').trim(),
-          role: String(row.role ?? '').trim(),
-          imageUrl: String(row.imageUrl ?? '').trim(),
-          blurb: String(row.blurb ?? '').trim(),
-        };
-      });
-    } catch {
-      setMessage('Leadership JSON is invalid. Use an array of profile objects.');
-      return;
-    }
+  function sanitizeGalleryCollections(collections: GalleryCollection[]): GalleryCollection[] {
+    return collections
+      .map((item) => ({
+        slug: String(item.slug ?? '').trim(),
+        title: String(item.title ?? '').trim(),
+        year: String(item.year ?? '').trim(),
+        description: String(item.description ?? '').trim(),
+        imageUrls: (item.imageUrls ?? []).map((url) => String(url).trim()).filter(Boolean),
+      }))
+      .filter((item) => item.slug && item.title && item.year && item.description && item.imageUrls.length > 0);
+  }
 
+  async function saveGallery() {
+    const sanitized = sanitizeGalleryCollections(images.galleryCollections ?? []);
+    const payload = { ...images, galleryCollections: sanitized };
+    const response = await fetch('/api/admin/images', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    if (!response.ok) {
+      setMessage('Could not save gallery.');
+      return;
+    }
+    const data = await response.json();
+    setImages(data.images ?? payload);
+    setMessage(`Gallery saved (${sanitized.length} collection${sanitized.length === 1 ? '' : 's'}).`);
+  }
+
+  async function saveAbout() {
     const payload: AboutPageContent = {
       ...about,
-      storyParagraphs: parsedStory,
-      leadershipProfiles: parsedLeaders,
+      storyParagraphs: (about.storyParagraphs ?? []).map((p) => p.trim()).filter(Boolean),
+      leadershipProfiles: (about.leadershipProfiles ?? []).map((row) => ({
+        name: row.name.trim(),
+        role: row.role.trim(),
+        imageUrl: row.imageUrl.trim(),
+        blurb: row.blurb.trim(),
+      })),
     };
     const response = await fetch('/api/admin/about', {
       method: 'PUT',
@@ -487,10 +495,7 @@ export default function AdminDashboardPage() {
       return;
     }
     const data = await response.json();
-    const aboutNext = { ...emptyAbout, ...(data.about ?? payload) };
-    setAbout(aboutNext);
-    setAboutStoryRaw(JSON.stringify(aboutNext.storyParagraphs ?? [], null, 2));
-    setAboutLeadersRaw(JSON.stringify(aboutNext.leadershipProfiles ?? [], null, 2));
+    setAbout({ ...emptyAbout, ...(data.about ?? payload) });
     setMessage('About page content updated.');
   }
 
@@ -614,9 +619,11 @@ export default function AdminDashboardPage() {
               'countdown',
               'popup',
               'images',
+              'gallery',
               'social',
               'about',
               'pages',
+              'donations',
               'registrations',
               'versions',
             ] as const
@@ -632,9 +639,11 @@ export default function AdminDashboardPage() {
               {key === 'countdown' && 'Countdown'}
               {key === 'popup' && 'Popup'}
               {key === 'images' && 'Imagery'}
+              {key === 'gallery' && 'Gallery'}
               {key === 'social' && 'Social Links'}
               {key === 'about' && 'About Page'}
               {key === 'pages' && 'Site pages'}
+              {key === 'donations' && 'Donations'}
               {key === 'registrations' && 'Registrations'}
               {key === 'versions' && 'Versions'}
             </button>
@@ -643,6 +652,8 @@ export default function AdminDashboardPage() {
 
         {message ? <div className="admin-toast">{message}</div> : null}
 
+        <div className="admin-workspace">
+          <div className="admin-workspace-main">
         {tab === 'guide' ? <AdminGuidePanel /> : null}
 
         {tab === 'events' ? (
@@ -773,11 +784,10 @@ export default function AdminDashboardPage() {
               </div>
               <div>
                 <label className="admin-field-label">Flyer / info image</label>
-                <input
-                  className="admin-input mb-2"
-                  placeholder="Image URL"
+                <AdminImageUrlField
                   value={eventForm.imageUrl}
-                  onChange={(e) => setEventForm((p) => ({ ...p, imageUrl: e.target.value }))}
+                  onChange={(url) => setEventForm((p) => ({ ...p, imageUrl: url }))}
+                  placeholder="Image URL"
                 />
                 <div
                   className="admin-drop"
@@ -800,11 +810,11 @@ export default function AdminDashboardPage() {
               </div>
               <div>
                 <label className="admin-field-label">Events page hero image</label>
-                <input
-                  className="admin-input"
-                  placeholder="Large top banner image URL"
+                <AdminImageUrlField
                   value={eventForm.heroImageUrl ?? ''}
-                  onChange={(e) => setEventForm((p) => ({ ...p, heroImageUrl: e.target.value }))}
+                  onChange={(url) => setEventForm((p) => ({ ...p, heroImageUrl: url }))}
+                  placeholder="Large top banner image URL"
+                  inputClassName="admin-input"
                 />
               </div>
               <div>
@@ -1074,10 +1084,9 @@ export default function AdminDashboardPage() {
               </div>
               <div>
                 <label className="admin-field-label">Artwork</label>
-                <input
-                  className="admin-input mb-2"
+                <AdminImageUrlField
                   value={popup.imageUrl}
-                  onChange={(e) => setPopup((p) => ({ ...p, imageUrl: e.target.value }))}
+                  onChange={(url) => setPopup((p) => ({ ...p, imageUrl: url }))}
                 />
                 <div
                   className="admin-drop"
@@ -1173,10 +1182,9 @@ export default function AdminDashboardPage() {
             ).map(({ key, label }) => (
               <div key={key} className="rounded-xl border border-[rgba(194,24,91,0.12)] bg-white/65 p-4">
                 <label className="admin-field-label">{label}</label>
-                <input
-                  className="admin-input mb-2"
+                <AdminImageUrlField
                   value={images[key] ?? ''}
-                  onChange={(e) => setImages((p) => ({ ...p, [key]: e.target.value }))}
+                  onChange={(url) => setImages((p) => ({ ...p, [key]: url }))}
                 />
                 <div
                   className="admin-drop"
@@ -1230,55 +1238,32 @@ export default function AdminDashboardPage() {
                   setImages((p) => ({ ...p, founderCarouselUrls: lines }));
                 }}
               />
+              <AdminImagePreviewList urls={images.founderCarouselUrls ?? []} />
             </div>
-            <div className="rounded-xl border border-[rgba(194,24,91,0.12)] bg-white/65 p-4">
-              <label className="admin-field-label">Gallery collections JSON (editable folders/events)</label>
-              <p className="mb-2 text-xs text-black/50">
-                Each collection becomes one event folder on `/gallery`. Hovering any image shows that collection&apos;s
-                description, and clicking opens its event page with all photos.
-              </p>
-              <textarea
-                rows={14}
-                className="admin-input font-mono text-[0.7rem] leading-relaxed"
-                value={galleryCollectionsRaw}
-                onChange={(e) => {
-                  const nextRaw = e.target.value;
-                  setGalleryCollectionsRaw(nextRaw);
-                  try {
-                    const parsed = JSON.parse(nextRaw) as GalleryCollection[];
-                    if (!Array.isArray(parsed)) throw new Error('Must be an array.');
-                    const sanitized = parsed.map((item) => ({
-                      slug: String(item.slug ?? '').trim(),
-                      title: String(item.title ?? '').trim(),
-                      year: String(item.year ?? '').trim(),
-                      description: String(item.description ?? '').trim(),
-                      imageUrls: Array.isArray(item.imageUrls)
-                        ? item.imageUrls.map((url) => String(url).trim()).filter(Boolean)
-                        : [],
-                    }));
-                    setImages((p) => ({ ...p, galleryCollections: sanitized }));
-                    setMessage('');
-                  } catch {
-                    // Keep typing fluid while showing parse guidance.
-                    setMessage('Invalid gallery JSON. Fix format before saving.');
-                  }
-                }}
-                placeholder={`[
-  {
-    "slug": "feast-2025-opening-night",
-    "title": "Opening Night Worship",
-    "year": "2025",
-    "description": "Highlights from the opening service.",
-    "imageUrls": [
-      "https://res.cloudinary.com/...",
-      "https://res.cloudinary.com/..."
-    ]
-  }
-]`}
-              />
-            </div>
+            <p className="text-xs text-black/50">
+              Gallery collections are managed on the <strong>Gallery</strong> tab.
+            </p>
             <button type="button" onClick={saveImages} className="btn-primary rounded-full px-10">
               Save imagery
+            </button>
+          </div>
+        ) : null}
+
+        {tab === 'gallery' ? (
+          <div className="admin-card max-w-4xl space-y-6">
+            <h2>Gallery collections</h2>
+            <p className="text-sm text-black/55">
+              Each collection is one event folder on the public Gallery page. Replace yellow placeholder photos with
+              your Cloudinary uploads, or delete them.
+            </p>
+            <AdminGalleryEditor
+              collections={images.galleryCollections ?? []}
+              onChange={(galleryCollections) => setImages((p) => ({ ...p, galleryCollections }))}
+              onUploadImage={uploadImage}
+              onDragOver={preventDragDefaults}
+            />
+            <button type="button" onClick={saveGallery} className="btn-primary rounded-full px-10">
+              Save gallery
             </button>
           </div>
         ) : null}
@@ -1389,10 +1374,9 @@ export default function AdminDashboardPage() {
             </div>
             <div>
               <label className="admin-field-label">Hero image URL</label>
-              <input
-                className="admin-input mb-2"
+              <AdminImageUrlField
                 value={about.heroImageUrl}
-                onChange={(e) => setAbout((p) => ({ ...p, heroImageUrl: e.target.value }))}
+                onChange={(url) => setAbout((p) => ({ ...p, heroImageUrl: url }))}
               />
               <div
                 className="admin-drop"
@@ -1423,12 +1407,10 @@ export default function AdminDashboardPage() {
               />
             </div>
             <div>
-              <label className="admin-field-label">Story paragraphs JSON (array of strings)</label>
-              <textarea
-                rows={8}
-                className="admin-input font-mono text-[0.72rem] leading-relaxed"
-                value={aboutStoryRaw}
-                onChange={(e) => setAboutStoryRaw(e.target.value)}
+              <label className="admin-field-label">Story paragraphs</label>
+              <AdminStoryParagraphsEditor
+                paragraphs={about.storyParagraphs ?? []}
+                onChange={(storyParagraphs) => setAbout((p) => ({ ...p, storyParagraphs }))}
               />
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
@@ -1486,14 +1468,12 @@ export default function AdminDashboardPage() {
               </div>
             </div>
             <div>
-              <label className="admin-field-label">
-                Leadership profiles JSON (array: name, role, imageUrl, blurb)
-              </label>
-              <textarea
-                rows={12}
-                className="admin-input font-mono text-[0.72rem] leading-relaxed"
-                value={aboutLeadersRaw}
-                onChange={(e) => setAboutLeadersRaw(e.target.value)}
+              <label className="admin-field-label">Leadership profiles</label>
+              <AdminLeadershipEditor
+                profiles={about.leadershipProfiles ?? []}
+                onChange={(leadershipProfiles) => setAbout((p) => ({ ...p, leadershipProfiles }))}
+                onUploadImage={uploadImage}
+                onDragOver={preventDragDefaults}
               />
             </div>
             <button type="button" onClick={saveAbout} className="btn-primary rounded-full px-10">
@@ -1508,7 +1488,7 @@ export default function AdminDashboardPage() {
               <h2>Site pages</h2>
               <p className="text-sm text-black/55">
                 Update headlines and supporting text visitors see on Gallery, Events, Contact, Donate, Register, Founder,
-                and About Us. Images for collections and carousels still live under <strong>Imagery</strong>; paste image
+                and About Us. Gallery photos live under <strong>Gallery</strong>; other site images under <strong>Imagery</strong>. Paste image
                 URLs here for the founder hero.
               </p>
               <div className="flex flex-wrap gap-2">
@@ -1783,8 +1763,9 @@ export default function AdminDashboardPage() {
                     ['sectionChooseAmount', '“Choose amount” heading'],
                     ['sectionCustomAmount', 'Custom amount label'],
                     ['sectionMethod', 'Method heading'],
-                    ['methodCard', 'Card / bank label'],
+                    ['methodZeffy', 'Zeffy label'],
                     ['methodPaypal', 'PayPal label'],
+                    ['zeffyEmbedUrl', 'Zeffy embed URL (iframe src)'],
                     ['sectionDetails', 'Details heading'],
                     ['hintOnline', 'Hint when online URL set'],
                     ['finePrint', 'Fine print (plain text; replaces default with contact link)'],
@@ -1799,7 +1780,12 @@ export default function AdminDashboardPage() {
                   <div
                     key={key}
                     className={
-                      key === 'asideLead' || key === 'hintOnline' || key === 'finePrint' ? 'md:col-span-2' : ''
+                      key === 'asideLead' ||
+                      key === 'hintOnline' ||
+                      key === 'finePrint' ||
+                      key === 'zeffyEmbedUrl'
+                        ? 'md:col-span-2'
+                        : ''
                     }
                   >
                     <label className="admin-field-label">{lab}</label>
@@ -2041,16 +2027,16 @@ export default function AdminDashboardPage() {
                 ).map(([key, label]) => (
                   <div key={key} className="md:col-span-2">
                     <label className="admin-field-label">Sidebar image — {label}</label>
-                    <input
-                      className="admin-input font-mono text-[0.72rem]"
+                    <AdminImageUrlField
                       value={pageContent.about2[key] ?? ''}
-                      onChange={(e) =>
+                      onChange={(url) =>
                         setPageContent((p) => ({
                           ...p,
-                          about2: { ...p.about2, [key]: e.target.value },
+                          about2: { ...p.about2, [key]: url },
                         }))
                       }
                       placeholder="https://…"
+                      inputClassName="admin-input font-mono text-[0.72rem] mb-2"
                     />
                   </div>
                 ))}
@@ -2065,6 +2051,8 @@ export default function AdminDashboardPage() {
             </div>
           </div>
         ) : null}
+
+        {tab === 'donations' ? <AdminDonationsPanel /> : null}
 
         {tab === 'versions' ? (
           <AdminVersionsPanel onReload={reloadAll} onMessage={setMessage} />
@@ -2151,6 +2139,9 @@ export default function AdminDashboardPage() {
             ) : null}
           </div>
         ) : null}
+          </div>
+          <AdminPagePreview tab={tab} pageSection={pageEditSection} />
+        </div>
       </div>
     </div>
   );

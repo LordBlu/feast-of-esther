@@ -8,7 +8,12 @@ import styles from './DonateStyles.module.css';
 
 const PRESETS = [25, 50, 100, 250, 500];
 
-const DONATE_URL = process.env.NEXT_PUBLIC_DONATE_URL ?? '';
+const ZEFFY_EMBED_URL =
+  process.env.NEXT_PUBLIC_ZEFFY_EMBED_URL?.trim() ||
+  process.env.NEXT_PUBLIC_DONATE_URL?.trim() ||
+  '';
+
+const PAYPAL_URL = process.env.NEXT_PUBLIC_PAYPAL_DONATE_URL?.trim() || '';
 
 const DEFAULT_OFFLINE_HINT =
   'Online giving is not connected here yet. To give today, email feastofesthernc@gmail.com or call (832) 372-0860. Mention your preferred amount ({{amount}}){{methodNote}} and whether you need a receipt.';
@@ -20,7 +25,7 @@ export interface DonateClientProps {
 export default function DonateClient({ page }: DonateClientProps) {
   const [amount, setAmount] = useState<number>(50);
   const [custom, setCustom] = useState('');
-  const [method, setMethod] = useState<'card' | 'paypal'>('card');
+  const [method, setMethod] = useState<'zeffy' | 'paypal'>('zeffy');
   const [info, setInfo] = useState({ first: '', last: '', email: '', phone: '' });
   const [showOffline, setShowOffline] = useState(false);
 
@@ -30,7 +35,8 @@ export default function DonateClient({ page }: DonateClientProps) {
     return amount;
   }, [amount, custom]);
 
-  const giveHref = DONATE_URL.trim();
+  const zeffyEmbedUrl = page.zeffyEmbedUrl?.trim() || ZEFFY_EMBED_URL;
+  const paypalHref = PAYPAL_URL;
 
   const asideTitle = page.asideTitle ?? 'Give with joy';
   const asideLead =
@@ -46,11 +52,11 @@ export default function DonateClient({ page }: DonateClientProps) {
   const sectionChooseAmount = page.sectionChooseAmount ?? 'Choose an amount';
   const sectionCustomAmount = page.sectionCustomAmount ?? 'Or enter a custom amount';
   const sectionMethod = page.sectionMethod ?? "How you'd like to give";
-  const methodCard = page.methodCard ?? 'Card / bank (online)';
+  const methodZeffy = page.methodZeffy ?? page.methodCard ?? 'Zeffy';
   const methodPaypal = page.methodPaypal ?? 'PayPal';
   const sectionDetails = page.sectionDetails ?? 'Your details';
   const hintOnline =
-    page.hintOnline ?? 'You will complete payment on our secure giving page in a new tab.';
+    page.hintOnline ?? 'Complete your gift securely using the form below or your chosen payment option.';
   const finePrintCustom = page.finePrint?.trim();
   const featureImpactTitle = page.featureImpactTitle ?? 'Impact';
   const featureImpactText =
@@ -60,18 +66,49 @@ export default function DonateClient({ page }: DonateClientProps) {
     page.featureStewardshipText ?? 'We honor your trust with careful, transparent use of resources.';
   const featureSecureTitle = page.featureSecureTitle ?? 'Secure';
   const featureSecureText =
-    page.featureSecureText ?? 'Use your organization’s official processor when the link is configured.';
+    page.featureSecureText ?? 'Giving is processed through Zeffy or PayPal on their secure pages.';
 
-  const methodNote = method === 'paypal' ? ' and that you prefer PayPal' : '';
+  const methodNote = method === 'paypal' ? ' and that you prefer PayPal' : ' and that you prefer Zeffy';
   const offlineHintText = fillTemplate(page.hintOfflineTemplate?.trim() || DEFAULT_OFFLINE_HINT, {
     amount: `$${displayAmount.toFixed(2)}`,
     methodNote,
   });
 
+  async function trackDonation(
+    action: 'method_select' | 'give_click' | 'paypal_link',
+    methodOverride?: 'zeffy' | 'paypal'
+  ) {
+    try {
+      await fetch('/api/donate/intent', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action,
+          method: methodOverride ?? method,
+          amount: displayAmount,
+          firstName: info.first.trim() || undefined,
+          lastName: info.last.trim() || undefined,
+          email: info.email.trim() || undefined,
+          phone: info.phone.trim() || undefined,
+        }),
+      });
+    } catch {
+      /* analytics must not block giving */
+    }
+  }
+
   function handleGiveClick() {
-    if (giveHref) return;
+    void trackDonation('give_click');
+    if (method === 'zeffy' && zeffyEmbedUrl) {
+      document.getElementById('zeffy-embed')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      return;
+    }
+    if (method === 'paypal' && paypalHref) return;
     setShowOffline(true);
   }
+
+  const showZeffyEmbed = method === 'zeffy' && Boolean(zeffyEmbedUrl);
+  const canGiveOnline = method === 'zeffy' ? Boolean(zeffyEmbedUrl) : Boolean(paypalHref);
 
   return (
     <div className={styles.page}>
@@ -129,10 +166,13 @@ export default function DonateClient({ page }: DonateClientProps) {
           <div className={styles.methodRow}>
             <button
               type="button"
-              className={`${styles.method} ${method === 'card' ? styles.methodActive : ''}`}
-              onClick={() => setMethod('card')}
+              className={`${styles.method} ${method === 'zeffy' ? styles.methodActive : ''}`}
+              onClick={() => {
+                setMethod('zeffy');
+                void trackDonation('method_select', 'zeffy');
+              }}
             >
-              {methodCard}
+              {methodZeffy}
             </button>
             <button
               type="button"
@@ -142,6 +182,19 @@ export default function DonateClient({ page }: DonateClientProps) {
               {methodPaypal}
             </button>
           </div>
+
+          {showZeffyEmbed ? (
+            <div id="zeffy-embed" className={styles.zeffyEmbedWrap}>
+              <iframe
+                src={zeffyEmbedUrl}
+                title="Give via Zeffy"
+                className={styles.zeffyEmbed}
+                loading="lazy"
+                allow="payment"
+                referrerPolicy="strict-origin-when-cross-origin"
+              />
+            </div>
+          ) : null}
 
           <h2 className={styles.sectionLabel}>{sectionDetails}</h2>
           <div className={styles.fieldGrid}>
@@ -196,30 +249,39 @@ export default function DonateClient({ page }: DonateClientProps) {
             </div>
           </div>
 
-          {giveHref ? (
+          {method === 'paypal' && paypalHref ? (
             <Link
-              href={giveHref}
+              href={paypalHref}
               target="_blank"
               rel="noopener noreferrer"
               className={`${styles.cta} ${styles.ctaLink}`}
+              onClick={() => void trackDonation('paypal_link', 'paypal')}
             >
-              Give ${displayAmount.toFixed(0)} — continue securely
+              Give ${displayAmount.toFixed(0)} — PayPal
             </Link>
+          ) : canGiveOnline ? (
+            <button type="button" className={styles.cta} onClick={handleGiveClick}>
+              {method === 'zeffy'
+                ? `Give $${displayAmount.toFixed(0)} — open Zeffy form`
+                : `Give $${displayAmount.toFixed(0)} — online`}
+            </button>
           ) : (
             <button type="button" className={styles.cta} onClick={handleGiveClick}>
-              Give ${displayAmount.toFixed(0)} — {method === 'paypal' ? 'PayPal' : 'online'}
+              Give ${displayAmount.toFixed(0)} — {method === 'paypal' ? 'PayPal' : 'Zeffy'}
             </button>
           )}
 
-          {showOffline && !giveHref ? (
+          {showOffline && !canGiveOnline ? (
             <p className={styles.hint} role="status">
               {offlineHintText}
             </p>
           ) : (
             <p className={styles.hint}>
-              {giveHref
-                ? hintOnline
-                : 'Use the button above for email and phone instructions. A one-click online link can be added when your giving portal is ready.'}
+              {canGiveOnline
+                ? method === 'zeffy'
+                  ? 'Use the embedded Zeffy form above, or the button to scroll to it. Amount presets are a guide — choose your gift on Zeffy.'
+                  : hintOnline
+                : 'Use the button above for email and phone instructions. Add NEXT_PUBLIC_ZEFFY_EMBED_URL or NEXT_PUBLIC_PAYPAL_DONATE_URL when your giving links are ready.'}
             </p>
           )}
 
@@ -259,7 +321,6 @@ export default function DonateClient({ page }: DonateClientProps) {
               <p>{featureSecureText}</p>
             </div>
           </div>
-
         </div>
       </div>
     </div>

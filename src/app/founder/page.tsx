@@ -22,10 +22,6 @@ export default async function FounderPage() {
 
   return (
     <div className="min-h-screen bg-[#faf8fc]">
-      {/*
-        Dockers-style pin: tall scroll track keeps the hero in view (sticky) while the user
-        moves through this segment, then the rest of the page scrolls normally.
-      */}
       <div className="founder-pin-track relative w-full">
         <div className="sticky top-0 z-0 h-screen w-full">
           <FounderHero backgroundSrc={heroBg} />
@@ -34,22 +30,24 @@ export default async function FounderPage() {
 
       <div className="relative z-10 bg-[#faf8fc]">
         <div className="foe-shell founder-body">
-          <div
-            id="founder-story"
-            className="founder-story mx-auto mb-0 grid w-full max-w-6xl scroll-mt-28 lg:grid-cols-[1.1fr_0.9fr] lg:items-start"
-          >
-            <div className="founder-story-copy mx-auto w-full max-w-3xl text-left text-[1.06rem] leading-[1.82] text-[#303845] md:text-[1.08rem]">
-              <p>{storyP1}</p>
-              <p>{storyP2}</p>
-              <p>{storyP3}</p>
+          <div className="founder-page-content">
+            <div
+              id="founder-story"
+              className="founder-story mx-auto mb-0 grid w-full max-w-6xl scroll-mt-28 lg:grid-cols-[1.1fr_0.9fr] lg:items-start"
+            >
+              <div className="founder-story-copy w-full min-w-0 text-left text-[1.06rem] leading-[1.82] text-[#303845] md:text-[1.08rem]">
+                <p>{storyP1}</p>
+                <p>{storyP2}</p>
+                <p>{storyP3}</p>
+              </div>
+              <div className="founder-story-media">
+                <FounderCarousel urls={slides} />
+              </div>
             </div>
-            <div className="flex w-full justify-center">
-              <FounderCarousel urls={slides} />
-            </div>
-          </div>
 
-          <div className="founder-ministry-zone mx-auto w-full max-w-6xl">
-            <FounderMinistryCards />
+            <div className="founder-ministry-zone mx-auto w-full max-w-6xl">
+              <FounderMinistryCards />
+            </div>
           </div>
         </div>
       </div>

@@ -1,8 +1,10 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
+import { randomUUID } from 'node:crypto';
 import type {
   AboutPageContent,
   CmsData,
+  DonationIntent,
   LeadershipProfile,
   SitePageContents,
   SocialLink,
@@ -136,6 +138,7 @@ const defaultData: CmsData = {
     galleryCollections: [],
   },
   registrations: [],
+  donationIntents: [],
   countdown: defaultCountdown,
   about: defaultAbout,
   socialLinks: defaultSocialLinks,
@@ -182,8 +185,24 @@ export async function readCmsData(): Promise<CmsData> {
       })) ?? defaultData.socialLinks,
     events,
     registrations: parsed.registrations ?? [],
+    donationIntents: parsed.donationIntents ?? [],
     pageContent: mergeSitePageContents(parsed.pageContent as Partial<SitePageContents> | undefined),
   };
+}
+
+export async function appendDonationIntent(
+  intent: Omit<DonationIntent, 'id' | 'createdAt'>
+): Promise<DonationIntent> {
+  const data = await readCmsData();
+  const record: DonationIntent = {
+    ...intent,
+    id: randomUUID(),
+    createdAt: new Date().toISOString(),
+  };
+  const existing = data.donationIntents ?? [];
+  data.donationIntents = [record, ...existing].slice(0, 500);
+  await writeCmsData(data, { recordHistory: false });
+  return record;
 }
 
 export type WriteCmsDataOptions = {

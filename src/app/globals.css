@@ -292,18 +292,41 @@ body {
   margin-right: auto;
 }
 
-/* ── Admin: feminine luxe surface ── */
+/* ── Admin: bright pink + white studio background ── */
 .admin-root {
+  position: relative;
+  isolation: isolate;
   min-height: 100vh;
-  background:
-    radial-gradient(1200px 600px at 10% -10%, rgba(248, 187, 208, 0.45), transparent 55%),
-    radial-gradient(900px 500px at 100% 0%, rgba(232, 201, 122, 0.22), transparent 50%),
-    linear-gradient(165deg, #fdf8fb 0%, #fce4ec 38%, #fdf8f5 100%);
   color: #3a1a2d;
+  background-color: #fff8fb;
+  background-image:
+    radial-gradient(ellipse 110% 70% at 100% -5%, rgba(255, 64, 129, 0.28), transparent 52%),
+    radial-gradient(ellipse 90% 55% at -5% 15%, rgba(252, 228, 236, 0.95), transparent 50%),
+    radial-gradient(circle at 50% 120%, rgba(255, 182, 193, 0.35), transparent 45%),
+    linear-gradient(165deg, #ffffff 0%, #fff5f9 38%, #ffe8f1 100%);
+  background-attachment: fixed;
+}
+
+.admin-root::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.45;
+  background-image: repeating-linear-gradient(
+    -12deg,
+    transparent,
+    transparent 48px,
+    rgba(255, 255, 255, 0.55) 48px,
+    rgba(255, 255, 255, 0.55) 49px
+  );
 }
 
 .admin-shell {
-  max-width: 56rem;
+  position: relative;
+  z-index: 1;
+  max-width: min(96rem, 100%);
   margin-left: auto;
   margin-right: auto;
   padding: 2rem 1.25rem 4rem;
@@ -314,6 +337,84 @@ body {
     padding-left: 2rem;
     padding-right: 2rem;
   }
+}
+
+.admin-workspace {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+@media (min-width: 1100px) {
+  .admin-workspace {
+    grid-template-columns: minmax(0, 1fr) min(400px, 36vw);
+  }
+}
+
+.admin-workspace-main {
+  min-width: 0;
+}
+
+.admin-preview-panel {
+  display: none;
+  flex-direction: column;
+  border-radius: 1rem;
+  border: 1px solid rgba(194, 24, 91, 0.18);
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: 0 12px 40px rgba(194, 24, 91, 0.12);
+  overflow: hidden;
+  min-height: 320px;
+}
+
+@media (min-width: 1100px) {
+  .admin-preview-panel {
+    display: flex;
+    position: sticky;
+    top: 1rem;
+    max-height: calc(100vh - 2rem);
+  }
+}
+
+.admin-preview-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.65rem 0.85rem;
+  border-bottom: 1px solid rgba(194, 24, 91, 0.1);
+  background: linear-gradient(90deg, #fff0f5, #ffffff);
+}
+
+.admin-preview-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--primary-dark);
+  margin: 0;
+}
+
+.admin-preview-path {
+  font-size: 0.7rem;
+  color: rgba(58, 26, 45, 0.5);
+  padding: 0.35rem 0.85rem 0;
+  margin: 0;
+}
+
+.admin-preview-frame-wrap {
+  flex: 1;
+  min-height: 280px;
+  padding: 0.5rem;
+}
+
+.admin-preview-iframe {
+  width: 100%;
+  height: min(72vh, 640px);
+  border: 1px solid rgba(194, 24, 91, 0.12);
+  border-radius: 0.5rem;
+  background: #fff;
 }
 
 .admin-hero {
@@ -1595,7 +1696,21 @@ body {
 
 /* ── Founder page (editorial spacing) ── */
 .founder-body {
-  padding: var(--editorial-section-y-half) 0 var(--editorial-section-y);
+  padding: var(--editorial-section-y-half) 0 calc(var(--editorial-section-y) / 2);
+}
+
+/* Story + ministry: nudge toward screen right (carousel side) to balance empty margin */
+.founder-page-content {
+  width: 100%;
+  max-width: 72rem;
+  margin-inline: auto;
+}
+
+@media (min-width: 1024px) {
+  .founder-page-content {
+    padding-inline-start: clamp(1.25rem, 3vw, 2.75rem);
+    padding-inline-end: clamp(0.25rem, 0.75vw, 0.5rem);
+  }
 }
 
 .founder-pin-track {
@@ -1611,22 +1726,29 @@ body {
 .founder-story {
   margin-bottom: calc(var(--editorial-content-gap) / 2);
   padding-bottom: calc(var(--editorial-content-gap) / 2);
-  gap: var(--editorial-inner-gap) !important;
-  justify-items: center;
-  text-align: center;
+  gap: clamp(1.75rem, 4vw, 3rem) !important;
+  justify-items: stretch;
+  align-items: start;
 }
 
 .founder-story-copy {
   display: flex;
   flex-direction: column;
   gap: clamp(1.35rem, 2.5vw, 2rem);
-  margin-inline: auto;
-  text-align: center;
+  text-align: left;
+}
+
+.founder-story-media {
+  width: 100%;
+  min-width: 0;
+  display: flex;
+  justify-content: center;
 }
 
 .founder-ministry-zone {
   margin-top: calc(var(--editorial-content-gap) / 2);
   padding-top: calc(var(--editorial-content-gap) / 2);
+  padding-bottom: 0;
   border-top: 1px solid rgba(236, 230, 239, 0.9);
   display: flex;
   flex-direction: column;

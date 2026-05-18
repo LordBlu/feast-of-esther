@@ -1,13 +1,15 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import { Suspense } from 'react';
 import { usePathname } from 'next/navigation';
 import AnnouncementBar from '@/components/AnnouncementBar';
 import Navbar from '@/components/Navbar';
 import PageViewTransition from '@/components/PageViewTransition';
 import SiteFooter from '@/components/SiteFooter';
-import EventPopup from '@/components/EventPopup';
-import HadassahChat from '@/components/HadassahChat';
+
+const EventPopup = dynamic(() => import('@/components/EventPopup'), { ssr: false });
+const HadassahChat = dynamic(() => import('@/components/HadassahChat'), { ssr: false });
 
 function ConditionalLayoutInner({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();

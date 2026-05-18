@@ -61,6 +61,7 @@ export default function HomeReliveFeast({
                   alt=""
                   className={`${styles.cellImg} ${styles.cellImgVisible}`}
                   decoding="async"
+                  loading="lazy"
                 />
               </div>
             );

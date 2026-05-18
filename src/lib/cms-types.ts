@@ -107,6 +107,22 @@ export interface RegistrationRecord {
   createdAt: string;
 }
 
+/** Logged when visitors interact with /donate (method choice, give CTA, PayPal link). */
+export type DonationIntentAction = 'method_select' | 'give_click' | 'paypal_link';
+export type DonationIntentMethod = 'zeffy' | 'paypal';
+
+export interface DonationIntent {
+  id: string;
+  action: DonationIntentAction;
+  method: DonationIntentMethod;
+  amount: number;
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  phone?: string;
+  createdAt: string;
+}
+
 export interface LeadershipProfile {
   name: string;
   role: string;
@@ -186,8 +202,13 @@ export interface DonatePageContent {
   sectionChooseAmount?: string;
   sectionCustomAmount?: string;
   sectionMethod?: string;
+  /** Label for the Zeffy giving option. */
+  methodZeffy?: string;
+  /** @deprecated Use methodZeffy */
   methodCard?: string;
   methodPaypal?: string;
+  /** iframe `src` for embedded Zeffy form (overrides env when set). */
+  zeffyEmbedUrl?: string;
   sectionDetails?: string;
   hintOnline?: string;
   /** When no donate URL; supports {{amount}} and {{methodNote}} (e.g. PayPal). */
@@ -274,6 +295,7 @@ export interface CmsData {
   popup: PopupContent;
   images: SiteImages;
   registrations: RegistrationRecord[];
+  donationIntents?: DonationIntent[];
   countdown: SiteCountdownSettings;
   about: AboutPageContent;
   socialLinks: SocialLink[];

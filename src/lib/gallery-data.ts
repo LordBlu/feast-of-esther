@@ -103,6 +103,37 @@ export function getGalleryItem(slug: string) {
   return galleryItems.find((item) => item.slug === slug);
 }
 
+/** URLs from bundled demo gallery — highlight these in Admin so editors can replace them. */
+export function getGalleryPlaceholderUrls(): string[] {
+  const urls = new Set<string>(CLOUDINARY_GALLERY_POOL);
+  for (const item of galleryItems) {
+    urls.add(item.coverImage);
+    for (const img of item.images) urls.add(img);
+  }
+  return [...urls];
+}
+
+export function isGalleryPlaceholderUrl(url: string): boolean {
+  const trimmed = url.trim();
+  if (!trimmed) return false;
+  const normalized = trimmed.split('?')[0] ?? trimmed;
+  return getGalleryPlaceholderUrls().some((sample) => {
+    const sampleBase = sample.split('?')[0] ?? sample;
+    return normalized === sampleBase || normalized.endsWith(sampleBase.split('/').pop() ?? '');
+  });
+}
+
+/** Starter collections for Admin when CMS has none saved yet (matches public fallback). */
+export function getDefaultGalleryCollections(): GalleryCollection[] {
+  return galleryItems.map((item) => ({
+    slug: item.slug,
+    title: item.title,
+    year: item.year,
+    description: item.description,
+    imageUrls: [...item.images],
+  }));
+}
+
 export function resolveGalleryItems(cmsCollections: GalleryCollection[] | undefined): GalleryItem[] {
   type Candidate = {
     slug?: string;

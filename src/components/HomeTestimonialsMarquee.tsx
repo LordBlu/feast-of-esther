@@ -34,7 +34,13 @@ export default function HomeTestimonialsMarquee({
               <p className={styles.quote}>{item.quote}</p>
               <div className={styles.author}>
                 {item.imageUrl?.trim() ? (
-                  <img src={item.imageUrl.trim()} alt="" className={styles.avatar} decoding="async" />
+                  <img
+                    src={item.imageUrl.trim()}
+                    alt=""
+                    className={styles.avatar}
+                    decoding="async"
+                    loading="lazy"
+                  />
                 ) : (
                   <span className={styles.avatarPlaceholder} aria-hidden />
                 )}

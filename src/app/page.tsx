@@ -1,11 +1,13 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { useState, useEffect, useMemo } from 'react';
 import FlipClockCountdown from '@/components/FlipClockCountdown';
-import HomeReliveFeast from '@/components/HomeReliveFeast';
 import HomeReserveStay from '@/components/HomeReserveStay';
-import HomeTestimonialsMarquee from '@/components/HomeTestimonialsMarquee';
+
+const HomeReliveFeast = dynamic(() => import('@/components/HomeReliveFeast'));
+const HomeTestimonialsMarquee = dynamic(() => import('@/components/HomeTestimonialsMarquee'));
 import type { HomePageContent, SiteImages } from '@/lib/cms-types';
 import { resolveHomeTestimonials, resolveReliveFeastImages } from '@/lib/home-content';
 import { HERO_CLOUDINARY_SLIDES, HOME_COPY, SITE, SITE_LOGO_URL } from '@/lib/site-content';
@@ -135,6 +137,8 @@ export default function Home() {
                   alt=""
                   className={`hero-slide-img ${idx % 2 === 1 ? 'hero-slide-img--alt' : ''}`}
                   decoding={idx === activeSlideIndex ? 'sync' : 'async'}
+                  loading={idx === activeSlideIndex ? 'eager' : 'lazy'}
+                  fetchPriority={idx === activeSlideIndex ? 'high' : 'low'}
                 />
               </div>
             ))}
@@ -190,6 +194,7 @@ export default function Home() {
                 src={homeVideoSrc}
                 title="Feast of Esther Experience"
                 frameBorder="0"
+                loading="lazy"
                 referrerPolicy="strict-origin-when-cross-origin"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                 allowFullScreen

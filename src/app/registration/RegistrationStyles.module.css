@@ -18,12 +18,17 @@
 }
 
 .aside {
-  background: #9d2a6a;
+  position: relative;
+  z-index: 2;
+  isolation: isolate;
+  background-color: #9d2a6a;
+  background-image: linear-gradient(165deg, #b02e72 0%, #9d2a6a 48%, #7a1f4d 100%);
   padding: 40px 32px 36px;
   color: #fff;
   display: flex;
   flex-direction: column;
   gap: 20px;
+  min-height: 100%;
 }
 
 .asideTitle {

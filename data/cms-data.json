@@ -53,9 +53,54 @@
     "popupImageUrl": "https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1778244638/Save_thedate_mkpbnu.jpg",
     "hotelRoomUrl": "",
     "founderCarouselUrls": [],
-    "galleryCollections": []
+    "galleryCollections": [
+      {
+        "slug": "feast-2017-inaugural",
+        "title": "2017 INAUGURAL BREAKFAST AT FAYETTIEVILLE NORTH-CAROLINA",
+        "year": "2017",
+        "description": "Highlights from the first evening as women in ministry gathered in one heart for worship and renewal.",
+        "imageUrls": [
+          "https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1779112510/gr4_k2aqom.jpg",
+          "https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1779112498/gr5_ondj5f.jpg",
+          "https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1779112490/gr2_obsb0w.jpg",
+          "https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1779112478/gr3_uaodm4.jpg",
+          "https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1779112495/gr6_ebogvw.jpg"
+        ]
+      },
+      {
+        "slug": "feast-2025-leadership-lab",
+        "title": "Leadership Lab",
+        "year": "2025",
+        "description": "Workshop moments from strategic mentoring and leadership activation sessions.",
+        "imageUrls": [
+          "https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1777790073/MA1_pgqf35.jpg",
+          "https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1777790078/MA3_txk1xd.jpg",
+          "https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1777790096/_MG_3358-2_hz4xxv.jpg",
+          "https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1777790096/205A6045_irlj0v.jpg",
+          "https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1777790070/MA_m27h6y.jpg",
+          "https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1777790073/MA1_pgqf35.jpg",
+          "https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1777790078/MA3_txk1xd.jpg"
+        ]
+      },
+      {
+        "slug": "feast-2025-intercession-watch",
+        "title": "Intercession Watch",
+        "year": "2025",
+        "description": "A visual journey through prayer watches, worship sets, and prophetic declarations.",
+        "imageUrls": [
+          "https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1777790078/MA3_txk1xd.jpg",
+          "https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1777790096/_MG_3358-2_hz4xxv.jpg",
+          "https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1777790096/205A6045_irlj0v.jpg",
+          "https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1777790070/MA_m27h6y.jpg",
+          "https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1777790073/MA1_pgqf35.jpg",
+          "https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1777790078/MA3_txk1xd.jpg",
+          "https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1777790096/_MG_3358-2_hz4xxv.jpg"
+        ]
+      }
+    ]
   },
   "registrations": [],
+  "donationIntents": [],
   "countdown": {
     "enabled": true,
     "sourceEventId": null,
@@ -157,6 +202,7 @@
     "donate": {},
     "registration": {},
     "founder": {},
-    "about2": {}
+    "about2": {},
+    "home": {}
   }
 }
