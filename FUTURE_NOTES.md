@@ -4,6 +4,7 @@
 
 - **Build before pairing:** The maintainer runs `npm run build` before starting a chat with the coding agent, to confirm the app compiles and to preview how the site looks. Assume the latest local build has already been checked unless they say otherwise.
 - **Lint on Windows:** Use PowerShell syntax, e.g. `Set-Location "path\to\feast-of-esther"; npm run lint` — not `cd /d` (that is CMD-only).
+- **Git push failed (`No space left on device`):** Free space on `C:` first (delete project `.next`, empty Recycle Bin, Disk Cleanup). Safe dev cleanup: `Remove-Item -Recurse -Force .next` from repo root. If `.git\index.lock` remains after a failed commit, delete it only when no other git process is running. Then `git add`, `git commit`, `git push` again.
 
 ## Project (one line)
 
@@ -11,7 +12,7 @@
 
 ## Progress so far
 
-- **Handoff (May 2026):** Maintainer resting — resume from **`FUTURE_NOTES.md`** + **`ADMIN_GUIDE.md`**. Recent session: **`HomeReliveFeast`** (3×3 rotating grid), **`HomeTestimonialsMarquee`**, **`FounderMinistryCards`** (“Her Ministry Worldwide”, 15s tabs, centered + wide copy panel), About **“Our Mission”** under mission line, admin **Guide** tab + undo actions, **`ADMIN_GUIDE.md`**. **QA:** `tsc`, `lint` (0 errors), `build` pass; `AdminVersionsPanel` mount fetch deferred with `setTimeout(0)` for `react-hooks/set-state-in-effect`. **Not from this app:** MetaMask `inpage.js` = browser extension. *Update this file when you ship more.*
+- **Handoff (May 2026):** Maintainer resting — resume from **`FUTURE_NOTES.md`** + **`ADMIN_GUIDE.md`**. **Latest (Admin overhaul):** Gallery tab with per-collection editor (not JSON); **General photos** vs **Past event** toggle syncs `/events` past grid automatically (`src/lib/gallery-event-sync.ts`); friendly About editors (story paragraphs + leadership cards); founder carousel URL list; **Donations** tab (Zeffy/PayPal click log); admin **Draft / Live** preview panel (`/admin/preview`); slug helpers (`src/lib/slugify.ts`, `AdminSlugField.tsx`). **Still earlier:** `HomeReliveFeast`, `HomeTestimonialsMarquee`, `FounderMinistryCards`, Versions/Guide, **`ADMIN_GUIDE.md`**. **CMS:** no separate database — `data/cms-data.json` + `src/app/api/admin/*`. **QA:** run `npm run build` after pulls. **Not from this app:** MetaMask `inpage.js` = browser extension. *Update this file when you ship more.*
 - **Events page — Programme block:** Replaced the old alternating “Event Schedule” timeline with a **Programme** section modeled on the Alamein-style layout: three clickable **day cards** (18–20 June 2026), **Next →** cycles days, **time | status dot | title/details** timeline, accent `#006699`, responsive stacking on small screens. Implementation: `src/components/events/ProgrammeSection.tsx` + `ProgrammeSection.module.css`, wired from `src/app/events/page.tsx`. Schedule copy in the component is **placeholder** until final programme is confirmed.
 - **Events page:** Still includes hero, info card, hotel block, past events grid; programme sits between info card and hotel.
 - **Homepage (`/`):** Hero crossfade + CTAs. **Forum + video:** mission quote (`HOME_COPY` in `site-content.ts`). **Our Purpose** vision block. **Ministry cards** with in-card watermark images. **Then:** `HomeReliveFeast` → `HomeReserveStay` → `FlipClockCountdown` → `HomeTestimonialsMarquee`. CMS hook: `pageContent.home` (`reliveImageUrls`, `testimonials` JSON) merged in `page-content` API — **no Admin Home UI tab yet**. Copy defaults in `src/lib/home-content.ts`.
@@ -22,6 +23,31 @@
 - **Admin — Versions:** Undo stack + named save slots (`src/lib/cms-history.ts`, `AdminVersionsPanel.tsx`); constants in `cms-history-constants.ts` (do not import `cms-history.ts` from client — uses `node:fs`).
 - **Global route transitions:** Public `<main>` content wrapped in **`PageViewTransition`** (Framer Motion `AnimatePresence` keyed by pathname) — see **Route transitions** section. **`/admin`** is excluded (no animation wrapper).
 - **This file:** Living context for agents and follow-up sessions — **update it** when you ship meaningful UX or infra changes.
+
+## Admin dashboard (May 2026 — editor-friendly)
+
+| Tab | What it does |
+|-----|----------------|
+| **Guide** | Short in-app help (links to `ADMIN_GUIDE.md`) |
+| **Events** | Upcoming/past events; optional **gallery slug** links to `/gallery/[slug]` |
+| **Countdown** | Homepage flip clock |
+| **Popup** | Welcome modal |
+| **Imagery** | Hero, YouTube, founder carousel URLs, hotel, etc. — **not** gallery folders |
+| **Gallery** | Collections → `/gallery/[slug]`; **General photos** or **Past event** (syncs Events page) |
+| **Social Links** | Footer icons |
+| **About Page** | Hero, story **paragraphs** (list), **leadership** (per-person cards), mission |
+| **Site pages** | Marketing copy per route (Gallery title, Donate, Contact, …) |
+| **Donations** | Log of donate-page interactions (`donationIntents` in JSON) |
+| **Registrations** | Sign-ups + CSV export |
+| **Versions** | Undo / Zero / 30 save slots |
+
+**Save rules (Gallery):** Every field required for public listing: slug, title, year, description, **≥1 photo URL**. Incomplete rows save as **Draft** (stored but hidden on `/gallery`). Toast explains live vs draft counts. **`PUT /api/admin/images`** runs `syncGalleryCollectionsToEvents` and `revalidatePath` for `/gallery` + `/events`.
+
+**Preview (wide screens):** Right column — **Draft** (unsaved, `/admin/preview`) vs **Live site** (saved JSON).
+
+**No separate “big backend”:** Admin → Next.js API routes → read/write `data/cms-data.json` (+ Cloudinary for images). See `ADMIN_GUIDE.md` for maintainers.
+
+---
 
 ## Likely next steps (“the rest”)
 
@@ -88,6 +114,9 @@ You do **not** need a custom domain to give them a link. You need a **hosted dep
 | Gallery index | `src/components/GalleryVerticalFeed.tsx`, `GalleryMosaic.module.css` |
 | Gallery detail | `src/app/gallery/[slug]/page.tsx`, `GalleryImageGrid.tsx`, `GalleryImageLightbox.tsx`, `GalleryPageBack.tsx` |
 | Hadassah | `src/components/HadassahChat.tsx`, `POST /api/hadassah` |
+| Admin gallery | `AdminGalleryEditor.tsx`, `gallery-event-sync.ts`, `gallery-data.ts` (`slugifyGallerySlug`, validation) |
+| Admin preview | `AdminPagePreview.tsx`, `AdminPreviewCanvas.tsx`, `src/app/admin/preview/page.tsx` |
+| Donate tracking | `src/app/api/donate/intent/route.ts`, `AdminDonationsPanel.tsx`, `donationIntents` in CMS |
 | CMS history | `src/lib/cms-history.ts`, `cms-snapshot.ts`, `src/app/api/admin/history/*`, `AdminVersionsPanel.tsx` |
 
 ---

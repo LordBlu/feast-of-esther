@@ -71,20 +71,39 @@ Welcome modal on the homepage: text, image, CTA, on/off, and optional typography
 
 ### Imagery
 
-Hero poster, hotel photo on home, founder image, popup fallback, YouTube embed URL, founder carousel URLs, and **gallery collections JSON** (folders on `/gallery`).
+Hero poster, hotel photo on home, founder image, popup fallback, YouTube embed URL, and **founder carousel** (one image per row — add URL or upload). **Gallery folders are edited on the Gallery tab**, not here.
 
 ### Social Links
 
 Footer icons: URL, label, enable/disable, add/remove.
 
+### Gallery
+
+Each **collection** is one folder on `/gallery` and its own page `/gallery/your-slug`.
+
+1. Fill **URL slug**, **title**, **year**, **description**, and **at least one photo** (Cloudinary URL or upload).
+2. Choose collection type:
+   - **General photos** — gallery only.
+   - **Past event** — also appears on the **Events** page under “Past Events” (no need to create the same event twice under Events).
+3. For **Past event**, add **Event dates** (e.g. `June 18–20, 2025`) and optional **venue**.
+4. Wait for the **Live on site** badge (not **Draft**), then click **Save gallery**.
+
+**Draft** means something is still missing — the yellow hint lists what’s needed. **Yellow-highlighted** photos are demo placeholders you can replace or delete.
+
+**Preview (right side on a wide screen):** **Draft** shows unsaved edits; **Live site** shows what visitors see after save. Hard refresh (`Ctrl + F5`) if the live preview looks stale.
+
 ### About Page
 
-Hero title, story paragraphs (JSON array), leadership profiles (JSON: `name`, `role`, `imageUrl`, `blurb`), leadership headings.  
-**Note:** Some fields here (hero image, mission lines) are stored but **not shown** on the current `/about` layout — use **Site pages → About Us** for the case-study page.
+Hero, mission lines, **story paragraphs** (one box per paragraph — add/remove), and **leadership** (one card per person: name, role, photo, short bio).  
+**Note:** Some hero fields are stored but **not shown** on the current `/about` layout — use **Site pages → About Us** for the case-study page.
 
 ### Site pages
 
 Copy for Gallery, Events (hotel block labels, etc.), Contact, Donate, Register, Founder (hero URL + bio paragraphs), About Us (focus bullets, mega accent, CTA bar, sidebar photos per section).
+
+### Donations
+
+View people who used the donate page: chose **Zeffy** or **PayPal**, clicked **Give**, or opened PayPal. This is a **log only** — not payment processing. Edit donate page **wording** under **Site pages → Donate**.
 
 ### Registrations
 
@@ -184,24 +203,32 @@ The tabbed block at the bottom of `/founder` is **`FounderMinistryCards.tsx`** (
 | Problem | Try |
 |---------|-----|
 | Changes not visible | Hard refresh; incognito |
-| Gallery JSON error | Fix JSON in Imagery before Save |
+| Gallery not saving / missing on site | Fill all fields + one photo; check **Draft** vs **Live** badge; read toast after **Save gallery** |
+| Past event not on Events page | Set type **Past event**, complete all fields, **Save gallery** |
 | Countdown wrong time | Set target on the **event** + pick it under Countdown |
 | Broke the whole site | Versions → Undo or Restore Zero |
 | Lost registrations | Registrations are separate — undo does not delete them |
+| `git` “no space left on device” | Free disk space on `C:` (delete `.next`, empty Recycle Bin, run Disk Cleanup) — not a site bug |
 
 ---
 
 ## For developers
 
-- CMS file: `data/cms-data.json`
+- **CMS file:** `data/cms-data.json` (events, popup, images, about, social, registrations, `donationIntents`, `pageContent`, …)
+- **No separate CMS database** — Admin `PUT` handlers call `readCmsData` / `writeCmsData` in `src/lib/cms-store.ts`
+- **Gallery + events sync:** `src/lib/gallery-event-sync.ts` from `PUT /api/admin/images` when `galleryCollections` is present; types on `GalleryCollection` (`collectionType`, `linkedEventId`, `eventDateLabel`, `eventVenue`)
+- **Gallery validation:** `normalizeGalleryCollection`, `isGalleryCollectionComplete` in `src/lib/gallery-data.ts`
+- **Slugs:** `src/lib/slugify.ts`, `AdminSlugField.tsx`
+- **Donate intents:** `POST /api/donate/intent` → `appendDonationIntent`; admin list `GET /api/admin/donations`
+- **Preview iframe:** `src/app/admin/preview/page.tsx` + `admin-preview-draft` sessionStorage key
 - History: `src/lib/cms-history.ts`, UI: `src/components/admin/AdminVersionsPanel.tsx`
 - Homepage extras: `src/lib/home-content.ts`, `HomeReliveFeast.tsx`, `HomeTestimonialsMarquee.tsx`, `pageContent.home` in `cms-types.ts`
 - Public read API: `GET /api/site-config`
 - Admin APIs: `src/app/api/admin/*`
-- **Quality check (May 2026):** `npx tsc --noEmit`, `npm run lint` (0 errors), and `npm run build` all pass; re-run after substantive changes.
+- **Quality check:** `npx tsc --noEmit`, `npm run lint`, `npm run build` after substantive changes
 
 Update this file when new Admin fields or toggles are added.
 
 ---
 
-*Last updated: May 2026 — Relive/testimonials on home, founder ministry layout, Versions lint fix.*
+*Last updated: May 2026 — Admin Gallery tab, past-event sync, friendly About/leadership editors, Donations log, Draft/Live preview.*

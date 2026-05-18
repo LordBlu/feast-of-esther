@@ -856,7 +856,7 @@ export default function AdminDashboardPage() {
               <div>
                 <label className="admin-field-label">Flyer / info image</label>
                 <AdminImageUrlField
-                  value={eventForm.imageUrl}
+                  value={eventForm.imageUrl ?? ''}
                   onChange={(url) => setEventForm((p) => ({ ...p, imageUrl: url }))}
                   placeholder="Image URL"
                 />
@@ -1156,7 +1156,7 @@ export default function AdminDashboardPage() {
               <div>
                 <label className="admin-field-label">Artwork</label>
                 <AdminImageUrlField
-                  value={popup.imageUrl}
+                  value={popup.imageUrl ?? ''}
                   onChange={(url) => setPopup((p) => ({ ...p, imageUrl: url }))}
                 />
                 <div
