@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useMemo, useState } from 'react';
 import type { DonatePageContent } from '@/lib/cms-types';
 import { fillTemplate } from '@/lib/fill-template';
+import { SITE } from '@/lib/site-content';
 import styles from './DonateStyles.module.css';
 
 const PRESETS = [25, 50, 100, 250, 500];
@@ -15,8 +16,7 @@ const ZEFFY_EMBED_URL =
 
 const PAYPAL_URL = process.env.NEXT_PUBLIC_PAYPAL_DONATE_URL?.trim() || '';
 
-const DEFAULT_OFFLINE_HINT =
-  'To give today, email us: feastofesthernaa@gmail.com or call (832) 372-0860. Mention your preferred amount and whether you need a receipt.';
+const DEFAULT_OFFLINE_HINT = `To give today, email us: ${SITE.contactEmail} or call ${SITE.contactPhoneDisplay}. Mention your preferred amount and whether you need a receipt.`;
 
 export interface DonateClientProps {
   page: DonatePageContent;

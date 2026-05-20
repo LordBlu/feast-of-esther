@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from 'react';
 import type { ContactPageContent, SocialLink } from '@/lib/cms-types';
+import { SITE } from '@/lib/site-content';
 import styles from './ContactStyles.module.css';
 
 const DEFAULT_MAP_EMBED =
@@ -70,7 +71,7 @@ export default function ContactClient({ page, socialLinks }: ContactClientProps)
   const phone2Href = page.phone2Href ?? 'tel:+18323720860';
   const showPhone2 =
     page.phone2Display === undefined ? true : page.phone2Display.trim().length > 0;
-  const email = page.email ?? 'feastofesthernc@gmail.com';
+  const email = page.email ?? SITE.contactEmail;
   const websiteUrl = page.websiteUrl ?? 'https://www.feastofestherna.com';
   const websiteLabel =
     page.websiteDisplay?.trim() ||

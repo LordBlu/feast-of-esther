@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { checkRateLimit, getClientIp } from '@/lib/rate-limit';
+import { SITE } from '@/lib/site-content';
 
 const SITE_CONTEXT = `
 You are Hadassah, a warm and helpful AI assistant for the Feast of Esther NA ministry website.
@@ -16,6 +17,7 @@ Feast of Esther NA 2026 Event:
 - Venue: Dallas/Fort Worth Airport Marriott, 8440 Freeport Parkway, Irving, Texas, USA, 75063
 - Registration is open — direct users to the Registration page
 - Donation page available for those who want to support the ministry
+- Contact email: ${SITE.contactEmail} | Phone: ${SITE.contactPhoneDisplay}
 
 Pages on this website:
 - Home, About Us, The Founder, Leaders, Gallery, Events, Registration ($150 fee via Zeffy), Donate (via Zeffy), Contact
@@ -59,7 +61,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(
       {
         error:
-          'Hadassah is temporarily unavailable. Please use our contact page or call (832) 372-0860.',
+          `Hadassah is temporarily unavailable. Email ${SITE.contactEmail} or call ${SITE.contactPhoneDisplay}.`,
       },
       { status: 503 },
     );

@@ -16,6 +16,10 @@ export const SITE = {
   venueAddress: '8440 Freeport Parkway, Irving, Texas, USA, 75063',
   hotelBookingUrl:
     'https://app.marriott.com/reslink?id=1775501475543&key=GRP&app=resvlink',
+  /** Primary ministry contact email (Contact, Donate, Hadassah, etc.). */
+  contactEmail: 'feastofesthernaa@gmail.com',
+  contactPhoneDisplay: '(832) 372-0860',
+  contactPhoneTel: '+18323720860',
 } as const;
 
 /** Navbar / watermark logo (Cloudinary). */

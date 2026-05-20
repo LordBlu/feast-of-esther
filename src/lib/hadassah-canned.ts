@@ -1,3 +1,5 @@
+import { SITE } from '@/lib/site-content';
+
 export type HadassahQuickReply = {
   id: string;
   label: string;
@@ -21,7 +23,7 @@ export const HADASSAH_STARTER_REPLIES: HadassahQuickReply[] = [
 export const HADASSAH_CANNED: Record<string, HadassahCanned> = {
   contact: {
     content:
-      'Reach us anytime — email feastofesthernc@gmail.com or call (832) 372-0860. Our contact page has the full form and address.',
+      `Reach us anytime — email ${SITE.contactEmail} or call ${SITE.contactPhoneDisplay}. Our contact page has the full form and address.`,
     quickReplies: [
       { id: 'contact-page', label: 'Open contact page', href: '/contact' },
       { id: 'feast', label: 'Want to know about the Feast', cannedId: 'feast' },
