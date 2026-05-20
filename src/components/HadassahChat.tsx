@@ -125,10 +125,10 @@ export default function HadassahChat() {
           typeof (data as { message?: unknown }).message === 'string'
             ? (data as { message: string }).message.trim()
             : '';
-        if (!reply) throw new Error('Empty reply from assistant.');
+        if (!reply) throw new Error('empty');
         pushAssistant(reply);
-      } catch (e) {
-        setError(e instanceof Error ? e.message : 'Something went wrong. Please try again.');
+      } catch {
+        setError('Hadassah could not respond right now. Please try again in a moment.');
       } finally {
         setLoading(false);
       }

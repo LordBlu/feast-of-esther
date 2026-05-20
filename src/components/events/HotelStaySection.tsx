@@ -60,7 +60,9 @@ export default function HotelStaySection() {
                 style={{ opacity: i === idx ? 1 : 0, pointerEvents: i === idx ? 'auto' : 'none' }}
               >
                 <div className="h-24 w-24 rounded-full border-2 border-dashed border-[var(--primary)]/40 bg-white/60" aria-hidden />
-                <p className="mt-4 text-sm text-gray-500">Image placeholder</p>
+                <p className="mt-4 text-sm font-semibold tracking-[0.15em] text-[var(--primary)]/70">
+                  OFFICIAL HOTEL
+                </p>
               </div>
             ))}
             <span className="absolute bottom-4 right-4 rounded bg-white px-3 py-1 text-[10px] font-bold tracking-[0.2em] text-gray-800 shadow">

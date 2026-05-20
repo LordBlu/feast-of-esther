@@ -44,11 +44,6 @@ function isChatMessage(row: unknown): row is ChatMessage {
   return typeof content === 'string' && content.length > 0;
 }
 
-function errMessage(error: unknown): string {
-  if (error instanceof Error) return error.message;
-  return String(error);
-}
-
 export async function POST(req: NextRequest) {
   const ip = getClientIp(req);
   const limited = checkRateLimit(`hadassah:${ip}`, 30, 60 * 60_000);
@@ -62,7 +57,10 @@ export async function POST(req: NextRequest) {
   const apiKey = process.env.OLLAMA_API_KEY?.trim();
   if (!apiKey) {
     return NextResponse.json(
-      { error: 'Chat is not configured (missing OLLAMA_API_KEY on the server).' },
+      {
+        error:
+          'Hadassah is temporarily unavailable. Please use our contact page or call (832) 372-0860.',
+      },
       { status: 503 },
     );
   }
@@ -74,7 +72,7 @@ export async function POST(req: NextRequest) {
     const body: unknown = await req.json();
     const rawMessages = (body as { messages?: unknown }).messages;
     if (!Array.isArray(rawMessages)) {
-      return NextResponse.json({ error: 'Expected { messages: [...] }' }, { status: 400 });
+      return NextResponse.json({ error: 'Invalid request.' }, { status: 400 });
     }
 
     const messages = rawMessages
@@ -87,7 +85,7 @@ export async function POST(req: NextRequest) {
       }));
 
     if (!messages.length) {
-      return NextResponse.json({ error: 'No valid messages to send.' }, { status: 400 });
+      return NextResponse.json({ error: 'Please enter a message.' }, { status: 400 });
     }
 
     const response = await fetch('https://ollama.com/v1/chat/completions', {
@@ -107,24 +105,20 @@ export async function POST(req: NextRequest) {
     const data: unknown = await response.json();
 
     if (!response.ok) {
-      const msg =
-        typeof data === 'object' &&
-        data !== null &&
-        'error' in data &&
-        typeof (data as { error?: { message?: string } }).error?.message === 'string'
-          ? (data as { error: { message: string } }).error.message
-          : `Ollama API error (${response.status})`;
-      throw new Error(msg);
+      throw new Error('upstream');
     }
 
     const choices = (data as { choices?: { message?: { content?: string } }[] }).choices;
     const content = choices?.[0]?.message?.content;
     if (typeof content !== 'string' || !content.trim()) {
-      throw new Error('Empty response from assistant.');
+      throw new Error('empty');
     }
 
     return NextResponse.json({ message: content });
-  } catch (error: unknown) {
-    return NextResponse.json({ error: errMessage(error) || 'Something went wrong' }, { status: 500 });
+  } catch {
+    return NextResponse.json(
+      { error: 'Hadassah could not respond right now. Please try again in a moment.' },
+      { status: 500 },
+    );
   }
 }

@@ -16,7 +16,7 @@ const ZEFFY_EMBED_URL =
 const PAYPAL_URL = process.env.NEXT_PUBLIC_PAYPAL_DONATE_URL?.trim() || '';
 
 const DEFAULT_OFFLINE_HINT =
-  'Online giving is not connected here yet. To give today, email feastofesthernc@gmail.com or call (832) 372-0860. Mention your preferred amount ({{amount}}){{methodNote}} and whether you need a receipt.';
+  'To give today, email us: feastofesthernaa@gmail.com or call (832) 372-0860. Mention your preferred amount and whether you need a receipt.';
 
 export interface DonateClientProps {
   page: DonatePageContent;
@@ -262,7 +262,7 @@ export default function DonateClient({ page }: DonateClientProps) {
           ) : canGiveOnline ? (
             <button type="button" className={styles.cta} onClick={handleGiveClick}>
               {method === 'zeffy'
-                ? `Give $${displayAmount.toFixed(0)} — open Zeffy form`
+                ? `Give $${displayAmount.toFixed(0)} — continue to form`
                 : `Give $${displayAmount.toFixed(0)} — online`}
             </button>
           ) : (
@@ -279,9 +279,9 @@ export default function DonateClient({ page }: DonateClientProps) {
             <p className={styles.hint}>
               {canGiveOnline
                 ? method === 'zeffy'
-                  ? 'Use the embedded Zeffy form above, or the button to scroll to it. Amount presets are a guide — choose your gift on Zeffy.'
+                  ? 'Complete your gift in the secure form above. Amounts shown here are suggestions — choose what you wish to give on the form.'
                   : hintOnline
-                : 'Use the button above for email and phone instructions. Add NEXT_PUBLIC_ZEFFY_EMBED_URL or NEXT_PUBLIC_PAYPAL_DONATE_URL when your giving links are ready.'}
+                : DEFAULT_OFFLINE_HINT}
             </p>
           )}
 
