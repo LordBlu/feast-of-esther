@@ -2,9 +2,11 @@
 
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
+import SiteImage from '@/components/SiteImage';
 import styles from './AboutHugeCaseStudy.module.css';
 import type { About2PageContent, AboutPageContent, LeadershipProfile } from '@/lib/cms-types';
 import { CHAPTERS, type ChapterKey } from '@/lib/about-chapters';
+import { resolveAboutSidebarVisuals } from '@/lib/site-placeholders';
 
 const defaultAbout: AboutPageContent = {
   heroEyebrow: 'About',
@@ -60,15 +62,15 @@ const FOCUS_ITEMS = [
   'A sacred annual gathering rooted in Scripture and calling.',
 ];
 
-function sectionImagesFromAbout2(about2: About2PageContent): Record<SectionId, string> {
+function sectionImagesFromResolved(resolved: Record<string, string>): Record<SectionId, string> {
   return {
-    about: about2.visualAbout?.trim() || VISUALS.about,
-    'our-journey': about2.visualOurJourney?.trim() || VISUALS['our-journey'],
-    'who-we-are': about2.visualWhoWeAre?.trim() || VISUALS['who-we-are'],
-    'our-vision': about2.visualOurVision?.trim() || VISUALS['our-vision'],
-    mission: about2.visualMission?.trim() || VISUALS.mission,
-    leadership: about2.visualLeadership?.trim() || VISUALS.leadership,
-    outreach: about2.visualOutreach?.trim() || VISUALS.outreach,
+    about: resolved.visualAbout?.trim() || VISUALS.about,
+    'our-journey': resolved.visualOurJourney?.trim() || VISUALS['our-journey'],
+    'who-we-are': resolved.visualWhoWeAre?.trim() || VISUALS['who-we-are'],
+    'our-vision': resolved.visualOurVision?.trim() || VISUALS['our-vision'],
+    mission: resolved.visualMission?.trim() || VISUALS.mission,
+    leadership: resolved.visualLeadership?.trim() || VISUALS.leadership,
+    outreach: resolved.visualOutreach?.trim() || VISUALS.outreach,
   };
 }
 
@@ -87,7 +89,14 @@ function VisualStack({
         const src = id === 'leadership' ? leadershipImage : sectionImages[id];
         return (
           <figure key={id} className={`${styles.visualLayer} ${activeSection === id ? styles.active : ''}`}>
-            <img src={src} alt="" role="presentation" decoding="async" />
+            <SiteImage
+              src={src}
+              alt=""
+              fill
+              sizes="(max-width: 1024px) 0px, 42vw"
+              cloudWidth={id === 'leadership' ? 900 : 1100}
+              role="presentation"
+            />
           </figure>
         );
       })}
@@ -109,14 +118,40 @@ function LeaderBlurb({ text }: { text: string }) {
   );
 }
 
-export default function AboutHugeCaseStudy() {
-  const [about, setAbout] = useState<AboutPageContent>(defaultAbout);
-  const [about2, setAbout2] = useState<About2PageContent>({});
+function mergeAboutContent(incoming: AboutPageContent): AboutPageContent {
+  return {
+    ...defaultAbout,
+    ...incoming,
+    storyParagraphs: Array.isArray(incoming.storyParagraphs)
+      ? incoming.storyParagraphs.filter((s): s is string => typeof s === 'string')
+      : defaultAbout.storyParagraphs,
+    leadershipProfiles: Array.isArray(incoming.leadershipProfiles)
+      ? incoming.leadershipProfiles
+      : defaultAbout.leadershipProfiles,
+  };
+}
+
+export interface AboutHugeCaseStudyProps {
+  initialAbout: AboutPageContent;
+  initialAbout2: About2PageContent;
+  placeholderUrls?: Record<string, string>;
+}
+
+export default function AboutHugeCaseStudy({
+  initialAbout,
+  initialAbout2,
+  placeholderUrls,
+}: AboutHugeCaseStudyProps) {
+  const [about] = useState<AboutPageContent>(() => mergeAboutContent(initialAbout));
+  const [about2] = useState<About2PageContent>(initialAbout2);
   const [activeSection, setActiveSection] = useState<SectionId>('about');
   const [activeLeaderIndex, setActiveLeaderIndex] = useState(0);
   const [chapter, setChapter] = useState<ChapterKey>('Texas');
 
-  const sectionImages = useMemo(() => sectionImagesFromAbout2(about2), [about2]);
+  const sectionImages = useMemo(() => {
+    const resolved = resolveAboutSidebarVisuals(about2, placeholderUrls);
+    return sectionImagesFromResolved(resolved);
+  }, [about2, placeholderUrls]);
 
   const leadershipProfiles = useMemo(() => {
     const rows = about.leadershipProfiles?.filter((p) => p.name?.trim());
@@ -131,28 +166,6 @@ export default function AboutHugeCaseStudy() {
     const url = profile?.imageUrl?.trim();
     return url || sectionImages.leadership;
   }, [leadershipProfiles, activeLeaderIndex, sectionImages.leadership]);
-
-  useEffect(() => {
-    fetch('/api/site-config')
-      .then((res) => res.json())
-      .then((data) => {
-        if (!data?.about) return;
-        setAbout({
-          ...defaultAbout,
-          ...data.about,
-          storyParagraphs: Array.isArray(data.about.storyParagraphs)
-            ? data.about.storyParagraphs.filter((s: unknown) => typeof s === 'string')
-            : defaultAbout.storyParagraphs,
-          leadershipProfiles: Array.isArray(data.about.leadershipProfiles)
-            ? data.about.leadershipProfiles
-            : defaultAbout.leadershipProfiles,
-        });
-        if (data.pageContent?.about2 && typeof data.pageContent.about2 === 'object') {
-          setAbout2({ ...data.pageContent.about2 });
-        }
-      })
-      .catch(() => setAbout(defaultAbout));
-  }, []);
 
   useEffect(() => {
     const sections = SECTION_IDS.map((id) => document.getElementById(id)).filter(
@@ -357,7 +370,13 @@ export default function AboutHugeCaseStudy() {
                     >
                       <div className={styles.leaderAvatar}>
                         {imageUrl ? (
-                          <img src={imageUrl} alt={profile.name} decoding="async" />
+                          <SiteImage
+                            src={imageUrl}
+                            alt={profile.name}
+                            width={165}
+                            height={165}
+                            cloudWidth={330}
+                          />
                         ) : null}
                       </div>
                       <h3 className={styles.leaderCardName}>{profile.name}</h3>

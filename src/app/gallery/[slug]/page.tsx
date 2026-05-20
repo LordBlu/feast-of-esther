@@ -16,7 +16,7 @@ export default async function GalleryDetailPage({
   if (!item) notFound();
 
   return (
-    <div className="bg-white text-neutral-900">
+    <div className="gallery-page bg-white text-neutral-900">
       <GalleryPageBack href="/gallery" />
       <header className="gallery-page-header foe-shell">
         <div className="gallery-page-header-inner">

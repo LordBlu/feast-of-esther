@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
+import SiteImage from '@/components/SiteImage';
 import styles from './HomeReliveFeast.module.css';
 
 const GRID_SIZE = 9;
@@ -56,12 +57,13 @@ export default function HomeReliveFeast({
             const src = pool[(cellIndex + tick) % pool.length];
             return (
               <div key={cellIndex} className={styles.cell}>
-                <img
+                <SiteImage
                   src={src}
                   alt=""
+                  fill
+                  sizes="(max-width: 640px) 33vw, 20vw"
+                  cloudWidth={480}
                   className={`${styles.cellImg} ${styles.cellImgVisible}`}
-                  decoding="async"
-                  loading="lazy"
                 />
               </div>
             );
@@ -77,3 +79,4 @@ export default function HomeReliveFeast({
     </section>
   );
 }
+

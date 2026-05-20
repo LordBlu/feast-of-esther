@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import SiteImage from '@/components/SiteImage';
 
 interface FounderHeroProps {
   backgroundSrc: string;
@@ -15,12 +16,14 @@ export default function FounderHero({ backgroundSrc }: FounderHeroProps) {
       aria-labelledby="founder-hero-heading"
     >
       <div className="founder-hero-media" aria-hidden>
-        <img
+        <SiteImage
           src={backgroundSrc}
           alt=""
+          fill
+          sizes="100vw"
+          cloudWidth={1920}
+          priority
           className="founder-hero-img"
-          fetchPriority="high"
-          decoding="async"
         />
         <div
           className="absolute inset-0 bg-gradient-to-r from-black/82 via-black/48 to-black/32"

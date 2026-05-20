@@ -2,7 +2,7 @@
 
 :root {
   --font-display: 'Cormorant Garamond', Georgia, serif;
-  --font-body: 'Jost', 'DM Sans', system-ui, sans-serif;
+  --font-body: 'DM Sans', system-ui, sans-serif;
   --font-flip-label: 'DM Sans', system-ui, sans-serif;
 
   --primary: #a0075a;
@@ -55,6 +55,7 @@ body {
 .hero-slide-frame {
   position: absolute;
   inset: 0;
+  overflow: hidden;
   opacity: 0;
   transition: opacity 1.35s cubic-bezier(0.22, 0.8, 0.2, 1);
   pointer-events: none;
@@ -1706,6 +1707,15 @@ body {
     max-height: none;
     opacity: 1;
   }
+}
+
+/* Gallery + similar content pages — breathing room above the footer */
+.gallery-page {
+  padding-bottom: clamp(2.75rem, 5vw, 4rem);
+}
+
+.gallery-page__mosaic {
+  padding-bottom: clamp(1rem, 2vw, 1.5rem);
 }
 
 /* Site footer — compact bar (homepage reference), all pages */

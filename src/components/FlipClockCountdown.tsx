@@ -2,58 +2,40 @@
 
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
+import { useSiteShell } from '@/components/SiteShellContext';
 import { SITE } from '@/lib/site-content';
-
-const FALLBACK_TARGET_ISO = '2026-06-18T14:00:00.000Z';
 
 type TimeParts = { days: number; hours: number; minutes: number; seconds: number };
 
 function useCountdownTarget() {
-  const [state, setState] = useState<{
-    ready: boolean;
-    enabled: boolean;
-    targetAt: string | null;
-  }>({ ready: false, enabled: false, targetAt: null });
-
-  useEffect(() => {
-    fetch('/api/site-config')
-      .then((r) => r.json())
-      .then((d) => {
-        const c = d.countdown;
-        setState({
-          ready: true,
-          enabled: !!(c?.enabled && c?.targetAt),
-          targetAt: typeof c?.targetAt === 'string' ? c.targetAt : null,
-        });
-      })
-      .catch(() => {
-        setState({
-          ready: true,
-          enabled: true,
-          targetAt: FALLBACK_TARGET_ISO,
-        });
-      });
-  }, []);
-
-  return state;
+  const { countdown } = useSiteShell();
+  return {
+    ready: true,
+    enabled: !!(countdown.enabled && countdown.targetAt),
+    targetAt: countdown.targetAt,
+  };
 }
 
-function useTimeLeft(target: Date | null): TimeParts {
-  const [parts, setParts] = useState<TimeParts>({
-    days: 0,
-    hours: 0,
-    minutes: 0,
-    seconds: 0,
-  });
+const ZERO_PARTS: TimeParts = { days: 0, hours: 0, minutes: 0, seconds: 0 };
+
+function useTimeLeft(target: Date | null): { parts: TimeParts; hasEnded: boolean } {
+  const [parts, setParts] = useState<TimeParts>(ZERO_PARTS);
+  const [hasEnded, setHasEnded] = useState(false);
 
   useEffect(() => {
-    if (!target) return;
+    if (!target) {
+      setParts(ZERO_PARTS);
+      setHasEnded(false);
+      return;
+    }
     const compute = () => {
       const diff = target.getTime() - Date.now();
       if (diff <= 0) {
-        setParts({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+        setParts(ZERO_PARTS);
+        setHasEnded(true);
         return;
       }
+      setHasEnded(false);
       setParts({
         days: Math.floor(diff / (1000 * 60 * 60 * 24)),
         hours: Math.floor((diff / (1000 * 60 * 60)) % 24),
@@ -66,7 +48,7 @@ function useTimeLeft(target: Date | null): TimeParts {
     return () => clearInterval(id);
   }, [target]);
 
-  return parts;
+  return { parts, hasEnded };
 }
 
 function pad2(n: number) {
@@ -189,7 +171,8 @@ export default function FlipClockCountdown() {
   }, [targetAt]);
 
   const activeTarget = ready && enabled && target ? target : null;
-  const { days, hours, minutes, seconds } = useTimeLeft(activeTarget);
+  const { parts, hasEnded } = useTimeLeft(activeTarget);
+  const { days, hours, minutes, seconds } = parts;
   const reducedMotion = usePrefersReducedMotion();
   const dayDigits: 2 | 3 = days > 99 ? 3 : 2;
 
@@ -204,7 +187,7 @@ export default function FlipClockCountdown() {
     [days, hours, minutes, seconds, dayDigits]
   );
 
-  if (!ready || !enabled || !target) return null;
+  if (!ready || !enabled || !target || hasEnded) return null;
 
   return (
     <section className="flip-clock-section">

@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import type { GalleryItem } from '@/lib/gallery-data';
+import SiteImage from '@/components/SiteImage';
 import styles from './GalleryMosaic.module.css';
 
 const DEFAULT_GALLERY_SUBTITLE =
@@ -24,7 +25,7 @@ export default function GalleryVerticalFeed({
   const subtitle = pageSubtitle?.trim() || DEFAULT_GALLERY_SUBTITLE;
 
   return (
-    <div className="bg-white text-neutral-900">
+    <div className="gallery-page bg-white text-neutral-900">
       <header className="gallery-page-header gallery-page-header--index foe-shell">
         <div className="gallery-page-header-inner">
           <h1 className="gallery-page-title">{title}</h1>
@@ -33,7 +34,7 @@ export default function GalleryVerticalFeed({
         </div>
       </header>
 
-      <section className="foe-shell pb-20 md:pb-28">
+      <section className="foe-shell gallery-page__mosaic">
         <div className={styles.mosaicContainer}>
           {items.map((item, index) => {
             const size = sizePattern[index % sizePattern.length];
@@ -47,12 +48,14 @@ export default function GalleryVerticalFeed({
                 className={`${styles.mosaicItem} ${styles.mosaicItemLink} ${styles[size]}`}
                 aria-label={`Open collection: ${item.title}`}
               >
-                <img
+                <SiteImage
                   src={cover}
                   alt={item.title}
+                  fill
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  cloudWidth={index < 6 ? 720 : 560}
+                  priority={index < 6}
                   className={styles.mosaicImage}
-                  loading={index < 6 ? 'eager' : 'lazy'}
-                  decoding="async"
                 />
                 <div className={styles.overlay}>
                   <span className={styles.overlayTitle}>{item.title}</span>

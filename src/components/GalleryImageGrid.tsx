@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import GalleryImageLightbox, { type LightboxFrame } from '@/components/GalleryImageLightbox';
+import SiteImage from '@/components/SiteImage';
 import styles from './GalleryImageGrid.module.css';
 
 type Props = {
@@ -34,11 +35,13 @@ export default function GalleryImageGrid({ images, title, year = '', slug = '' }
               onClick={() => setLightboxIndex(idx)}
               aria-label={`View larger: ${title} photo ${idx + 1}`}
             >
-              <img
+              <SiteImage
                 src={imageUrl}
                 alt={`${title} — photo ${idx + 1}`}
-                loading={idx < 4 ? 'eager' : 'lazy'}
-                decoding="async"
+                fill
+                sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                cloudWidth={640}
+                priority={idx < 4}
               />
             </button>
           ))}

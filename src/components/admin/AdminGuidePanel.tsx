@@ -89,7 +89,11 @@ export default function AdminGuidePanel() {
           </div>
           <div>
             <dt className="font-semibold text-[var(--primary-dark)]">Imagery</dt>
-            <dd>Hero, hotel photo, gallery JSON, video URL</dd>
+            <dd>Hero poster, hotel photo, founder carousel list, video URL</dd>
+          </div>
+          <div>
+            <dt className="font-semibold text-[var(--primary-dark)]">Placeholders</dt>
+            <dd>Demo photos for Home, About sidebar, Founder, Events — upload or clear</dd>
           </div>
           <div>
             <dt className="font-semibold text-[var(--primary-dark)]">Social Links</dt>
@@ -97,11 +101,11 @@ export default function AdminGuidePanel() {
           </div>
           <div>
             <dt className="font-semibold text-[var(--primary-dark)]">About Page</dt>
-            <dd>Story + leadership JSON</dd>
+            <dd>Story, mission, leadership JSON, hero image</dd>
           </div>
           <div>
             <dt className="font-semibold text-[var(--primary-dark)]">Site pages</dt>
-            <dd>Headlines per page (Gallery, Contact, Founder, …)</dd>
+            <dd>Home copy, Founder biography, page headlines, About sidebar visuals</dd>
           </div>
           <div>
             <dt className="font-semibold text-[var(--primary-dark)]">Registrations</dt>
@@ -117,9 +121,10 @@ export default function AdminGuidePanel() {
       <section className="admin-card space-y-3">
         <h2>Cannot edit here (developer needed)</h2>
         <p className="text-sm text-[#5c6370]">
-          Homepage main headlines, nav menu, announcement bar, event programme schedule, Sister Chapters map, and
-          Founder <strong>Ministry Focus</strong> tabs (Global Impact / Mission Outreach / Rehabilitation) are in
-          code today.
+          Nav menu, announcement bar, event programme schedule, Sister Chapters map, and Founder{' '}
+          <strong>Ministry Focus</strong> tab labels (Global Impact / Mission Outreach / Rehabilitation) are still in
+          code. Homepage hero headline, mission quote, purpose block, and ministry card text are editable under{' '}
+          <strong>Site pages → Home</strong>.
         </p>
         <p className="text-sm text-[#5c6370]">
           Full reference for your team:{' '}

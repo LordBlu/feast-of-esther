@@ -1,8 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
 import styles from './SiteFooter.module.css';
+import { useSiteShell } from '@/components/SiteShellContext';
 import { SocialLink } from '@/lib/cms-types';
 
 const FALLBACK_SOCIAL_LINKS: SocialLink[] = [
@@ -82,18 +82,10 @@ function SocialSvg({ id }: { id: string }) {
 }
 
 export default function SiteFooter() {
-  const [socialLinks, setSocialLinks] = useState<SocialLink[]>(FALLBACK_SOCIAL_LINKS);
+  const { socialLinks: cmsLinks } = useSiteShell();
   const year = new Date().getFullYear();
-
-  useEffect(() => {
-    fetch('/api/site-config')
-      .then((res) => res.json())
-      .then((data) => {
-        const links = Array.isArray(data.socialLinks) ? data.socialLinks : FALLBACK_SOCIAL_LINKS;
-        setSocialLinks(links);
-      })
-      .catch(() => setSocialLinks(FALLBACK_SOCIAL_LINKS));
-  }, []);
+  const socialLinks =
+    Array.isArray(cmsLinks) && cmsLinks.length > 0 ? cmsLinks : FALLBACK_SOCIAL_LINKS;
 
   const enabledLinks = socialLinks.filter((item) => item.enabled !== false && item.url?.trim());
 

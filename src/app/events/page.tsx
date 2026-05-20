@@ -1,11 +1,10 @@
 import Link from 'next/link';
+import SiteImage from '@/components/SiteImage';
 import styles from './EventsStyles.module.css';
 import { readCmsData } from '@/lib/cms-store';
 import { resolveGalleryItems } from '@/lib/gallery-data';
+import { resolveEventsDefaultFlyer, resolveEventsDefaultHero } from '@/lib/site-placeholders';
 import { ProgrammeSection } from '@/components/events/ProgrammeSection';
-
-const DEFAULT_EVENT_FLYER_IMAGE =
-  'https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1778244638/Save_thedate_mkpbnu.jpg';
 
 export default async function EventsPage() {
   const cms = await readCmsData();
@@ -14,12 +13,11 @@ export default async function EventsPage() {
   const upcomingEvent = publishedEvents.find((event) => event.category !== 'past') ?? publishedEvents[0] ?? null;
   const pastEvents = publishedEvents.filter((event) => event.category === 'past');
 
+  const placeholderMap = cms.images.placeholderUrls;
   const heroImage =
-    upcomingEvent?.heroImageUrl?.trim() ||
-    'https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1777728539/20250710_090859_b81076.jpg';
+    upcomingEvent?.heroImageUrl?.trim() || resolveEventsDefaultHero(placeholderMap);
   const flyerImage =
-    upcomingEvent?.imageUrl?.trim() ||
-    DEFAULT_EVENT_FLYER_IMAGE;
+    upcomingEvent?.imageUrl?.trim() || resolveEventsDefaultFlyer(placeholderMap);
   const eventTitle = upcomingEvent?.title || 'Feast of Esther 2026';
   const eventTheme = upcomingEvent?.theme || 'The Anointing That Endures';
   const eventDate = upcomingEvent?.dateLabel || 'June 18TH - 20TH, 2026';
@@ -51,7 +49,19 @@ export default async function EventsPage() {
 
   return (
     <div className={styles.eventsContainer}>
-      <section className={styles.eventsHero} style={{ backgroundImage: `linear-gradient(rgba(0,0,0,0.62), rgba(0,0,0,0.62)), url('${heroImage}')` }}>
+      <section className={styles.eventsHero}>
+        <div className={styles.eventsHeroMedia} aria-hidden>
+          <SiteImage
+            src={heroImage}
+            alt=""
+            fill
+            sizes="100vw"
+            cloudWidth={1920}
+            priority
+            className="object-cover object-center"
+          />
+          <div className={styles.eventsHeroScrim} />
+        </div>
         <div className={styles.heroContent}>
           <span className={styles.dateBadge}>{eventDate}</span>
           <h1>{eventTitle}</h1>
@@ -65,7 +75,14 @@ export default async function EventsPage() {
       <section className={styles.infoCardSection}>
         <div className={styles.infoCard}>
           <div className={styles.infoImage}>
-            <img className="fx-media fx-zoom-in" src={flyerImage} alt={`${eventTitle} flyer`} />
+            <SiteImage
+              src={flyerImage}
+              alt={`${eventTitle} flyer`}
+              width={640}
+              height={800}
+              cloudWidth={800}
+              className="fx-media fx-zoom-in h-auto w-full"
+            />
           </div>
           <div className={styles.infoDetails}>
             <span className={styles.eyebrow}>Event Information</span>
@@ -93,8 +110,15 @@ export default async function EventsPage() {
           <p>{hotelSectionSubtitle}</p>
         </div>
         <div className={styles.hotelGrid}>
-          <div className={styles.hotelPhoto}>
-            <img className="fx-media fx-pan-vertical" src={hotelImage} alt="Official conference hotel room" />
+          <div className={`${styles.hotelPhoto} ${styles.mediaFill}`}>
+            <SiteImage
+              src={hotelImage}
+              alt="Official conference hotel room"
+              fill
+              sizes="(max-width: 768px) 100vw, 50vw"
+              cloudWidth={960}
+              className="fx-media fx-pan-vertical object-cover"
+            />
           </div>
           <div className={styles.hotelDetails}>
             <h3>{hotelName}</h3>
@@ -117,7 +141,16 @@ export default async function EventsPage() {
             const coverImage = event.imageUrl || galleryMatch?.coverImage || heroImage;
             return (
               <article key={event.id} className={styles.pastCard}>
-                <img src={coverImage} alt={event.title} />
+                <div className={styles.pastCardMedia}>
+                  <SiteImage
+                    src={coverImage}
+                    alt={event.title}
+                    fill
+                    sizes="(max-width: 640px) 100vw, 33vw"
+                    cloudWidth={560}
+                    className="object-cover"
+                  />
+                </div>
                 <div className={styles.pastCardBody}>
                   <h3>{event.title}</h3>
                   <p>{event.dateLabel}</p>

@@ -81,6 +81,11 @@ export interface SiteImages {
   /** Founder page carousel — one or more image URLs (optional; falls back to site defaults). */
   founderCarouselUrls?: string[];
   /**
+   * Per-slot demo image overrides (see `site-placeholder-catalog.ts`).
+   * Key = slot id; value = Cloudinary URL. Omit key to use bundled default.
+   */
+  placeholderUrls?: Record<string, string>;
+  /**
    * Gallery collections editable from Admin.
    * Each item is a "folder/event" with a slug, description, and one or more image URLs.
    */
@@ -251,8 +256,21 @@ export interface HomeTestimonial {
   imageUrl?: string;
 }
 
+export interface HomeMinistryCard {
+  title?: string;
+  tag?: string;
+  href?: string;
+  copy?: string;
+  imageUrl?: string;
+}
+
 /** Homepage: Relive the Feast mosaic + testimonials marquee. */
 export interface HomePageContent {
+  heroTitle?: string;
+  forumMissionQuote?: string;
+  purposeTitle?: string;
+  purposeSubtitle?: string;
+  ministryCards?: HomeMinistryCard[];
   reliveFeastTitle?: string;
   reliveFeastSubtitle?: string;
   reliveFeastImageUrls?: string[];
@@ -262,12 +280,19 @@ export interface HomePageContent {
   showTestimonials?: boolean;
 }
 
+export interface FounderMinistryCard {
+  title?: string;
+  text?: string;
+  imageUrl?: string;
+}
+
 /** Hero image + biography paragraphs on /founder (carousel stays under Imagery). */
 export interface FounderPageContent {
   heroBackgroundUrl?: string;
   storyP1?: string;
   storyP2?: string;
   storyP3?: string;
+  ministryCards?: FounderMinistryCard[];
 }
 
 /** High-visibility strings + sidebar photography on the About Us case-study page (`/about`). */

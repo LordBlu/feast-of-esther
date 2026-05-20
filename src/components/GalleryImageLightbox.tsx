@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useCallback, useEffect } from 'react';
+import SiteImage from '@/components/SiteImage';
 
 export type LightboxFrame = {
   src: string;
@@ -106,10 +107,14 @@ export default function GalleryImageLightbox({
         className="relative flex max-h-[min(88vh,920px)] max-w-[min(96vw,1200px)] flex-col items-center"
         onClick={(e) => e.stopPropagation()}
       >
-        <img
+        <SiteImage
           src={frame.src}
           alt={frame.alt}
-          className="max-h-[min(78vh,820px)] w-auto max-w-full object-contain shadow-[0_24px_80px_rgba(0,0,0,0.55)]"
+          width={1600}
+          height={1200}
+          cloudWidth={1600}
+          className="max-h-[min(78vh,820px)] h-auto w-auto max-w-full object-contain shadow-[0_24px_80px_rgba(0,0,0,0.55)]"
+          style={{ width: 'auto', height: 'auto', maxHeight: 'min(78vh, 820px)' }}
         />
         <figcaption className="mt-4 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-center">
           <div>

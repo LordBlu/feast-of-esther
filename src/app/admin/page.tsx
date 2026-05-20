@@ -4,6 +4,9 @@ import { DragEvent, FormEvent, useCallback, useEffect, useMemo, useState } from 
 import { useRouter } from 'next/navigation';
 import AdminDonationsPanel from '@/components/admin/AdminDonationsPanel';
 import AdminGalleryEditor from '@/components/admin/AdminGalleryEditor';
+import AdminFounderPageEditor from '@/components/admin/AdminFounderPageEditor';
+import AdminHomePageEditor from '@/components/admin/AdminHomePageEditor';
+import AdminPlaceholdersPanel from '@/components/admin/AdminPlaceholdersPanel';
 import AdminGuidePanel from '@/components/admin/AdminGuidePanel';
 import { AdminImagePreviewList } from '@/components/admin/AdminImagePreview';
 import AdminImageUrlField from '@/components/admin/AdminImageUrlField';
@@ -216,6 +219,7 @@ export default function AdminDashboardPage() {
     | 'countdown'
     | 'popup'
     | 'images'
+    | 'placeholders'
     | 'gallery'
     | 'social'
     | 'about'
@@ -543,6 +547,13 @@ export default function AdminDashboardPage() {
     setMessage('About page content updated.');
   }
 
+  async function savePlaceholdersBundle() {
+    await saveImages();
+    await saveAbout();
+    await savePageContent();
+    setMessage('Placeholders and page copy saved.');
+  }
+
   async function savePageContent() {
     const response = await fetch('/api/admin/page-content', {
       method: 'PUT',
@@ -607,7 +618,15 @@ export default function AdminDashboardPage() {
     }
     const data = await response.json();
     onUploaded(data.url);
-    setMessage('Image uploaded.');
+    const storage =
+      typeof data.storage === 'string' ? data.storage : 'uploaded';
+    setMessage(
+      storage === 'cloudinary'
+        ? 'Image uploaded to Cloudinary.'
+        : storage === 'local'
+          ? 'Image saved locally (add Cloudinary API keys on Vercel for production CDN).'
+          : 'Image uploaded.',
+    );
   }
 
   function dropFile(
@@ -688,6 +707,7 @@ export default function AdminDashboardPage() {
               'countdown',
               'popup',
               'images',
+              'placeholders',
               'gallery',
               'social',
               'about',
@@ -708,6 +728,7 @@ export default function AdminDashboardPage() {
               {key === 'countdown' && 'Countdown'}
               {key === 'popup' && 'Popup'}
               {key === 'images' && 'Imagery'}
+              {key === 'placeholders' && 'Placeholders'}
               {key === 'gallery' && 'Gallery'}
               {key === 'social' && 'Social Links'}
               {key === 'about' && 'About Page'}
@@ -1315,6 +1336,33 @@ export default function AdminDashboardPage() {
           </div>
         ) : null}
 
+        {tab === 'placeholders' ? (
+          <div className="admin-card max-w-4xl space-y-6">
+            <h2>Site placeholders</h2>
+            <p className="text-sm text-black/55">
+              Demo photos bundled with the site. Replace or clear them here. Written content for Home, About, and
+              Founder is under <strong>Site pages</strong> and <strong>About Page</strong>.
+            </p>
+            <AdminPlaceholdersPanel
+              images={images}
+              onImagesChange={setImages}
+              about={about}
+              onAboutChange={setAbout}
+              pageContent={pageContent}
+              onPageContentChange={setPageContent}
+              onUpload={uploadImage}
+              onDragOver={preventDragDefaults}
+            />
+            <button
+              type="button"
+              onClick={() => void savePlaceholdersBundle()}
+              className="btn-primary rounded-full px-10"
+            >
+              Save placeholders
+            </button>
+          </div>
+        ) : null}
+
         {tab === 'gallery' ? (
           <div className="admin-card max-w-4xl space-y-6">
             <h2>Gallery collections</h2>
@@ -1331,7 +1379,7 @@ export default function AdminDashboardPage() {
             <button type="button" onClick={saveGallery} className="btn-primary rounded-full px-10">
               Save gallery
             </button>
-          </div>
+            </div>
         ) : null}
 
         {tab === 'social' ? (
@@ -1386,7 +1434,7 @@ export default function AdminDashboardPage() {
                   >
                     Remove
                   </button>
-                </div>
+            </div>
               ))}
             </div>
             <div className="flex flex-wrap gap-3">
@@ -1409,7 +1457,7 @@ export default function AdminDashboardPage() {
               </button>
               <button type="button" onClick={saveSocialLinks} className="btn-primary rounded-full px-10">
                 Save social links
-              </button>
+            </button>
             </div>
           </div>
         ) : null}
@@ -1553,13 +1601,14 @@ export default function AdminDashboardPage() {
             <div className="admin-card space-y-3">
               <h2>Site pages</h2>
               <p className="text-sm text-black/55">
-                Update headlines and supporting text visitors see on Gallery, Events, Contact, Donate, Register, Founder,
-                and About Us. Gallery photos live under <strong>Gallery</strong>; other site images under <strong>Imagery</strong>. Paste image
-                URLs here for the founder hero.
+                Update headlines and supporting text visitors see on Home, Gallery, Events, Contact, Donate, Register,
+                Founder, and About Us. Gallery photos live under <strong>Gallery</strong>; other site images under{' '}
+                <strong>Imagery</strong>.
               </p>
               <div className="flex flex-wrap gap-2">
                 {(
                   [
+                    ['home', 'Home'],
                     ['gallery', 'Gallery'],
                     ['events', 'Events'],
                     ['contact', 'Contact'],
@@ -1584,6 +1633,15 @@ export default function AdminDashboardPage() {
                 ))}
               </div>
             </div>
+
+            {pageEditSection === 'home' ? (
+              <AdminHomePageEditor
+                home={pageContent.home ?? {}}
+                onChange={(home) => setPageContent((p) => ({ ...p, home }))}
+                onUpload={uploadImage}
+                onDragOver={preventDragDefaults}
+              />
+            ) : null}
 
             {pageEditSection === 'gallery' ? (
               <div className="admin-card grid gap-4 md:grid-cols-2">
@@ -1881,10 +1939,10 @@ export default function AdminDashboardPage() {
                   </div>
                 ))}
                 <div className="md:col-span-2">
-                  <label className="admin-field-label">
+              <label className="admin-field-label">
                     Offline giving template (use {'{{amount}}'} and {'{{methodNote}}'})
-                  </label>
-                  <textarea
+              </label>
+              <textarea
                     className="admin-input min-h-[100px] font-mono text-[0.75rem]"
                     value={pageContent.donate.hintOfflineTemplate ?? ''}
                     onChange={(e) =>
@@ -1893,8 +1951,8 @@ export default function AdminDashboardPage() {
                         donate: { ...p.donate, hintOfflineTemplate: e.target.value },
                       }))
                     }
-                  />
-                </div>
+              />
+            </div>
               </div>
             ) : null}
 
@@ -2009,6 +2067,12 @@ export default function AdminDashboardPage() {
                     />
                   </div>
                 ))}
+                <div className="md:col-span-2">
+                  <AdminFounderPageEditor
+                    founder={pageContent.founder ?? {}}
+                    onChange={(founder) => setPageContent((p) => ({ ...p, founder }))}
+                  />
+                </div>
               </div>
             ) : null}
 
@@ -2113,7 +2177,7 @@ export default function AdminDashboardPage() {
               <p className="text-sm text-black/55">Saves all sections above in one file with your other CMS data.</p>
               <button type="button" onClick={() => void savePageContent()} className="btn-primary rounded-full px-10">
                 Save site page copy
-              </button>
+            </button>
             </div>
           </div>
         ) : null}

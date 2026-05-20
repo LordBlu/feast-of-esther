@@ -6,7 +6,9 @@ import { usePathname } from 'next/navigation';
 import AnnouncementBar from '@/components/AnnouncementBar';
 import Navbar from '@/components/Navbar';
 import PageViewTransition from '@/components/PageViewTransition';
+import { SiteShellProvider } from '@/components/SiteShellContext';
 import SiteFooter from '@/components/SiteFooter';
+import type { PublicSiteConfig } from '@/lib/public-site-config';
 
 const EventPopup = dynamic(() => import('@/components/EventPopup'), { ssr: false });
 const HadassahChat = dynamic(() => import('@/components/HadassahChat'), { ssr: false });
@@ -33,10 +35,22 @@ function ConditionalLayoutInner({ children }: { children: React.ReactNode }) {
   );
 }
 
-export function ConditionalLayout({ children }: { children: React.ReactNode }) {
-  return (
+export function ConditionalLayout({
+  children,
+  siteConfig,
+}: {
+  children: React.ReactNode;
+  siteConfig?: PublicSiteConfig | null;
+}) {
+  const inner = (
     <Suspense fallback={<main className="site-main w-full overflow-x-hidden">{children}</main>}>
       <ConditionalLayoutInner>{children}</ConditionalLayoutInner>
     </Suspense>
   );
+
+  if (!siteConfig) {
+    return inner;
+  }
+
+  return <SiteShellProvider value={siteConfig}>{inner}</SiteShellProvider>;
 }

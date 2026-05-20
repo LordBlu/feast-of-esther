@@ -1,6 +1,7 @@
 'use client';
 
 import type { HomeTestimonial } from '@/lib/cms-types';
+import SiteImage from '@/components/SiteImage';
 import styles from './HomeTestimonialsMarquee.module.css';
 
 interface HomeTestimonialsMarqueeProps {
@@ -34,12 +35,13 @@ export default function HomeTestimonialsMarquee({
               <p className={styles.quote}>{item.quote}</p>
               <div className={styles.author}>
                 {item.imageUrl?.trim() ? (
-                  <img
+                  <SiteImage
                     src={item.imageUrl.trim()}
                     alt=""
+                    width={48}
+                    height={48}
+                    cloudWidth={96}
                     className={styles.avatar}
-                    decoding="async"
-                    loading="lazy"
                   />
                 ) : (
                   <span className={styles.avatarPlaceholder} aria-hidden />

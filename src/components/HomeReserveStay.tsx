@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
+import SiteImage from '@/components/SiteImage';
 import { HOME_COPY, SITE } from '@/lib/site-content';
 
 const DEFAULT_HOTEL_IMAGE =
@@ -47,7 +48,14 @@ export default function HomeReserveStay({ hotelRoomUrl }: HomeReserveStayProps) 
 
         <article className="home-reserveStay__card reveal">
           <div className="home-reserveStay__media">
-            <img src={imageSrc} alt="Official conference hotel room" className="home-reserveStay__img" />
+            <SiteImage
+              src={imageSrc}
+              alt="Official conference hotel room"
+              fill
+              sizes="(max-width: 768px) 100vw, 50vw"
+              cloudWidth={960}
+              className="home-reserveStay__img"
+            />
             <span className="home-reserveStay__badge">Official Hotel</span>
           </div>
 

@@ -1,15 +1,23 @@
 import FounderCarousel from '@/components/FounderCarousel';
 import FounderHero from '@/components/FounderHero';
 import FounderMinistryCards from '@/components/FounderMinistryCards';
-import { resolveFounderCarouselSlides } from '@/lib/founder-carousel-resolve';
 import { readCmsData } from '@/lib/cms-store';
-import { FOUNDER_HERO_CLOUDINARY } from '@/lib/site-content';
+import {
+  resolveFounderCarouselFromPlaceholders,
+  resolveFounderHeroBackground,
+  resolveFounderMinistryCards,
+} from '@/lib/site-placeholders';
 
 export default async function FounderPage() {
   const data = await readCmsData();
-  const slides = resolveFounderCarouselSlides(data.images.founderCarouselUrls);
   const founder = data.pageContent.founder;
-  const heroBg = founder.heroBackgroundUrl?.trim() || FOUNDER_HERO_CLOUDINARY;
+  const placeholderMap = data.images.placeholderUrls;
+  const slides = resolveFounderCarouselFromPlaceholders(
+    data.images.founderCarouselUrls,
+    placeholderMap,
+  );
+  const heroBg = resolveFounderHeroBackground(founder, placeholderMap);
+  const ministryCards = resolveFounderMinistryCards(founder, placeholderMap);
   const storyP1 =
     founder.storyP1 ??
     "Pastor Mrs Folu Adeboye is the wife of the General Overseer of the Redeemed Christian Church of God (RCCG) Worldwide. She's a mother, a mentor, a teacher and a woman in the ministry. Over the years she has been noted for efficiency, effectiveness, excellency and balancing of roles.";
@@ -46,7 +54,7 @@ export default async function FounderPage() {
             </div>
 
             <div className="founder-ministry-zone mx-auto w-full max-w-6xl">
-              <FounderMinistryCards />
+              <FounderMinistryCards cards={ministryCards} />
             </div>
           </div>
         </div>

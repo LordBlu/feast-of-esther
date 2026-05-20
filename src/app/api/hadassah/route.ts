@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { checkRateLimit, getClientIp } from '@/lib/rate-limit';
 
 const SITE_CONTEXT = `
 You are Hadassah, a warm and helpful AI assistant for the Feast of Esther NA ministry website.
@@ -27,6 +28,9 @@ Your personality:
 - Never make up event details beyond what's listed above
 `;
 
+const MAX_MESSAGES = 24;
+const MAX_CONTENT_LEN = 2000;
+
 type ChatRole = 'user' | 'assistant' | 'system';
 
 type ChatMessage = { role: ChatRole; content: string };
@@ -46,6 +50,15 @@ function errMessage(error: unknown): string {
 }
 
 export async function POST(req: NextRequest) {
+  const ip = getClientIp(req);
+  const limited = checkRateLimit(`hadassah:${ip}`, 30, 60 * 60_000);
+  if (!limited.ok) {
+    return NextResponse.json(
+      { error: 'Too many messages. Please wait a moment and try again.' },
+      { status: 429, headers: { 'Retry-After': String(limited.retryAfterSec) } },
+    );
+  }
+
   const apiKey = process.env.OLLAMA_API_KEY?.trim();
   if (!apiKey) {
     return NextResponse.json(
@@ -67,9 +80,10 @@ export async function POST(req: NextRequest) {
     const messages = rawMessages
       .filter(isChatMessage)
       .filter((m) => m.role === 'user' || m.role === 'assistant')
+      .slice(-MAX_MESSAGES)
       .map((m) => ({
         role: m.role,
-        content: m.content,
+        content: m.content.slice(0, MAX_CONTENT_LEN),
       }));
 
     if (!messages.length) {

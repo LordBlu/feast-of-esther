@@ -23,6 +23,9 @@
 # production
 /build
 
+# Admin uploads (ephemeral on serverless; do not commit user uploads)
+/public/uploads/
+
 # misc
 .DS_Store
 *.pem

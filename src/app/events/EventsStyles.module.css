@@ -3,15 +3,30 @@
 }
 
 .eventsHero {
+  position: relative;
   height: 80vh;
   min-height: 560px;
-  background-size: cover;
-  background-position: center;
   display: flex;
   align-items: center;
+  overflow: hidden;
+}
+
+.eventsHeroMedia {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.eventsHeroScrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(rgba(0, 0, 0, 0.62), rgba(0, 0, 0, 0.62));
+  z-index: 1;
 }
 
 .heroContent {
+  position: relative;
+  z-index: 2;
   width: min(1120px, 92%);
   margin: 0 auto;
   color: #fff;
@@ -178,6 +193,16 @@
   grid-template-columns: 1.2fr 1fr;
   background: #fff;
   border: 1px solid #e6d8e9;
+}
+
+.mediaFill {
+  position: relative;
+  min-height: 360px;
+}
+
+.pastCardMedia {
+  position: relative;
+  height: 176px;
 }
 
 .hotelPhoto img {

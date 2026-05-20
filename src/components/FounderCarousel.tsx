@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import SiteImage from '@/components/SiteImage';
 
 const AUTO_MS = 5200;
 
@@ -28,6 +29,11 @@ export default function FounderCarousel({ urls }: FounderCarouselProps) {
     );
   }
 
+  const indicesToShow =
+    slides.length <= 2
+      ? slides.map((_, i) => i)
+      : [active, (active + 1) % slides.length];
+
   return (
     <div
       className="relative mx-auto w-full max-w-md overflow-hidden rounded-2xl border border-[var(--blush-mid)] bg-black/5 shadow-lg aspect-[4/5]"
@@ -35,17 +41,23 @@ export default function FounderCarousel({ urls }: FounderCarouselProps) {
       aria-roledescription="carousel"
       aria-label="Founder gallery"
     >
-      {slides.map((src, idx) => (
-        <img
-          key={`${src}-${idx}`}
-          src={src}
-          alt=""
-          className="absolute inset-0 h-full w-full object-cover object-center transition-opacity duration-[1200ms] ease-out"
-          style={{ opacity: active === idx ? 1 : 0 }}
-          loading={idx === 0 ? 'eager' : 'lazy'}
-          draggable={false}
-        />
-      ))}
+      {slides.map((src, idx) => {
+        if (!indicesToShow.includes(idx)) return null;
+        return (
+          <SiteImage
+            key={`${src}-${idx}`}
+            src={src}
+            alt=""
+            fill
+            sizes="(max-width: 768px) 100vw, 448px"
+            cloudWidth={800}
+            priority={idx === active}
+            className="object-cover object-center transition-opacity duration-[1200ms] ease-out"
+            style={{ opacity: active === idx ? 1 : 0 }}
+            draggable={false}
+          />
+        );
+      })}
       {slides.length > 1 ? (
         <div
           className="absolute bottom-3 left-0 right-0 z-[1] flex justify-center gap-1.5"

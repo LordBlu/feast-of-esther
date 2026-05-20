@@ -25,6 +25,7 @@ export default function RegistrationClient({ page }: RegistrationClientProps) {
     city: '',
     country: '',
     notes: '',
+    website: '',
   });
 
   const asideTitle = page.asideTitle ?? 'Registration';
@@ -62,6 +63,7 @@ export default function RegistrationClient({ page }: RegistrationClientProps) {
         city: form.city,
         country: form.country,
         notes: form.notes,
+        website: form.website,
       }),
     });
     setLoading(false);
@@ -115,6 +117,17 @@ export default function RegistrationClient({ page }: RegistrationClientProps) {
             </div>
           ) : (
             <form onSubmit={handleNext}>
+              <input
+                type="text"
+                name="website"
+                value={form.website}
+                onChange={(e) => setForm((p) => ({ ...p, website: e.target.value }))}
+                tabIndex={-1}
+                autoComplete="off"
+                aria-hidden
+                className="sr-only"
+                style={{ position: 'absolute', left: '-9999px', width: 1, height: 1, opacity: 0 }}
+              />
               <h2 className={styles.stepHeading}>{STEPS[step]}</h2>
               <p className={styles.stepSub}>{stepHints[step]}</p>
 

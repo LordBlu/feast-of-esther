@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-import type { PopupContent } from '@/lib/cms-types';
+import { useSiteShell } from '@/components/SiteShellContext';
+import SiteImage from '@/components/SiteImage';
 import { popupStyleToCss } from '@/lib/popup-styles';
 
 function IconClose({ className }: { className?: string }) {
@@ -17,30 +18,15 @@ function IconClose({ className }: { className?: string }) {
 const ALLOWED_PATHS = ['/'];
 const POPUP_TTL_MS = 1000 * 60 * 60 * 12;
 
+const DEFAULT_POPUP_IMAGE =
+  'https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1778244638/Save_thedate_mkpbnu.jpg';
+
 export default function EventPopup() {
   const pathname = usePathname();
+  const { popup, images } = useSiteShell();
   const [visible, setVisible] = useState(false);
-  const [popup, setPopup] = useState<PopupContent | null>(null);
-  const [popupFallbackImage, setPopupFallbackImage] = useState('');
   const [portraitImage, setPortraitImage] = useState(false);
-
-  useEffect(() => {
-    fetch('/api/site-config')
-      .then((res) => res.json())
-      .then((data) => {
-        setPopup(data.popup);
-        setPopupFallbackImage(
-          data.images?.popupImageUrl ??
-            'https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1778244638/Save_thedate_mkpbnu.jpg'
-        );
-      })
-      .catch(() => {
-        setPopup(null);
-        setPopupFallbackImage(
-          'https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1778244638/Save_thedate_mkpbnu.jpg'
-        );
-      });
-  }, []);
+  const popupFallbackImage = images.popupImageUrl?.trim() || DEFAULT_POPUP_IMAGE;
 
   useEffect(() => {
     if (popup && !popup.enabled) return;
@@ -100,12 +86,16 @@ export default function EventPopup() {
           }}
         >
           {popupImageSrc ? (
-            <img
+            <SiteImage
               src={popupImageSrc}
               alt=""
-              className="absolute inset-0 h-full w-full object-cover"
+              fill
+              sizes="(max-width: 640px) 100vw, 420px"
+              cloudWidth={900}
+              className="object-cover"
               onLoad={(event) => {
-                const { naturalWidth, naturalHeight } = event.currentTarget;
+                const img = event.currentTarget as HTMLImageElement;
+                const { naturalWidth, naturalHeight } = img;
                 if (naturalWidth > 0 && naturalHeight > 0) {
                   setPortraitImage(naturalHeight / naturalWidth > 1.2);
                 }
