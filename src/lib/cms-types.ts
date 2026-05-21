@@ -144,6 +144,30 @@ export interface LeadershipProfile {
   blurb: string;
 }
 
+/** Single executive on `/executive` (chairperson or committee member). */
+export interface ExecutiveProfile {
+  id: string;
+  name: string;
+  title: string;
+  subtitle?: string;
+  imageUrl: string;
+  responsibilities: string[];
+  /** Long-form bio for the chairperson hero only. */
+  bioParagraphs?: string[];
+}
+
+/** Content for the Executives page (`/executive`). */
+export interface ExecutivesPageContent {
+  heroEyebrow?: string;
+  heroTitle?: string;
+  gridTitle?: string;
+  gridLead?: string;
+  /** Extra gold pills under the chairperson name (e.g. Continental Evangelist). */
+  heroBadges?: string[];
+  chairperson: ExecutiveProfile;
+  committee: ExecutiveProfile[];
+}
+
 export interface AboutPageContent {
   heroEyebrow: string;
   heroTitle: string;
@@ -332,6 +356,7 @@ export interface CmsData {
   donationIntents?: DonationIntent[];
   countdown: SiteCountdownSettings;
   about: AboutPageContent;
+  executives: ExecutivesPageContent;
   socialLinks: SocialLink[];
   pageContent: SitePageContents;
 }

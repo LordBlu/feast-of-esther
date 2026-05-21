@@ -4,6 +4,7 @@ import { DragEvent, FormEvent, useCallback, useEffect, useMemo, useState } from 
 import { useRouter } from 'next/navigation';
 import AdminDonationsPanel from '@/components/admin/AdminDonationsPanel';
 import AdminGalleryEditor from '@/components/admin/AdminGalleryEditor';
+import AdminExecutivesEditor from '@/components/admin/AdminExecutivesEditor';
 import AdminFounderPageEditor from '@/components/admin/AdminFounderPageEditor';
 import AdminHomePageEditor from '@/components/admin/AdminHomePageEditor';
 import AdminPlaceholdersPanel from '@/components/admin/AdminPlaceholdersPanel';
@@ -24,6 +25,7 @@ import {
   normalizeGalleryCollection,
   slugifyGallerySlug,
 } from '@/lib/gallery-data';
+import { buildDefaultExecutivesContent } from '@/lib/executive-data';
 import { slugifyPathSegment } from '@/lib/slugify';
 import {
   AboutPageContent,
@@ -38,6 +40,7 @@ import {
   SiteCountdownSettings,
   SiteEvent,
   SiteImages,
+  ExecutivesPageContent,
 } from '@/lib/cms-types';
 
 const emptySitePageContents = (): SitePageContents => ({
@@ -223,6 +226,7 @@ export default function AdminDashboardPage() {
     | 'gallery'
     | 'social'
     | 'about'
+    | 'executives'
     | 'pages'
     | 'donations'
     | 'registrations'
@@ -237,6 +241,9 @@ export default function AdminDashboardPage() {
   const [countdownFallbackLocal, setCountdownFallbackLocal] = useState('');
   const [images, setImages] = useState<SiteImages>({});
   const [about, setAbout] = useState<AboutPageContent>(emptyAbout);
+  const [executives, setExecutives] = useState<ExecutivesPageContent>(() =>
+    buildDefaultExecutivesContent(),
+  );
   const [socialLinks, setSocialLinks] = useState<SocialLink[]>(defaultSocialLinks);
   const [pageContent, setPageContent] = useState<SitePageContents>(emptySitePageContents);
   const [pageEditSection, setPageEditSection] = useState<keyof SitePageContents>('gallery');
@@ -261,23 +268,31 @@ export default function AdminDashboardPage() {
   }, [eventFilter, router]);
 
   const loadCore = useCallback(async () => {
-    const [popupRes, imagesRes, countdownRes, aboutRes, socialRes, pagesRes] = await Promise.all([
+    const [popupRes, imagesRes, countdownRes, aboutRes, executivesRes, socialRes, pagesRes] =
+      await Promise.all([
       fetch('/api/admin/popup'),
       fetch('/api/admin/images'),
       fetch('/api/admin/countdown'),
       fetch('/api/admin/about'),
+      fetch('/api/admin/executives'),
       fetch('/api/admin/social'),
       fetch('/api/admin/page-content'),
     ]);
-    if ([popupRes, imagesRes, countdownRes, aboutRes, socialRes, pagesRes].some((res) => res.status === 401)) {
+    if (
+      [popupRes, imagesRes, countdownRes, aboutRes, executivesRes, socialRes, pagesRes].some(
+        (res) => res.status === 401,
+      )
+    ) {
       router.push('/admin/login');
       return;
     }
-    const [popupData, imagesData, countdownData, aboutData, socialData, pagesData] = await Promise.all([
+    const [popupData, imagesData, countdownData, aboutData, executivesData, socialData, pagesData] =
+      await Promise.all([
       popupRes.json(),
       imagesRes.json(),
       countdownRes.json(),
       aboutRes.json(),
+      executivesRes.json(),
       socialRes.json(),
       pagesRes.json(),
     ]);
@@ -295,6 +310,9 @@ export default function AdminDashboardPage() {
     setCountdownFallbackLocal(toDatetimeLocalValue(cd.fallbackTargetAt));
     const aboutNext = { ...emptyAbout, ...(aboutData.about ?? {}) };
     setAbout(aboutNext);
+    if (executivesData.executives) {
+      setExecutives(executivesData.executives);
+    }
     setSocialLinks(
       Array.isArray(socialData.socialLinks) && socialData.socialLinks.length > 0
         ? socialData.socialLinks
@@ -522,6 +540,21 @@ export default function AdminDashboardPage() {
     );
   }
 
+  async function saveExecutives() {
+    const response = await fetch('/api/admin/executives', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ executives }),
+    });
+    if (!response.ok) {
+      setMessage('Could not save Executives page.');
+      return;
+    }
+    const data = await response.json();
+    if (data.executives) setExecutives(data.executives);
+    setMessage('Executives page updated.');
+  }
+
   async function saveAbout() {
     const payload: AboutPageContent = {
       ...about,
@@ -711,6 +744,7 @@ export default function AdminDashboardPage() {
               'gallery',
               'social',
               'about',
+              'executives',
               'pages',
               'donations',
               'registrations',
@@ -732,6 +766,7 @@ export default function AdminDashboardPage() {
               {key === 'gallery' && 'Gallery'}
               {key === 'social' && 'Social Links'}
               {key === 'about' && 'About Page'}
+              {key === 'executives' && 'Executives'}
               {key === 'pages' && 'Site pages'}
               {key === 'donations' && 'Donations'}
               {key === 'registrations' && 'Registrations'}
@@ -1592,6 +1627,25 @@ export default function AdminDashboardPage() {
             </div>
             <button type="button" onClick={saveAbout} className="btn-primary rounded-full px-10">
               Save About page
+            </button>
+          </div>
+        ) : null}
+
+        {tab === 'executives' ? (
+          <div className="admin-card max-w-4xl space-y-6">
+            <h2>Executives page</h2>
+            <p className="text-sm text-black/55">
+              Chairperson hero and committee grid on <strong>/executive</strong>. Upload photos or paste
+              Cloudinary URLs. Add or remove executives anytime.
+            </p>
+            <AdminExecutivesEditor
+              content={executives}
+              onChange={setExecutives}
+              onUploadImage={uploadImage}
+              onDragOver={preventDragDefaults}
+            />
+            <button type="button" onClick={() => void saveExecutives()} className="btn-primary rounded-full px-10">
+              Save Executives page
             </button>
           </div>
         ) : null}

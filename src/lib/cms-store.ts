@@ -1,6 +1,7 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { randomUUID } from 'node:crypto';
+import { mergeExecutivesContent } from '@/lib/executive-data';
 import type {
   AboutPageContent,
   CmsData,
@@ -141,6 +142,7 @@ const defaultData: CmsData = {
   donationIntents: [],
   countdown: defaultCountdown,
   about: defaultAbout,
+  executives: mergeExecutivesContent(undefined),
   socialLinks: defaultSocialLinks,
   pageContent: emptyPageContent,
 };
@@ -176,6 +178,7 @@ export async function readCmsData(): Promise<CmsData> {
     images: { ...defaultData.images, ...parsed.images },
     countdown: { ...defaultData.countdown, ...parsed.countdown },
     about: { ...defaultData.about, ...parsed.about },
+    executives: mergeExecutivesContent(parsed.executives),
     socialLinks:
       parsed.socialLinks?.map((row) => ({
         id: String(row.id ?? '').trim(),

@@ -1,0 +1,325 @@
+.page {
+  min-height: 100vh;
+  background: #f7f4fb;
+}
+
+/* ── Hero (matches live Leaders “Our Leadership” strip) ── */
+.hero {
+  background: linear-gradient(135deg, #4a0d2e 0%, #6a0f35 42%, #8b1a4a 100%);
+  padding: clamp(2.5rem, 6vw, 4.5rem) clamp(1rem, 4vw, 2rem) clamp(3rem, 7vw, 5rem);
+}
+
+.heroInner {
+  max-width: 72rem;
+  margin: 0 auto;
+}
+
+.heroHeading {
+  text-align: center;
+  margin-bottom: clamp(2rem, 4vw, 3rem);
+}
+
+.heroEyebrow {
+  margin: 0 0 0.5rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.heroTitle {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(2.25rem, 5vw, 3.5rem);
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.1;
+}
+
+.heroRule {
+  width: 4.5rem;
+  height: 3px;
+  margin: 1rem auto 0;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--gold) 0%, var(--gold-light) 100%);
+}
+
+.profileCard {
+  display: grid;
+  gap: clamp(1.5rem, 3vw, 2.5rem);
+  align-items: start;
+  padding: clamp(1.25rem, 3vw, 2rem);
+  border-radius: 1.25rem;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.22);
+}
+
+@media (min-width: 768px) {
+  .profileCard {
+    grid-template-columns: minmax(220px, 34%) 1fr;
+  }
+}
+
+.profileImageWrap {
+  position: relative;
+  aspect-ratio: 3 / 4;
+  max-height: 520px;
+  border-radius: 1rem;
+  overflow: hidden;
+  border: 3px solid rgba(255, 255, 255, 0.35);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+}
+
+.profileImageWrap img {
+  object-fit: cover;
+  object-position: center top;
+}
+
+.profileBody {
+  color: #fff;
+}
+
+.profileName {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.75rem, 3.5vw, 2.65rem);
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+.pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.pill {
+  display: inline-block;
+  padding: 0.4rem 0.85rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #3d1028;
+  background: linear-gradient(90deg, var(--gold) 0%, var(--gold-light) 100%);
+}
+
+.profileBio {
+  margin-top: 1.25rem;
+  font-size: clamp(0.95rem, 1.5vw, 1.05rem);
+  line-height: 1.75;
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.profileBio p + p {
+  margin-top: 0.85rem;
+}
+
+/* ── Exco grid ── */
+.gridSection {
+  padding: clamp(2.5rem, 6vw, 4rem) clamp(1rem, 4vw, 2rem) clamp(4rem, 8vw, 5rem);
+}
+
+.gridInner {
+  max-width: 72rem;
+  margin: 0 auto;
+}
+
+.gridHeader {
+  text-align: center;
+  max-width: 40rem;
+  margin: 0 auto clamp(2rem, 4vw, 3rem);
+}
+
+.gridTitle {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.85rem, 3.5vw, 2.5rem);
+  color: var(--primary-dark);
+}
+
+.gridLead {
+  margin: 0.75rem 0 0;
+  font-size: 0.98rem;
+  line-height: 1.6;
+  color: #5c6370;
+}
+
+.excoGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: clamp(1rem, 2.5vw, 1.75rem);
+}
+
+@media (max-width: 1024px) {
+  .excoGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 520px) {
+  .excoGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.excoCard {
+  margin: 0;
+}
+
+.excoSlot {
+  position: relative;
+  min-height: 340px;
+  padding: 0.35rem;
+  border-radius: 1rem;
+  background: #fff;
+  border: 1px solid #ece8ef;
+  box-shadow: 0 10px 28px rgba(106, 15, 53, 0.06);
+  overflow: hidden;
+}
+
+@media (min-width: 768px) {
+  .excoSlot {
+    min-height: 380px;
+  }
+}
+
+/* Face: avatar + name — slides up on hover */
+.excoFace {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0.75rem 0.5rem 0.65rem;
+  min-height: 100%;
+  transition:
+    transform 0.45s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.35s ease;
+  will-change: transform, opacity;
+}
+
+.excoAvatar {
+  --size: clamp(156px, 19vw, 210px);
+  width: var(--size);
+  height: var(--size);
+  flex-shrink: 0;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 3px solid rgba(194, 24, 91, 0.25);
+  box-shadow: 0 10px 28px rgba(106, 15, 53, 0.14);
+  margin-bottom: 0.65rem;
+}
+
+.excoAvatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+}
+
+.excoName {
+  margin: 0;
+  font-size: clamp(0.88rem, 1.2vw, 1rem);
+  font-weight: 700;
+  line-height: 1.25;
+  color: #1a1a22;
+}
+
+.excoRole {
+  margin: 0.35rem 0 0;
+  font-size: 0.72rem;
+  line-height: 1.45;
+  color: #6a0f35;
+  font-weight: 600;
+}
+
+.excoSubtitle {
+  margin: 0.25rem 0 0;
+  font-size: 0.65rem;
+  line-height: 1.4;
+  color: #7a5a6e;
+}
+
+/* Role detail panel — replaces circle area on hover */
+.excoDetail {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 1rem 1rem 1.1rem;
+  background: linear-gradient(165deg, #fff 0%, #faf6f9 100%);
+  opacity: 0;
+  transform: translateY(16px);
+  pointer-events: none;
+  transition:
+    opacity 0.38s ease,
+    transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow-y: auto;
+}
+
+.excoDetailName {
+  margin: 0;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--primary-dark);
+  line-height: 1.25;
+}
+
+.excoDetailRole {
+  margin: 0.35rem 0 0.65rem;
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--primary);
+  line-height: 1.4;
+}
+
+.excoList {
+  margin: 0;
+  padding-left: 1.1rem;
+  font-size: 0.68rem;
+  line-height: 1.5;
+  color: #444951;
+}
+
+.excoList li + li {
+  margin-top: 0.35rem;
+}
+
+.excoCard:hover .excoFace,
+.excoCard:focus-within .excoFace {
+  transform: translateY(-108%);
+  opacity: 0;
+}
+
+.excoCard:hover .excoDetail,
+.excoCard:focus-within .excoDetail {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .excoFace,
+  .excoDetail {
+    transition: none;
+  }
+
+  .excoCard:hover .excoFace,
+  .excoCard:focus-within .excoFace {
+    transform: none;
+    opacity: 1;
+  }
+
+  .excoCard:hover .excoDetail,
+  .excoCard:focus-within .excoDetail {
+    position: relative;
+    opacity: 1;
+    transform: none;
+    margin-top: 0.5rem;
+    border-top: 1px solid #ece8ef;
+  }
+}

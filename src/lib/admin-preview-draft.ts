@@ -68,6 +68,7 @@ export function resolveAdminPreviewPath(tab: string, pageSection?: string): stri
     gallery: '/gallery',
     social: '/contact',
     about: '/about',
+    executives: '/executive',
     pages: '/gallery',
     donations: '/donate',
     registrations: null,
