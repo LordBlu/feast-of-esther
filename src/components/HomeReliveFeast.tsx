@@ -6,7 +6,66 @@ import SiteImage from '@/components/SiteImage';
 import styles from './HomeReliveFeast.module.css';
 
 const GRID_SIZE = 9;
-const TICK_MS = 3000;
+/** Base slide cadence — each cell adds its own offset for a kaleidoscopic rhythm. */
+const BASE_INTERVAL_MS = 2000;
+
+function cellIntervalMs(cellIndex: number): number {
+  const spread = (cellIndex * 317 + cellIndex * cellIndex * 41) % 750;
+  return BASE_INTERVAL_MS + spread;
+}
+
+function cellStartDelayMs(cellIndex: number): number {
+  return (cellIndex * 401 + 180) % 2200;
+}
+
+interface ReliveFeastCellProps {
+  cellIndex: number;
+  pool: string[];
+  reducedMotion: boolean;
+}
+
+function ReliveFeastCell({ cellIndex, pool, reducedMotion }: ReliveFeastCellProps) {
+  const [index, setIndex] = useState(() => cellIndex % pool.length);
+  const intervalMs = cellIntervalMs(cellIndex);
+  const startDelayMs = cellStartDelayMs(cellIndex);
+
+  useEffect(() => {
+    setIndex(cellIndex % pool.length);
+  }, [pool.length, cellIndex]);
+
+  useEffect(() => {
+    if (reducedMotion || pool.length < 2) return;
+
+    let intervalId: ReturnType<typeof setInterval> | undefined;
+    const timeoutId = window.setTimeout(() => {
+      intervalId = window.setInterval(
+        () => setIndex((prev) => (prev + 1) % pool.length),
+        intervalMs,
+      );
+    }, startDelayMs);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+      if (intervalId !== undefined) window.clearInterval(intervalId);
+    };
+  }, [pool.length, reducedMotion, intervalMs, startDelayMs]);
+
+  const src = pool[index % pool.length];
+
+  return (
+    <div className={styles.cell}>
+      <SiteImage
+        key={src}
+        src={src}
+        alt=""
+        fill
+        sizes="(max-width: 640px) 33vw, 20vw"
+        cloudWidth={480}
+        className={`${styles.cellImg} ${styles.cellImgVisible}`}
+      />
+    </div>
+  );
+}
 
 interface HomeReliveFeastProps {
   title?: string;
@@ -20,7 +79,6 @@ export default function HomeReliveFeast({
   images,
 }: HomeReliveFeastProps) {
   const pool = useMemo(() => images.filter(Boolean), [images]);
-  const [tick, setTick] = useState(0);
   const [reducedMotion, setReducedMotion] = useState(false);
 
   useEffect(() => {
@@ -30,12 +88,6 @@ export default function HomeReliveFeast({
     mq.addEventListener('change', fn);
     return () => mq.removeEventListener('change', fn);
   }, []);
-
-  useEffect(() => {
-    if (reducedMotion || pool.length < 2) return;
-    const id = window.setInterval(() => setTick((t) => t + 1), TICK_MS);
-    return () => window.clearInterval(id);
-  }, [pool.length, reducedMotion]);
 
   if (pool.length < GRID_SIZE) return null;
 
@@ -53,21 +105,14 @@ export default function HomeReliveFeast({
 
       <div className={styles.gridWrap}>
         <div className={styles.grid} aria-live="polite">
-          {Array.from({ length: GRID_SIZE }, (_, cellIndex) => {
-            const src = pool[(cellIndex + tick) % pool.length];
-            return (
-              <div key={cellIndex} className={styles.cell}>
-                <SiteImage
-                  src={src}
-                  alt=""
-                  fill
-                  sizes="(max-width: 640px) 33vw, 20vw"
-                  cloudWidth={480}
-                  className={`${styles.cellImg} ${styles.cellImgVisible}`}
-                />
-              </div>
-            );
-          })}
+          {Array.from({ length: GRID_SIZE }, (_, cellIndex) => (
+            <ReliveFeastCell
+              key={cellIndex}
+              cellIndex={cellIndex}
+              pool={pool}
+              reducedMotion={reducedMotion}
+            />
+          ))}
         </div>
       </div>
 
