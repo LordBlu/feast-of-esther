@@ -36,7 +36,7 @@ function ReliveFeastCell({ cellIndex, pool, reducedMotion }: ReliveFeastCellProp
   useEffect(() => {
     if (reducedMotion || pool.length < 2) return;
 
-    let intervalId: ReturnType<typeof setInterval> | undefined;
+    let intervalId: number | undefined;
     const timeoutId = window.setTimeout(() => {
       intervalId = window.setInterval(
         () => setIndex((prev) => (prev + 1) % pool.length),
