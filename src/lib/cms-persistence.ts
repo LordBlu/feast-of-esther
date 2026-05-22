@@ -46,7 +46,7 @@ async function writeLocalFile(filePath: string, content: string): Promise<void> 
 async function readBlobText(blobPathname: string): Promise<string | null> {
   const { get } = await import('@vercel/blob');
   try {
-    const result = await get(blobPathname, { access: 'private' });
+    const result = await get(blobPathname, { access: 'private', useCache: false });
     if (!result || result.statusCode !== 200 || !result.stream) return null;
     return await new Response(result.stream).text();
   } catch {
@@ -73,6 +73,12 @@ export async function readCmsDataRaw(): Promise<string> {
   if (getCmsStorageMode() === 'blob') {
     const fromBlob = await readBlobText(BLOB_CMS_PATH);
     if (fromBlob) return fromBlob;
+    // On Vercel, bundled data/cms-data.json is stale after admin saves — do not serve it.
+    if (isVercelRuntime()) {
+      throw new Error(
+        'CMS data is not in Blob storage yet. Save once in Admin after connecting Blob, or redeploy.',
+      );
+    }
   }
 
   const fromDisk = await readLocalFile(CMS_DATA_LOCAL_PATH);

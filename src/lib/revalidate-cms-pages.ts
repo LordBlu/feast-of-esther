@@ -7,10 +7,9 @@ export function revalidateAfterCmsSave(paths: string[] = ['/']) {
     if (!path || seen.has(path)) continue;
     seen.add(path);
     revalidatePath(path);
-    if (path === '/') {
-      revalidatePath('/', 'layout');
-    }
   }
+  // Root layout loads popup/images/countdown — always invalidate after any CMS save.
+  revalidatePath('/', 'layout');
 }
 
 export const CMS_PAGE_PATHS = {
