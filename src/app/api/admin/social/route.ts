@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { isAdminAuthenticated } from '@/lib/admin-auth';
 import { readCmsData, writeCmsData } from '@/lib/cms-store';
 import { SocialLink } from '@/lib/cms-types';
+import { revalidateAfterCmsSave } from '@/lib/revalidate-cms-pages';
 
 function unauthorized() {
   return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -38,5 +39,6 @@ export async function PUT(request: NextRequest) {
   const data = await readCmsData();
   data.socialLinks = sanitizeSocialLinks(body.socialLinks);
   await writeCmsData(data);
+  revalidateAfterCmsSave(['/']);
   return NextResponse.json({ socialLinks: data.socialLinks });
 }

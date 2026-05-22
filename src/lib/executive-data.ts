@@ -1,24 +1,60 @@
-import { randomUUID } from 'node:crypto';
 import type { ExecutiveProfile, ExecutivesPageContent } from '@/lib/cms-types';
 
+function newExecutiveId(): string {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID();
+  }
+  return `exco-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
+}
+
 export const EXECUTIVE_IMAGES = {
+  anthonia:
+    'https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1779463665/photo_7_2026-05-22_16-05-49_y1vjex.jpg',
   grace:
     'https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1778084218/founder_m47pqn.jpg',
-  exco1:
-    'https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1777761831/20260221_001220_is6nla.jpg',
-  exco2:
-    'https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1777761828/20260221_001107_p9wmvi.jpg',
-  exco3:
-    'https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1777761791/20260220_131152_jvhb9z.jpg',
-  exco4:
-    'https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1777761778/20260220_125214_h54x2b.jpg',
-  exco5:
-    'https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1777761723/20260219_124935_cr7o7g.jpg',
-  exco6:
-    'https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1777761714/20260219_114039_w1bvck.jpg',
-  exco7:
-    'https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1777761682/20250712_083226_bgqeac.jpg',
+  favour:
+    'https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1779463582/photo_2_2026-05-22_16-05-46_wjgzev.jpg',
+  kemi:
+    'https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1779463573/photo_6_2026-05-22_16-05-48_xewiyc.jpg',
+  elizabeth:
+    'https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1779463627/photo_1_2026-05-22_16-05-46_wc4k8s.jpg',
+  jumoke:
+    'https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1779464456/photo_5_2026-05-22_16-05-48_qrszam.jpg',
+  temitosan:
+    'https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1779463658/photo_3_2026-05-22_16-05-46_skm6di.jpg',
+  christie:
+    'https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1779463620/photo_4_2026-05-22_16-05-46_k0lpd3.jpg',
 } as const;
+
+const CHAIR_RESPONSIBILITIES = [
+  'Provides overall leadership and direction.',
+  'Presides over board meetings and ensures productive discussions.',
+  'Facilitates decision-making and ensures board resolutions are implemented.',
+  'Represents the organization at official events, partnerships, and engagements.',
+  'Makes key decisions and oversees strategy.',
+] as const;
+
+const VICE_RESPONSIBILITIES = [
+  'Supports the Chairperson and assumes their responsibilities when absent.',
+  'May oversee specific committees or strategic initiatives.',
+  'Serves as a key advisor and sounding board for the President.',
+  'Steps in to lead board meetings and official duties when the President is absent.',
+  'Collaborates with the President to develop and implement strategic objectives.',
+] as const;
+
+/** Former chair copy — now on Pastor Anthonia Adeyeye (Chairman). */
+const GRACE_CHAIR_BIO: string[] = [
+  'Pastor Grace Okonrende is a dynamic evangelist and Deliverance Minister. She and her husband are gifted marriage counselors who have served the Lord faithfully over many years.',
+  'She was used by God to pioneer churches in Nigeria and the UK, and was instrumental in taking RCCG to the Republic of Ireland. She started the first RCCG Yoruba/English Church in London.',
+  'The Lord established RCCG expressions in Sacramento, Oakland, and Stockton through Pastor Grace and her husband. They currently co-pastor in Sugar Land, Texas.',
+  'Her ministry has impacted many nations through healing, deliverance, and revival. She was promoted as the first female regional evangelist in RCCG and later as the first female continental evangelist in RCCG America.',
+];
+
+/** Short vice-era copy — now on Pastor Grace as Vice Chairperson. */
+const ANTHONIA_VICE_BIO: string[] = [
+  'Pastor Anthonia Adeyeye serves as Chairman (President) of the Feast of Esther USA Executive Committee.',
+  'She provides overall leadership and direction for the national body, presides over board meetings, and represents the organization at official engagements.',
+];
 
 export function buildDefaultExecutivesContent(): ExecutivesPageContent {
   return {
@@ -30,43 +66,31 @@ export function buildDefaultExecutivesContent(): ExecutivesPageContent {
     heroBadges: ['Continental Evangelist · RCCG America'],
     chairperson: {
       id: 'chairperson',
-      name: 'Pastor Mrs. Grace Okonrende',
+      name: 'Pastor Anthonia Adeyeye',
       title: 'Chairperson (President)',
       subtitle: 'Country Coordinator · Feast of Esther USA',
-      imageUrl: EXECUTIVE_IMAGES.grace,
-      responsibilities: [
-        'Provides overall leadership and direction.',
-        'Presides over board meetings and ensures productive discussions.',
-        'Facilitates decision-making and ensures board resolutions are implemented.',
-        'Represents the organization at official events, partnerships, and engagements.',
-        'Makes key decisions and oversees strategy.',
-      ],
-      bioParagraphs: [
-        'Pastor Grace Okonrende is a dynamic evangelist and Deliverance Minister. She and her husband are gifted marriage counselors who have served the Lord faithfully over many years.',
-        'She was used by God to pioneer churches in Nigeria and the UK, and was instrumental in taking RCCG to the Republic of Ireland. She started the first RCCG Yoruba/English Church in London.',
-        'The Lord established RCCG expressions in Sacramento, Oakland, and Stockton through Pastor Grace and her husband. They currently co-pastor in Sugar Land, Texas.',
-        'Her ministry has impacted many nations through healing, deliverance, and revival. She was promoted as the first female regional evangelist in RCCG and later as the first female continental evangelist in RCCG America.',
-      ],
+      imageUrl: EXECUTIVE_IMAGES.anthonia,
+      responsibilities: [...CHAIR_RESPONSIBILITIES],
+      bioParagraphs: GRACE_CHAIR_BIO.map((p) =>
+        p
+          .replace(/Pastor Grace Okonrende/g, 'Pastor Anthonia Adeyeye')
+          .replace(/through Pastor Grace and her husband/g, 'through Pastor Anthonia and her husband')
+          .replace(/Pastor Grace/g, 'Pastor Anthonia'),
+      ),
     },
     committee: [
       {
         id: 'vice-chair',
-        name: 'Pastor Anthonia Adeyeye',
+        name: 'Pastor Mrs. Grace Okonrende',
         title: 'Vice Chairperson (Assistant President)',
-        imageUrl: EXECUTIVE_IMAGES.exco1,
-        responsibilities: [
-          'Supports the Chairperson and assumes their responsibilities when absent.',
-          'May oversee specific committees or strategic initiatives.',
-          'Serves as a key advisor and sounding board for the President.',
-          'Steps in to lead board meetings and official duties when the President is absent.',
-          'Collaborates with the President to develop and implement strategic objectives.',
-        ],
+        imageUrl: EXECUTIVE_IMAGES.grace,
+        responsibilities: [...VICE_RESPONSIBILITIES],
       },
       {
         id: 'secretary',
-        name: 'Pastor Favor Winner',
+        name: 'Pastor Favour Winner',
         title: 'Secretary',
-        imageUrl: EXECUTIVE_IMAGES.exco2,
+        imageUrl: EXECUTIVE_IMAGES.favour,
         responsibilities: [
           'Handles correspondence and communication.',
           'Maintains records and documents.',
@@ -78,7 +102,7 @@ export function buildDefaultExecutivesContent(): ExecutivesPageContent {
         id: 'prayer',
         name: 'Pastor Kemi Ojo',
         title: 'Prayer Coordinator',
-        imageUrl: EXECUTIVE_IMAGES.exco3,
+        imageUrl: EXECUTIVE_IMAGES.kemi,
         responsibilities: [
           'Organizes corporate prayer sessions for FOE members.',
           'Encourages intercessory prayers for members and initiatives.',
@@ -91,7 +115,7 @@ export function buildDefaultExecutivesContent(): ExecutivesPageContent {
         id: 'strategic',
         name: 'Pastor Elizabeth Ojuolape',
         title: 'Director of Strategic Coordination',
-        imageUrl: EXECUTIVE_IMAGES.exco4,
+        imageUrl: EXECUTIVE_IMAGES.elizabeth,
         responsibilities: [
           'Coordination and alignment across leadership.',
           'Facilitation of communication among leaders and their teams.',
@@ -106,7 +130,7 @@ export function buildDefaultExecutivesContent(): ExecutivesPageContent {
         name: 'Pastor Jumoke Elkanah',
         title: 'Marketing & Social Media Coordinator',
         subtitle: 'Assisted by Pastor Temitosan Abimbola',
-        imageUrl: EXECUTIVE_IMAGES.exco5,
+        imageUrl: EXECUTIVE_IMAGES.jumoke,
         responsibilities: [
           'Develop and implement a comprehensive social media strategy across Facebook, Instagram, and other platforms.',
           'Manage the FOE website.',
@@ -121,7 +145,7 @@ export function buildDefaultExecutivesContent(): ExecutivesPageContent {
         id: 'hospitality',
         name: 'Pastor Temitosan Abimbola',
         title: 'Hospitality Coordinator',
-        imageUrl: EXECUTIVE_IMAGES.exco6,
+        imageUrl: EXECUTIVE_IMAGES.temitosan,
         responsibilities: [
           'Coordinate hospitality arrangements for guest speakers, ministers, and special guests.',
           'Ensure guests are warmly welcomed and properly attended to.',
@@ -133,7 +157,7 @@ export function buildDefaultExecutivesContent(): ExecutivesPageContent {
         id: 'finance',
         name: 'Evangelist Christie Ohuabunwa',
         title: 'Finance Coordinator',
-        imageUrl: EXECUTIVE_IMAGES.exco7,
+        imageUrl: EXECUTIVE_IMAGES.christie,
         responsibilities: [
           'Oversee financial transactions and accounting.',
           'Manage budgets and financial planning.',
@@ -144,6 +168,22 @@ export function buildDefaultExecutivesContent(): ExecutivesPageContent {
   };
 }
 
+/** About page featured leader — Anthonia with Grace’s public role + bio. */
+export const DEFAULT_ANTHONIA_LEADERSHIP_PROFILE = {
+  name: 'Pastor Anthonia Adeyeye',
+  role: 'Chairperson (President) · Country Coordinator Feast of Esther USA · Continental Evangelist RCCG America',
+  imageUrl: EXECUTIVE_IMAGES.anthonia,
+  blurb:
+    'Pastor Anthonia Adeyeye is a dynamic evangelist and Deliverance Minister; she and her husband are gifted marriage counselors, serving the Lord from her youthful days.\n\nShe pioneered churches in Nigeria and the UK, took RCCG to Ireland, and established RCCG in Sacramento, Oakland, and Stockton, California. She co-pastors the Pavilion of Redemption in Sugar Land, Texas.',
+} as const;
+
+export const DEFAULT_GRACE_LEADERSHIP_PROFILE = {
+  name: 'Pastor Mrs. Grace Okonrende',
+  role: 'Vice Chairperson',
+  imageUrl: EXECUTIVE_IMAGES.grace,
+  blurb: '',
+} as const;
+
 export function mergeExecutivesContent(
   incoming: Partial<ExecutivesPageContent> | undefined,
 ): ExecutivesPageContent {
@@ -153,7 +193,7 @@ export function mergeExecutivesContent(
   const committee = Array.isArray(patch.committee)
     ? patch.committee.map((row) => ({
         ...row,
-        id: row.id?.trim() || randomUUID(),
+        id: row.id?.trim() || newExecutiveId(),
         responsibilities: Array.isArray(row.responsibilities)
           ? row.responsibilities.filter((s): s is string => typeof s === 'string' && s.trim().length > 0)
           : [],
@@ -163,7 +203,7 @@ export function mergeExecutivesContent(
       }))
     : defaults.committee;
 
-  return {
+  const merged: ExecutivesPageContent = {
     heroEyebrow: patch.heroEyebrow?.trim() || defaults.heroEyebrow,
     heroTitle: patch.heroTitle?.trim() || defaults.heroTitle,
     gridTitle: patch.gridTitle?.trim() || defaults.gridTitle,
@@ -182,5 +222,52 @@ export function mergeExecutivesContent(
         : defaults.chairperson.bioParagraphs,
     },
     committee: committee.length > 0 ? committee : defaults.committee,
+  };
+
+  return applyExecutivePhotoDefaults(merged, defaults);
+}
+
+function namesMatch(a: string, b: string): boolean {
+  return a.trim().toLowerCase() === b.trim().toLowerCase();
+}
+
+function applyExecutivePhotoDefaults(
+  content: ExecutivesPageContent,
+  defaults: ExecutivesPageContent,
+): ExecutivesPageContent {
+  const chair = {
+    ...content.chairperson,
+    imageUrl: content.chairperson.imageUrl?.trim() || defaults.chairperson.imageUrl,
+    title: content.chairperson.title?.trim() || defaults.chairperson.title,
+    subtitle: content.chairperson.subtitle?.trim() || defaults.chairperson.subtitle,
+    bioParagraphs: content.chairperson.bioParagraphs?.length
+      ? content.chairperson.bioParagraphs
+      : defaults.chairperson.bioParagraphs,
+    responsibilities: content.chairperson.responsibilities?.length
+      ? content.chairperson.responsibilities
+      : defaults.chairperson.responsibilities,
+  };
+
+  const committee = content.committee.map((member) => {
+    const defaultRow = defaults.committee.find(
+      (d) => (member.id && d.id === member.id) || namesMatch(d.name, member.name),
+    );
+    if (!defaultRow) return member;
+    return {
+      ...member,
+      imageUrl: member.imageUrl?.trim() || defaultRow.imageUrl,
+      title: member.title?.trim() || defaultRow.title,
+      subtitle: member.subtitle?.trim() || defaultRow.subtitle,
+      responsibilities: member.responsibilities?.length
+        ? member.responsibilities
+        : defaultRow.responsibilities,
+    };
+  });
+
+  return {
+    ...content,
+    chairperson: chair,
+    committee,
+    heroBadges: content.heroBadges?.length ? content.heroBadges : defaults.heroBadges,
   };
 }

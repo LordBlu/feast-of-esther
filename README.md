@@ -3,9 +3,11 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 ## Feast of Esther — North America
 
 - **Run locally:** `npm run dev` → [http://localhost:3000](http://localhost:3000)
-- **Content:** JSON-backed CMS in `data/cms-data.json` (events, popup, imagery, about, social, registrations, **`pageContent`** for per-route marketing copy). **Admin:** `/admin` (set `ADMIN_DASHBOARD_PASSWORD` / token in `.env` per your setup).
-- **Hadassah (AI chat):** Requires **`OLLAMA_API_KEY`** on the server (e.g. Vercel). Optional **`OLLAMA_CHAT_MODEL`** — defaults to `qwen3-coder:480b-cloud` for Ollama Cloud’s OpenAI-compatible API (`POST /api/hadassah`).
-- **Agent / maintainer notes:** See **`FUTURE_NOTES.md`** (routes, CMS, deployment caveats, `tsc` vs `.next/types`).
+- **Content:** JSON-backed CMS in `data/cms-data.json` (events, popup, imagery, about, **executives**, social, registrations, **`pageContent`**). **Admin:** `/admin` — see **`ADMIN_GUIDE.md`**.
+- **Public routes (high-signal):** `/` home · `/about` · `/executive` Executives · `/founder` · `/gallery` · `/events` · `/donate` · `/contact` · `/registration`
+- **Hadassah (AI chat):** **`OLLAMA_API_KEY`** on the server. Optional **`OLLAMA_CHAT_MODEL`** (`POST /api/hadassah`).
+- **Donations:** Zeffy embed via Admin or `NEXT_PUBLIC_ZEFFY_EMBED_URL`; PayPal via `NEXT_PUBLIC_PAYPAL_DONATE_URL`.
+- **Agent / maintainer notes:** **`FUTURE_NOTES.md`** (latest features, env vars, Vercel caveats).
 
 ## Getting Started
 

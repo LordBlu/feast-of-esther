@@ -73,6 +73,21 @@ Welcome modal on the homepage: text, image, CTA, on/off, and optional typography
 
 Hero poster, hotel photo on home, founder image, popup fallback, YouTube embed URL, and **founder carousel** (one image per row — add URL or upload). **Gallery folders are edited on the Gallery tab**, not here.
 
+### Placeholders
+
+Bundled **demo photos** used before you upload real ones (Home hero slides, ministry cards, About sidebar sections, Founder, Events fallbacks). Yellow **Demo** badges mean the original placeholder is still active. Upload or paste a URL to replace; **Use default image** clears your override.
+
+### Executives
+
+Edits the public **Executives** page (`/executive`):
+
+1. **Page headings** — hero title, grid intro, optional extra badges under the chairperson name.
+2. **Chairperson (hero)** — name, roles, photo, biography (one paragraph per blank line), responsibilities list.
+3. **Committee (grid)** — one card per executive: name, title, optional subtitle, photo, responsibilities (one per line). Use **+ Add executive** / **Remove** as needed.
+4. Click **Save Executives page**.
+
+Visitors **hover** a committee photo to read responsibilities in place.
+
 ### Social Links
 
 Footer icons: URL, label, enable/disable, add/remove.
@@ -99,11 +114,28 @@ Hero, mission lines, **story paragraphs** (one box per paragraph — add/remove)
 
 ### Site pages
 
-Copy for Gallery, Events (hotel block labels, etc.), Contact, Donate, Register, Founder (hero URL + bio paragraphs), About Us (focus bullets, mega accent, CTA bar, sidebar photos per section).
+Pick a section from the dropdown, then edit and save.
+
+| Section | What you can change |
+|---------|---------------------|
+| **Home** | Hero headline, mission quote, purpose title/subtitle, ministry card text (title, tag, copy, link), Relive the Feast image URLs (need **9+** for the grid), testimonials, show/hide Relive & testimonials |
+| **Founder** | Hero image URL, biography paragraphs, ministry panel titles/text |
+| **Gallery** | Page title and subtitle |
+| **Donate** | Labels, Zeffy embed URL, offline giving hint template |
+| **Contact** | Contact details shown on `/contact` |
+| **About Us** | Sidebar photo per scroll section (Intro, Journey, …) |
+| **Events / Register** | Supporting labels where used |
+
+**Contact email default:** `feastofesthernaa@gmail.com` (also used on Donate offline text and Hadassah). Override under **Contact** if needed.
 
 ### Donations
 
-View people who used the donate page: chose **Zeffy** or **PayPal**, clicked **Give**, or opened PayPal. This is a **log only** — not payment processing. Edit donate page **wording** under **Site pages → Donate**.
+View people who used the donate page: chose **Zeffy** or **PayPal**, clicked **Give**, or opened PayPal. This is a **log only** — not payment processing.
+
+**Online giving setup:**
+
+- **Zeffy:** **Site pages → Donate** → **Zeffy embed URL** (iframe `src` from Zeffy), or ask your host to set `NEXT_PUBLIC_ZEFFY_EMBED_URL`.
+- **PayPal:** Host must set `NEXT_PUBLIC_PAYPAL_DONATE_URL` (full PayPal donation link) — not in Admin UI yet.
 
 ### Registrations
 
@@ -117,14 +149,15 @@ Undo, Zero, and 30 save slots — see [Reset or undo](#reset-or-undo-site-conten
 
 ## Homepage sections (what exists today)
 
-**Order on `/`:** ministry cards → **Relive the Feast** (3×3 photo grid, rotates every 3s) → hotel block → countdown → **testimonials** marquee (below countdown).
+**Order on `/`:** hero → mission video strip → Our Purpose + ministry cards → **Relive the Feast** (3×3 photo grid, each cell changes on its own rhythm) → hotel block → countdown (hides automatically after the target time) → **testimonials** marquee.
 
 | Section | Editable in Admin? |
 |---------|---------------------|
-| Hero, mission quote, Our Purpose, ministry cards | **No** — `src/lib/site-content.ts` |
-| Relive the Feast (image URLs) | **Partial** — `pageContent.home` in JSON; **no dedicated Admin tab yet** (developer) |
-| Testimonials (quotes + names) | **Partial** — same `home` object in JSON |
-| Hotel block | **Partial** — Imagery + Site pages → Events labels; **no off switch** |
+| Hero headline, mission quote, purpose, ministry cards | **Yes** — **Site pages → Home** |
+| Relive the Feast (≥9 image URLs, on/off) | **Yes** — **Site pages → Home** |
+| Relive photos (demo placeholders) | **Yes** — **Placeholders** tab (Home ministry / hero slots) |
+| Testimonials | **Yes** — **Site pages → Home** |
+| Hotel block | **Partial** — Imagery (hotel photo); **no off switch** |
 | Countdown | **Yes** — Countdown tab |
 
 After any homepage change, hard refresh (`Ctrl + Shift + R` on Windows).
@@ -133,8 +166,7 @@ After any homepage change, hard refresh (`Ctrl + Shift + R` on Windows).
 
 ## What you cannot change in Admin (needs a developer)
 
-- Homepage headline, mission quote, “Our Purpose” text, and ministry card copy (in code: `src/lib/site-content.ts`).
-- Navigation menu labels/routes, page layout, colors, fonts.
+- Navigation menu order/labels (except content on pages), global colors, fonts.
 - Top **announcement bar** text.
 - **Event programme** schedule (days/times on `/events`).
 - **Sister Chapters** map on About (states/cities in code).
@@ -156,7 +188,7 @@ After any homepage change, hard refresh (`Ctrl + Shift + R` on Windows).
 
 ## Homepage ideas when countdown + hotel are removed
 
-**Already live:** Relive the Feast grid + testimonials marquee (see table above). Wire URLs/quotes through Admin when a **Home** tab is added, or edit `pageContent.home` in `cms-data.json` with developer help.
+**Already live:** Relive the Feast grid + testimonials — edit under **Site pages → Home**.
 
 **Still optional (developer):**
 
@@ -185,16 +217,16 @@ The tabbed block at the bottom of `/founder` is **`FounderMinistryCards.tsx`** (
 
 **Editor requests (developer):**
 
-- Wire card text/images to **Site pages → Founder** or Imagery.
-- Add Admin **Home** tab for Relive URLs / testimonials JSON.
+- Wire tab labels / auto-rotate timing to Admin.
 - Turn off auto-rotate or add a fourth card if needed.
 
 ---
 
 ## Image uploads
 
-- Paste a **Cloudinary** (or any HTTPS) URL, or upload a file (stored under `/uploads/...` on your server).
-- Prefer Cloudinary for production so images survive redeploys.
+- Paste a **Cloudinary** (or any HTTPS) URL, or upload a file.
+- When **Cloudinary API keys** are set on the host, uploads go to your Cloudinary account (best for production).
+- Otherwise files may save under `/public/uploads/` on the server (may not persist on Vercel after redeploy).
 
 ---
 
@@ -214,7 +246,7 @@ The tabbed block at the bottom of `/founder` is **`FounderMinistryCards.tsx`** (
 
 ## For developers
 
-- **CMS file:** `data/cms-data.json` (events, popup, images, about, social, registrations, `donationIntents`, `pageContent`, …)
+- **CMS file:** `data/cms-data.json` (events, popup, images, about, **`executives`**, social, registrations, `donationIntents`, `pageContent`, …)
 - **No separate CMS database** — Admin `PUT` handlers call `readCmsData` / `writeCmsData` in `src/lib/cms-store.ts`
 - **Gallery + events sync:** `src/lib/gallery-event-sync.ts` from `PUT /api/admin/images` when `galleryCollections` is present; types on `GalleryCollection` (`collectionType`, `linkedEventId`, `eventDateLabel`, `eventVenue`)
 - **Gallery validation:** `normalizeGalleryCollection`, `isGalleryCollectionComplete` in `src/lib/gallery-data.ts`
@@ -222,7 +254,10 @@ The tabbed block at the bottom of `/founder` is **`FounderMinistryCards.tsx`** (
 - **Donate intents:** `POST /api/donate/intent` → `appendDonationIntent`; admin list `GET /api/admin/donations`
 - **Preview iframe:** `src/app/admin/preview/page.tsx` + `admin-preview-draft` sessionStorage key
 - History: `src/lib/cms-history.ts`, UI: `src/components/admin/AdminVersionsPanel.tsx`
-- Homepage extras: `src/lib/home-content.ts`, `HomeReliveFeast.tsx`, `HomeTestimonialsMarquee.tsx`, `pageContent.home` in `cms-types.ts`
+- Homepage: `HomeClient.tsx`, `src/lib/home-content.ts`, `src/lib/site-placeholders.ts`, `AdminHomePageEditor.tsx`, `HomeReliveFeast.tsx` (per-cell timers — use `number` for `setInterval` ids in browser code)
+- Executives: `src/app/executive/`, `src/lib/executive-data.ts`, `PUT /api/admin/executives`, `AdminExecutivesEditor.tsx`
+- Placeholders: `src/lib/site-placeholder-catalog.ts`, `site-placeholders.ts`, `AdminPlaceholdersPanel.tsx`
+- Contact email constant: `SITE.contactEmail` in `src/lib/site-content.ts` (`feastofesthernaa@gmail.com`)
 - Public read API: `GET /api/site-config`
 - Admin APIs: `src/app/api/admin/*`
 - **Quality check:** `npx tsc --noEmit`, `npm run lint`, `npm run build` after substantive changes
@@ -231,4 +266,4 @@ Update this file when new Admin fields or toggles are added.
 
 ---
 
-*Last updated: May 2026 — Admin Gallery tab, past-event sync, friendly About/leadership editors, Donations log, Draft/Live preview.*
+*Last updated: May 2026 — Executives page + Admin tab, Placeholders, Site pages Home/Founder editors, staggered Relive grid, donate/contact email, performance/security batch.*

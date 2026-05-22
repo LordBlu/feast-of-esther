@@ -5,11 +5,14 @@ import type { HomePageContent, HomeTestimonial } from '@/lib/cms-types';
 import { HOME_MINISTRY_CARD_DEFAULTS } from '@/lib/site-placeholder-catalog';
 import { HOME_COPY } from '@/lib/site-content';
 import AdminImageUrlField from '@/components/admin/AdminImageUrlField';
+import AdminReorderButtons from '@/components/admin/AdminReorderButtons';
 import AdminUrlListEditor from '@/components/admin/AdminUrlListEditor';
+import { swapArrayItems } from '@/lib/reorder-array';
 
 interface AdminHomePageEditorProps {
   home: HomePageContent;
   onChange: (next: HomePageContent) => void;
+  onSwapMinistryCards?: (from: number, to: number) => void;
   onUpload?: (file: File, onUrl: (url: string) => void) => void;
   onDragOver?: (e: DragEvent) => void;
 }
@@ -21,6 +24,7 @@ function emptyTestimonial(): HomeTestimonial {
 export default function AdminHomePageEditor({
   home,
   onChange,
+  onSwapMinistryCards,
   onUpload,
   onDragOver,
 }: AdminHomePageEditorProps) {
@@ -98,12 +102,24 @@ export default function AdminHomePageEditor({
 
       {HOME_MINISTRY_CARD_DEFAULTS.map((defaults, index) => {
         const row = home.ministryCards?.[index] ?? {};
+        const ministryCount = HOME_MINISTRY_CARD_DEFAULTS.length;
         return (
           <div
-            key={defaults.title}
+            key={`ministry-card-${index}`}
             className="rounded-xl border border-[rgba(194,24,91,0.12)] bg-white/65 p-4"
           >
-            <p className="mb-3 text-xs font-semibold text-[var(--primary-dark)]">{defaults.title}</p>
+            <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+              <p className="text-xs font-semibold text-[var(--primary-dark)]">
+                Card {index + 1} · {defaults.title}
+              </p>
+              <AdminReorderButtons
+                index={index}
+                total={ministryCount}
+                label={`ministry card ${index + 1}`}
+                onMoveUp={() => onSwapMinistryCards?.(index, index - 1)}
+                onMoveDown={() => onSwapMinistryCards?.(index, index + 1)}
+              />
+            </div>
             <div className="grid gap-3 md:grid-cols-2">
               <div>
                 <label className="admin-field-label">Card title</label>
@@ -149,8 +165,8 @@ export default function AdminHomePageEditor({
       <div className="border-t border-black/10 pt-6">
         <h3 className="text-lg font-semibold text-[var(--primary-dark)]">Relive the Feast</h3>
         <p className="mt-1 text-sm text-black/55">
-          Rotating photo grid on the homepage. Add at least nine image URLs, or leave empty to pull from gallery
-          collections and defaults.
+          Rotating photo grid on the homepage. Your URLs are used first (even if you have fewer than nine). Leave empty
+          to pull from gallery collections and defaults. Use ↑ / ↓ to change order, then save under Site pages.
         </p>
       </div>
 
@@ -225,19 +241,30 @@ export default function AdminHomePageEditor({
             key={`testimonial-${index}`}
             className="rounded-xl border border-[rgba(194,24,91,0.12)] bg-white/65 p-4"
           >
-            <div className="mb-3 flex items-center justify-between gap-2">
+            <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
               <span className="text-xs font-semibold text-[var(--primary-dark)]">
                 Testimonial {index + 1}
               </span>
-              {testimonials.length > 1 ? (
-                <button
-                  type="button"
-                  className="admin-btn-ghost text-xs"
-                  onClick={() => patch({ testimonials: testimonials.filter((_, i) => i !== index) })}
-                >
-                  Remove
-                </button>
-              ) : null}
+              <div className="flex flex-wrap items-center gap-2">
+                <AdminReorderButtons
+                  index={index}
+                  total={testimonials.length}
+                  label={`testimonial ${index + 1}`}
+                  onMoveUp={() => patch({ testimonials: swapArrayItems(testimonials, index, index - 1) })}
+                  onMoveDown={() =>
+                    patch({ testimonials: swapArrayItems(testimonials, index, index + 1) })
+                  }
+                />
+                {testimonials.length > 1 ? (
+                  <button
+                    type="button"
+                    className="admin-btn-ghost text-xs"
+                    onClick={() => patch({ testimonials: testimonials.filter((_, i) => i !== index) })}
+                  >
+                    Remove
+                  </button>
+                ) : null}
+              </div>
             </div>
             <div className="grid gap-3 md:grid-cols-2">
               <div className="md:col-span-2">

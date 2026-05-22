@@ -1,7 +1,12 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { randomUUID } from 'node:crypto';
-import { mergeExecutivesContent } from '@/lib/executive-data';
+import {
+  DEFAULT_ANTHONIA_LEADERSHIP_PROFILE,
+  DEFAULT_GRACE_LEADERSHIP_PROFILE,
+  EXECUTIVE_IMAGES,
+  mergeExecutivesContent,
+} from '@/lib/executive-data';
 import type {
   AboutPageContent,
   CmsData,
@@ -23,26 +28,18 @@ const defaultCountdown: SiteCountdownSettings = {
 };
 
 const defaultLeadershipProfiles: LeadershipProfile[] = [
+  { ...DEFAULT_ANTHONIA_LEADERSHIP_PROFILE },
+  { ...DEFAULT_GRACE_LEADERSHIP_PROFILE },
   {
-    name: 'Pastor Mrs. Grace Okonrende',
-    role: 'Country Coordinator Feast of Esther USA · Continental Evangelist RCCG America',
-    imageUrl:
-      'https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1777761734/20260219_131617_ocrby8.jpg',
-    blurb:
-      'Pastor Grace Okonrende is a dynamic evangelist and Deliverance Minister; she and her husband are gifted marriage counselors, serving the Lord from her youthful days.\n\nShe pioneered churches in Nigeria and the UK, took RCCG to Ireland, and established RCCG in Sacramento, Oakland, and Stockton, California. She co-pastors the Pavilion of Redemption in Sugar Land, Texas.',
-  },
-  {
-    name: 'Pastor Mabel Odigie',
-    role: 'Chapter Coordinator — Richmond, Virginia',
-    imageUrl:
-      'https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1777761505/20250221_200317_el9dzk.jpg',
+    name: 'Pastor Favour Winner',
+    role: 'Secretary',
+    imageUrl: EXECUTIVE_IMAGES.favour,
     blurb: '',
   },
   {
-    name: 'Rev. Dr. Felicia Ajayi',
-    role: 'Maryland',
-    imageUrl:
-      'https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1777761510/20250221_200448_xfsekz.jpg',
+    name: 'Pastor Kemi Ojo',
+    role: 'Prayer Co-ordinator',
+    imageUrl: EXECUTIVE_IMAGES.kemi,
     blurb: '',
   },
   {
@@ -177,7 +174,14 @@ export async function readCmsData(): Promise<CmsData> {
     popup: { ...defaultData.popup, ...parsed.popup },
     images: { ...defaultData.images, ...parsed.images },
     countdown: { ...defaultData.countdown, ...parsed.countdown },
-    about: { ...defaultData.about, ...parsed.about },
+    about: {
+      ...defaultData.about,
+      ...parsed.about,
+      leadershipProfiles:
+        parsed.about?.leadershipProfiles?.length
+          ? parsed.about.leadershipProfiles
+          : defaultData.about.leadershipProfiles,
+    },
     executives: mergeExecutivesContent(parsed.executives),
     socialLinks:
       parsed.socialLinks?.map((row) => ({

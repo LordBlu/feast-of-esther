@@ -134,21 +134,27 @@
     "leadershipTitle": "Leading with grace and conviction",
     "leadershipProfiles": [
       {
-        "name": "Pastor Mrs. Grace Okonrende",
-        "role": "Country Coordinator Feast of Esther USA · Continental Evangelist RCCG America",
-        "imageUrl": "https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1777761734/20260219_131617_ocrby8.jpg",
-        "blurb": "Pastor Grace Okonrende is a dynamic evangelist and Deliverance Minister; she and her husband are gifted marriage counselors, serving the Lord from her youthful days.\n\nShe pioneered churches in Nigeria and the UK, took RCCG to Ireland, and established RCCG in Sacramento, Oakland, and Stockton, California. She co-pastors the Pavilion of Redemption in Sugar Land, Texas."
+        "name": "Pastor Anthonia Adeyeye",
+        "role": "Chairperson (President) · Country Coordinator Feast of Esther USA · Continental Evangelist RCCG America",
+        "imageUrl": "https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1779463665/photo_7_2026-05-22_16-05-49_y1vjex.jpg",
+        "blurb": "Pastor Anthonia Adeyeye is a dynamic evangelist and Deliverance Minister; she and her husband are gifted marriage counselors, serving the Lord from her youthful days.\n\nShe pioneered churches in Nigeria and the UK, took RCCG to Ireland, and established RCCG in Sacramento, Oakland, and Stockton, California. She co-pastors the Pavilion of Redemption in Sugar Land, Texas."
       },
       {
-        "name": "Pastor Mabel Odigie",
-        "role": "Chapter Coordinator — Richmond, Virginia",
-        "imageUrl": "https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1777761505/20250221_200317_el9dzk.jpg",
+        "name": "Pastor Mrs. Grace Okonrende",
+        "role": "Vice Chairperson",
+        "imageUrl": "https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1778084218/founder_m47pqn.jpg",
         "blurb": ""
       },
       {
-        "name": "Rev. Dr. Felicia Ajayi",
-        "role": "Maryland",
-        "imageUrl": "https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1777761510/20250221_200448_xfsekz.jpg",
+        "name": "Pastor Favour Winner",
+        "role": "Secretary",
+        "imageUrl": "https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1779463582/photo_2_2026-05-22_16-05-46_wjgzev.jpg",
+        "blurb": ""
+      },
+      {
+        "name": "Pastor Kemi Ojo",
+        "role": "Prayer Co-ordinator",
+        "imageUrl": "https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1779463573/photo_6_2026-05-22_16-05-48_xewiyc.jpg",
         "blurb": ""
       },
       {
@@ -156,6 +162,128 @@
         "role": "Virginia Chapter",
         "imageUrl": "https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1777761835/20260221_002014_nethgk.jpg",
         "blurb": ""
+      }
+    ]
+  },
+  "executives": {
+    "heroEyebrow": "Feast of Esther USA",
+    "heroTitle": "Our Executive Committee",
+    "gridTitle": "Roles & Responsibilities",
+    "gridLead": "Hover over a leader to read their responsibilities. Move away to return to their profile.",
+    "heroBadges": [
+      "Continental Evangelist · RCCG America"
+    ],
+    "chairperson": {
+      "id": "chairperson",
+      "name": "Pastor Anthonia Adeyeye",
+      "title": "Chairperson (President)",
+      "subtitle": "Country Coordinator · Feast of Esther USA",
+      "imageUrl": "https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1779463665/photo_7_2026-05-22_16-05-49_y1vjex.jpg",
+      "responsibilities": [
+        "Provides overall leadership and direction.",
+        "Presides over board meetings and ensures productive discussions.",
+        "Facilitates decision-making and ensures board resolutions are implemented.",
+        "Represents the organization at official events, partnerships, and engagements.",
+        "Makes key decisions and oversees strategy."
+      ],
+      "bioParagraphs": [
+        "Pastor Anthonia Adeyeye is a dynamic evangelist and Deliverance Minister. She and her husband are gifted marriage counselors who have served the Lord faithfully over many years.",
+        "She was used by God to pioneer churches in Nigeria and the UK, and was instrumental in taking RCCG to the Republic of Ireland. She started the first RCCG Yoruba/English Church in London.",
+        "The Lord established RCCG expressions in Sacramento, Oakland, and Stockton through Pastor Anthonia and her husband. They currently co-pastor in Sugar Land, Texas.",
+        "Her ministry has impacted many nations through healing, deliverance, and revival. She was promoted as the first female regional evangelist in RCCG and later as the first female continental evangelist in RCCG America."
+      ]
+    },
+    "committee": [
+      {
+        "id": "vice-chair",
+        "name": "Pastor Mrs. Grace Okonrende",
+        "title": "Vice Chairperson (Assistant President)",
+        "imageUrl": "https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1779463603/photo_8_2026-05-22_16-05-49_vyurix.jpg",
+        "responsibilities": [
+          "Supports the Chairperson and assumes their responsibilities when absent.",
+          "May oversee specific committees or strategic initiatives.",
+          "Serves as a key advisor and sounding board for the President.",
+          "Steps in to lead board meetings and official duties when the President is absent.",
+          "Collaborates with the President to develop and implement strategic objectives."
+        ]
+      },
+      {
+        "id": "secretary",
+        "name": "Pastor Favour Winner",
+        "title": "Secretary",
+        "imageUrl": "https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1779463582/photo_2_2026-05-22_16-05-46_wjgzev.jpg",
+        "responsibilities": [
+          "Handles correspondence and communication.",
+          "Maintains records and documents.",
+          "Provides administrative support.",
+          "Records meeting minutes accurately."
+        ]
+      },
+      {
+        "id": "prayer",
+        "name": "Pastor Kemi Ojo",
+        "title": "Prayer Coordinator",
+        "imageUrl": "https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1779463573/photo_6_2026-05-22_16-05-48_xewiyc.jpg",
+        "responsibilities": [
+          "Organizes corporate prayer sessions for FOE members.",
+          "Encourages intercessory prayers for members and initiatives.",
+          "Establishes a structured prayer plan to support the organization’s mission and vision.",
+          "Coordinates prayer gatherings and meetings.",
+          "Creates a prayer calendar focused on key events."
+        ]
+      },
+      {
+        "id": "strategic",
+        "name": "Pastor Elizabeth Ojuolape",
+        "title": "Director of Strategic Coordination",
+        "imageUrl": "https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1779463627/photo_1_2026-05-22_16-05-46_wc4k8s.jpg",
+        "responsibilities": [
+          "Coordination and alignment across leadership.",
+          "Facilitation of communication among leaders and their teams.",
+          "Participation in strategic discussions and development of initiatives.",
+          "Follow-up on agreed action points to support effective execution.",
+          "Plans and coordinates events and programs; ensures timely execution.",
+          "Manages logistics for events and meetings; collaborates with other team members."
+        ]
+      },
+      {
+        "id": "marketing",
+        "name": "Pastor Jumoke Elkanah",
+        "title": "Marketing & Social Media Coordinator",
+        "subtitle": "Assisted by Pastor Temitosan Abimbola",
+        "imageUrl": "https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1779464456/photo_5_2026-05-22_16-05-48_qrszam.jpg",
+        "responsibilities": [
+          "Develop and implement a comprehensive social media strategy across Facebook, Instagram, and other platforms.",
+          "Manage the FOE website.",
+          "Create, schedule, and manage posts aligned with organizational goals.",
+          "Engage with followers, respond to comments and messages, and foster online community growth.",
+          "Monitor social media trends and adjust strategies accordingly.",
+          "Develop and execute marketing campaigns for events, programs, and initiatives.",
+          "Design promotional materials, including flyers, graphics, and advertisements."
+        ]
+      },
+      {
+        "id": "hospitality",
+        "name": "Pastor Temitosan Abimbola",
+        "title": "Hospitality Coordinator",
+        "imageUrl": "https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1779463658/photo_3_2026-05-22_16-05-46_skm6di.jpg",
+        "responsibilities": [
+          "Coordinate hospitality arrangements for guest speakers, ministers, and special guests.",
+          "Ensure guests are warmly welcomed and properly attended to.",
+          "Oversee accommodation, transportation, meals, and comfort needs when required.",
+          "Recruit, train, and supervise hospitality team volunteers."
+        ]
+      },
+      {
+        "id": "finance",
+        "name": "Evangelist Christie Ohuabunwa",
+        "title": "Finance Coordinator",
+        "imageUrl": "https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1779463620/photo_4_2026-05-22_16-05-46_k0lpd3.jpg",
+        "responsibilities": [
+          "Oversee financial transactions and accounting.",
+          "Manage budgets and financial planning.",
+          "Ensure financial transparency and accountability."
+        ]
       }
     ]
   },

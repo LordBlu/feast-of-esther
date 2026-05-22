@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { isAdminAuthenticated } from '@/lib/admin-auth';
 import { readCmsData, writeCmsData } from '@/lib/cms-store';
+import { CMS_PAGE_PATHS, revalidateAfterCmsSave } from '@/lib/revalidate-cms-pages';
 
 function unauthorized() {
   return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -21,5 +22,6 @@ export async function PUT(request: NextRequest) {
     ...body,
   };
   await writeCmsData(data);
+  revalidateAfterCmsSave([...CMS_PAGE_PATHS.about]);
   return NextResponse.json({ about: data.about });
 }

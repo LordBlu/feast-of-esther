@@ -3,6 +3,8 @@
 import type { DragEvent } from 'react';
 import type { ExecutiveProfile, ExecutivesPageContent } from '@/lib/cms-types';
 import AdminImageUrlField from '@/components/admin/AdminImageUrlField';
+import AdminReorderButtons from '@/components/admin/AdminReorderButtons';
+import { swapArrayItems } from '@/lib/reorder-array';
 
 function linesToList(text: string): string[] {
   return text
@@ -41,6 +43,7 @@ function MemberFields({
   onDragOver,
   showBio,
   onRemove,
+  onReorder,
 }: {
   label: string;
   member: ExecutiveProfile;
@@ -49,6 +52,12 @@ function MemberFields({
   onDragOver: (e: DragEvent) => void;
   showBio?: boolean;
   onRemove?: () => void;
+  onReorder?: {
+    index: number;
+    total: number;
+    onMoveUp: () => void;
+    onMoveDown: () => void;
+  };
 }) {
   return (
     <article className="rounded-xl border border-[rgba(194,24,91,0.15)] bg-white/70 p-4 shadow-sm">
@@ -57,11 +66,22 @@ function MemberFields({
           {label}
           {member.name.trim() ? ` · ${member.name.trim()}` : ''}
         </h3>
-        {onRemove ? (
-          <button type="button" className="admin-btn-ghost text-xs" onClick={onRemove}>
-            Remove
-          </button>
-        ) : null}
+        <div className="flex flex-wrap items-center gap-2">
+          {onReorder ? (
+            <AdminReorderButtons
+              index={onReorder.index}
+              total={onReorder.total}
+              label={label}
+              onMoveUp={onReorder.onMoveUp}
+              onMoveDown={onReorder.onMoveDown}
+            />
+          ) : null}
+          {onRemove ? (
+            <button type="button" className="admin-btn-ghost text-xs" onClick={onRemove}>
+              Remove
+            </button>
+          ) : null}
+        </div>
       </div>
       <div className="grid gap-3 sm:grid-cols-2">
         <div>
@@ -159,6 +179,10 @@ export default function AdminExecutivesEditor({
 
   return (
     <div className="space-y-8">
+      <p className="text-sm text-black/55">
+        Edit names, titles, photos, biography (chairperson only), and responsibilities (one per line). Changes
+        go live after you click <strong>Save Executives page</strong> at the bottom of this tab.
+      </p>
       <section className="space-y-3">
         <h3 className="text-base font-semibold text-[var(--primary-dark)]">Page headings</h3>
         <div className="grid gap-3 sm:grid-cols-2">
@@ -199,7 +223,7 @@ export default function AdminExecutivesEditor({
       </section>
 
       <section className="space-y-3">
-        <h3 className="text-base font-semibold text-[var(--primary-dark)]">Chairperson (hero)</h3>
+        <h3 className="text-base font-semibold text-[var(--primary-dark)]">Chairperson / Chairman (hero)</h3>
         <p className="text-xs text-black/50">
           Large photo left, biography right on the public Executives page.
         </p>
@@ -249,6 +273,20 @@ export default function AdminExecutivesEditor({
                     })
                 : undefined
             }
+            onReorder={{
+              index,
+              total: committee.length,
+              onMoveUp: () =>
+                onChange({
+                  ...content,
+                  committee: swapArrayItems(committee, index, index - 1),
+                }),
+              onMoveDown: () =>
+                onChange({
+                  ...content,
+                  committee: swapArrayItems(committee, index, index + 1),
+                }),
+            }}
           />
         ))}
       </section>

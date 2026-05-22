@@ -1,4 +1,4 @@
-import { revalidatePath } from 'next/cache';
+import { CMS_PAGE_PATHS, revalidateAfterCmsSave } from '@/lib/revalidate-cms-pages';
 import { NextRequest, NextResponse } from 'next/server';
 import { isAdminAuthenticated } from '@/lib/admin-auth';
 import { syncGalleryCollectionsToEvents } from '@/lib/gallery-event-sync';
@@ -33,9 +33,13 @@ export async function PUT(request: NextRequest) {
 
   await writeCmsData(data);
 
-  revalidatePath('/gallery', 'layout');
-  revalidatePath('/events');
-  revalidatePath('/');
+  revalidateAfterCmsSave([
+    ...CMS_PAGE_PATHS.home,
+    ...CMS_PAGE_PATHS.gallery,
+    ...CMS_PAGE_PATHS.events,
+    ...CMS_PAGE_PATHS.founder,
+    ...CMS_PAGE_PATHS.about,
+  ]);
 
   return NextResponse.json({ images: data.images, events: data.events });
 }

@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
+  ADMIN_PREVIEW_DRAFT_MESSAGE,
   type AdminPreviewDraft,
   resolveAdminPreviewPath,
   writeAdminPreviewDraft,
@@ -24,13 +25,28 @@ export default function AdminPagePreview({
 }: AdminPagePreviewProps) {
   const [mode, setMode] = useState<PreviewMode>('draft');
   const [refreshKey, setRefreshKey] = useState(0);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
 
   const path = useMemo(() => resolveAdminPreviewPath(tab, pageSection), [tab, pageSection]);
 
+  const pushDraftToPreview = useCallback(
+    (target: Window | null) => {
+      if (!target) return;
+      writeAdminPreviewDraft(draft);
+      target.postMessage({ type: ADMIN_PREVIEW_DRAFT_MESSAGE, draft }, window.location.origin);
+    },
+    [draft],
+  );
+
   useEffect(() => {
-    const id = window.setTimeout(() => writeAdminPreviewDraft(draft), 200);
-    return () => window.clearTimeout(id);
-  }, [draft]);
+    if (mode !== 'draft') return;
+    writeAdminPreviewDraft(draft);
+    pushDraftToPreview(iframeRef.current?.contentWindow ?? null);
+  }, [draft, mode, pushDraftToPreview]);
+
+  const handleDraftIframeLoad = () => {
+    pushDraftToPreview(iframeRef.current?.contentWindow ?? null);
+  };
 
   const draftSrc = path
     ? `/admin/preview?view=${encodeURIComponent(path)}&t=${draft.updatedAt}`
@@ -93,10 +109,12 @@ export default function AdminPagePreview({
       <div className="admin-preview-frame-wrap">
         {iframeSrc ? (
           <iframe
+            ref={mode === 'draft' ? iframeRef : undefined}
             key={iframeSrc}
             title={mode === 'draft' ? `Draft preview of ${path}` : `Live preview of ${path}`}
             src={iframeSrc}
             className="admin-preview-iframe"
+            onLoad={mode === 'draft' ? handleDraftIframeLoad : undefined}
           />
         ) : null}
       </div>

@@ -3,6 +3,7 @@ import { isAdminAuthenticated } from '@/lib/admin-auth';
 import { readCmsData, writeCmsData } from '@/lib/cms-store';
 import type { SiteCountdownSettings } from '@/lib/cms-types';
 import { resolveCountdownForPublic } from '@/lib/countdown-resolve';
+import { revalidateAfterCmsSave } from '@/lib/revalidate-cms-pages';
 
 function unauthorized() {
   return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -34,6 +35,7 @@ export async function PUT(request: NextRequest) {
   };
 
   await writeCmsData(data);
+  revalidateAfterCmsSave(['/']);
   return NextResponse.json({
     countdown: data.countdown,
     resolved: resolveCountdownForPublic(data),

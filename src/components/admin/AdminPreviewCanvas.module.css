@@ -180,3 +180,24 @@
 .popupMock p {
   margin: 0.25rem 0;
 }
+
+.reliveGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.35rem;
+  margin-bottom: 0.5rem;
+}
+
+.reliveThumb {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: 0.35rem;
+}
+
+.thumbPlaceholder {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 0.3rem;
+  background: rgba(194, 24, 91, 0.08);
+}

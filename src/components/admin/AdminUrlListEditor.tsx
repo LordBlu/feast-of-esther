@@ -3,6 +3,8 @@
 import type { DragEvent } from 'react';
 import { AdminImagePreviewList } from '@/components/admin/AdminImagePreview';
 import AdminImageUrlField from '@/components/admin/AdminImageUrlField';
+import AdminReorderButtons from '@/components/admin/AdminReorderButtons';
+import { swapArrayItems } from '@/lib/reorder-array';
 
 interface AdminUrlListEditorProps {
   label: string;
@@ -42,17 +44,26 @@ export default function AdminUrlListEditor({
           key={`url-row-${index}`}
           className="rounded-xl border border-[rgba(194,24,91,0.12)] bg-white/65 p-3"
         >
-          <div className="mb-2 flex items-center justify-between gap-2">
+          <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
             <span className="text-xs font-semibold text-[var(--primary-dark)]">Image {index + 1}</span>
-            {rows.length > 1 ? (
-              <button
-                type="button"
-                className="admin-btn-ghost text-xs"
-                onClick={() => onChange(rows.filter((_, i) => i !== index))}
-              >
-                Remove
-              </button>
-            ) : null}
+            <div className="flex flex-wrap items-center gap-2">
+              <AdminReorderButtons
+                index={index}
+                total={rows.length}
+                label={`image ${index + 1}`}
+                onMoveUp={() => onChange(swapArrayItems(rows, index, index - 1))}
+                onMoveDown={() => onChange(swapArrayItems(rows, index, index + 1))}
+              />
+              {rows.length > 1 ? (
+                <button
+                  type="button"
+                  className="admin-btn-ghost text-xs"
+                  onClick={() => onChange(rows.filter((_, i) => i !== index))}
+                >
+                  Remove
+                </button>
+              ) : null}
+            </div>
           </div>
           <AdminImageUrlField value={url} onChange={(v) => updateAt(index, v)} />
           {onUpload && onDragOver ? (

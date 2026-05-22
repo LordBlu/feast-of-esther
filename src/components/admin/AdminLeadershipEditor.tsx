@@ -3,6 +3,8 @@
 import type { DragEvent } from 'react';
 import type { LeadershipProfile } from '@/lib/cms-types';
 import AdminImageUrlField from '@/components/admin/AdminImageUrlField';
+import AdminReorderButtons from '@/components/admin/AdminReorderButtons';
+import { swapArrayItems } from '@/lib/reorder-array';
 
 const emptyProfile = (): LeadershipProfile => ({
   name: '',
@@ -33,7 +35,9 @@ export default function AdminLeadershipEditor({
   return (
     <div className="space-y-4">
       <p className="text-xs text-black/50">
-        One card per leader. Write their bio in plain text — line breaks are kept on the live site.
+        <strong>Leader 1</strong> is the large featured profile on About (left column + sidebar photo as you
+        scroll). <strong>Leaders 2–4</strong> appear in the row of circles. Use ↑ / ↓ to reorder, then click{' '}
+        <strong>Save About page</strong> below.
       </p>
       {rows.map((profile, index) => (
         <article
@@ -42,18 +46,27 @@ export default function AdminLeadershipEditor({
         >
           <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
             <h3 className="text-sm font-semibold text-[var(--primary-dark)]">
-              Leader {index + 1}
+              {index === 0 ? 'Featured leader' : `Leader ${index + 1}`}
               {profile.name.trim() ? ` · ${profile.name.trim()}` : ''}
             </h3>
-            {rows.length > 1 ? (
-              <button
-                type="button"
-                className="admin-btn-ghost text-xs"
-                onClick={() => onChange(rows.filter((_, i) => i !== index))}
-              >
-                Remove
-              </button>
-            ) : null}
+            <div className="flex flex-wrap items-center gap-2">
+              <AdminReorderButtons
+                index={index}
+                total={rows.length}
+                label={`leader ${index + 1}`}
+                onMoveUp={() => onChange(swapArrayItems(rows, index, index - 1))}
+                onMoveDown={() => onChange(swapArrayItems(rows, index, index + 1))}
+              />
+              {rows.length > 1 ? (
+                <button
+                  type="button"
+                  className="admin-btn-ghost text-xs"
+                  onClick={() => onChange(rows.filter((_, i) => i !== index))}
+                >
+                  Remove
+                </button>
+              ) : null}
+            </div>
           </div>
           <div className="grid gap-3 sm:grid-cols-2">
             <div>

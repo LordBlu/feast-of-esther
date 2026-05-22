@@ -51,7 +51,10 @@ export function resolveReliveFeastImages(
   if (fromCms.length >= 9) return fromCms;
 
   const fromGallery = resolveGalleryItems(galleryCollections).flatMap((item) => item.images);
-  const merged = [...fromCms, ...fromGallery, ...DEFAULT_RELIVE_FEAST_IMAGES];
+  const merged =
+    fromCms.length > 0
+      ? [...fromCms, ...fromGallery, ...DEFAULT_RELIVE_FEAST_IMAGES]
+      : [...fromGallery, ...DEFAULT_RELIVE_FEAST_IMAGES];
   const unique: string[] = [];
   for (const url of merged) {
     if (!unique.includes(url)) unique.push(url);

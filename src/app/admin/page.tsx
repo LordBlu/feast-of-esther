@@ -16,7 +16,9 @@ import AdminPagePreview from '@/components/admin/AdminPagePreview';
 import AdminSlugField from '@/components/admin/AdminSlugField';
 import AdminStoryParagraphsEditor from '@/components/admin/AdminStoryParagraphsEditor';
 import AdminUrlListEditor from '@/components/admin/AdminUrlListEditor';
+import AdminSaveNotice from '@/components/admin/AdminSaveNotice';
 import AdminVersionsPanel from '@/components/admin/AdminVersionsPanel';
+import { swapArrayItems } from '@/lib/reorder-array';
 import type { AdminPreviewDraft } from '@/lib/admin-preview-draft';
 import {
   getDefaultGalleryCollections,
@@ -254,7 +256,59 @@ export default function AdminDashboardPage() {
   const [regSearch, setRegSearch] = useState('');
   const [regSearchInput, setRegSearchInput] = useState('');
   const [loading, setLoading] = useState(true);
-  const [message, setMessage] = useState('');
+  const [saveNotice, setSaveNotice] = useState<{ message: string; variant: 'success' | 'error' } | null>(
+    null,
+  );
+
+  const dismissSaveNotice = useCallback(() => setSaveNotice(null), []);
+
+  const notify = useCallback(
+    (text: string, options?: { refresh?: boolean }) => {
+      const variant = /^could not/i.test(text) ? 'error' : 'success';
+      setSaveNotice({ message: text, variant });
+      if (variant === 'success' && options?.refresh !== false) {
+        router.refresh();
+      }
+    },
+    [router],
+  );
+
+  useEffect(() => {
+    if (!saveNotice) return;
+    const timer = window.setTimeout(() => setSaveNotice(null), 7000);
+    return () => window.clearTimeout(timer);
+  }, [saveNotice]);
+
+  const savedOnLiveSiteHint =
+    ' If the public homepage still looks old, hard refresh (Ctrl+Shift+R on Windows).';
+
+  function swapMinistryCards(from: number, to: number) {
+    setPageContent((prev) => {
+      const cards = [...(prev.home?.ministryCards ?? [])];
+      while (cards.length < 3) cards.push({});
+      return { ...prev, home: { ...prev.home, ministryCards: swapArrayItems(cards, from, to) } };
+    });
+    setImages((prev) => {
+      const map = { ...(prev.placeholderUrls ?? {}) };
+      const keyA = `home-ministry-${from}`;
+      const keyB = `home-ministry-${to}`;
+      const hasA = keyA in map;
+      const hasB = keyB in map;
+      if (!hasA && !hasB) return prev;
+      const nextMap = { ...map };
+      if (hasA && hasB) {
+        nextMap[keyA] = map[keyB];
+        nextMap[keyB] = map[keyA];
+      } else if (hasA) {
+        nextMap[keyB] = map[keyA];
+        delete nextMap[keyA];
+      } else {
+        nextMap[keyA] = map[keyB];
+        delete nextMap[keyB];
+      }
+      return { ...prev, placeholderUrls: nextMap };
+    });
+  }
 
   const loadEvents = useCallback(async () => {
     const q = eventFilter === 'all' ? '' : `?status=${eventFilter}`;
@@ -375,7 +429,7 @@ export default function AdminDashboardPage() {
 
   async function addEvent(event: FormEvent) {
     event.preventDefault();
-    setMessage('');
+    dismissSaveNotice();
 
     const gallerySlug = slugifyPathSegment(eventForm.gallerySlug ?? '');
 
@@ -393,7 +447,7 @@ export default function AdminDashboardPage() {
     });
 
     if (!response.ok) {
-      setMessage('Could not save event.');
+      notify('Could not save event.');
       return;
     }
 
@@ -401,7 +455,7 @@ export default function AdminDashboardPage() {
     setEvents((prev) => [data.event, ...prev.filter((item) => item.id !== data.event.id)]);
     setEventForm(emptyEvent);
     setEditingEventId(null);
-    setMessage(editingEventId ? 'Event updated.' : 'Event created.');
+    notify(editingEventId ? 'Event updated — changes saved.' : 'Event created — changes saved.');
     await loadEvents();
   }
 
@@ -444,7 +498,8 @@ export default function AdminDashboardPage() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(popup),
     });
-    if (response.ok) setMessage('Popup updated.');
+    if (response.ok) notify('Popup updated — changes saved.');
+    else notify('Could not save popup.');
   }
 
   async function saveCountdown() {
@@ -460,25 +515,34 @@ export default function AdminDashboardPage() {
       }),
     });
     if (!response.ok) {
-      setMessage('Could not save countdown.');
+      notify('Could not save countdown.');
       return;
     }
     const data = await response.json();
     setCountdown({ ...emptyCountdown, ...data.countdown });
-    setMessage(
+    notify(
       data.resolved?.targetAt
         ? `Countdown saved · target ${new Date(data.resolved.targetAt).toLocaleString()}`
-        : 'Countdown saved (off or no target).'
+        : 'Countdown saved (off or no target).',
     );
   }
 
-  async function saveImages() {
+  async function saveImages(options?: { quiet?: boolean }): Promise<boolean> {
     const response = await fetch('/api/admin/images', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(images),
     });
-    if (response.ok) setMessage('Images updated.');
+    if (!response.ok) {
+      notify('Could not save images.');
+      return false;
+    }
+    const data = await response.json();
+    if (data.images) setImages(data.images);
+    if (!options?.quiet) {
+      notify(`Images saved successfully.${savedOnLiveSiteHint}`);
+    }
+    return true;
   }
 
   async function saveGallery() {
@@ -492,7 +556,7 @@ export default function AdminDashboardPage() {
     }
     const duplicateSlug = [...slugCounts.entries()].find(([, count]) => count > 1)?.[0];
     if (duplicateSlug) {
-      setMessage(`Could not save: duplicate URL slug "${duplicateSlug}". Each collection needs a unique slug.`);
+      notify(`Could not save: duplicate URL slug "${duplicateSlug}". Each collection needs a unique slug.`);
       return;
     }
 
@@ -506,7 +570,7 @@ export default function AdminDashboardPage() {
       body: JSON.stringify(payload),
     });
     if (!response.ok) {
-      setMessage('Could not save gallery.');
+      notify('Could not save gallery.');
       return;
     }
     const data = await response.json();
@@ -524,8 +588,8 @@ export default function AdminDashboardPage() {
     if (draftCount > 0) {
       const firstDraft = normalized.find((row) => !isGalleryCollectionComplete(row));
       const missing = firstDraft ? getGalleryCollectionValidationErrors(firstDraft).join(', ') : '';
-      setMessage(
-        `Gallery saved. ${liveCount} collection${liveCount === 1 ? '' : 's'} live on /gallery. ${draftCount} still need: ${missing} (fill every field + one photo, then save again).`
+      notify(
+        `Gallery saved. ${liveCount} collection${liveCount === 1 ? '' : 's'} live on /gallery. ${draftCount} still need: ${missing} (fill every field + one photo, then save again).`,
       );
       return;
     }
@@ -533,10 +597,10 @@ export default function AdminDashboardPage() {
       eventCollectionCount > 0
         ? ` ${eventCollectionCount} also synced to the Events page (past events).`
         : '';
-    setMessage(
+    notify(
       liveCount === 0
         ? 'Gallery saved (no collections on the public gallery yet — add one with all fields filled).'
-        : `Gallery saved. ${liveCount} collection${liveCount === 1 ? '' : 's'} are live on /gallery.${eventNote}`
+        : `Gallery saved. ${liveCount} collection${liveCount === 1 ? '' : 's'} are live on /gallery.${eventNote}`,
     );
   }
 
@@ -547,15 +611,22 @@ export default function AdminDashboardPage() {
       body: JSON.stringify({ executives }),
     });
     if (!response.ok) {
-      setMessage('Could not save Executives page.');
+      notify('Could not save Executives page.');
       return;
     }
     const data = await response.json();
     if (data.executives) setExecutives(data.executives);
-    setMessage('Executives page updated.');
+    notify(`Executives page saved successfully.${savedOnLiveSiteHint}`);
   }
 
-  async function saveAbout() {
+  async function savePlaceholdersBundle() {
+    if (!(await saveImages({ quiet: true }))) return;
+    if (!(await saveAbout({ quiet: true }))) return;
+    if (!(await savePageContent({ quiet: true }))) return;
+    notify(`Placeholders and related content saved successfully.${savedOnLiveSiteHint}`);
+  }
+
+  async function saveAbout(options?: { quiet?: boolean }): Promise<boolean> {
     const payload: AboutPageContent = {
       ...about,
       storyParagraphs: (about.storyParagraphs ?? []).map((p) => p.trim()).filter(Boolean),
@@ -572,30 +643,26 @@ export default function AdminDashboardPage() {
       body: JSON.stringify(payload),
     });
     if (!response.ok) {
-      setMessage('Could not save About page content.');
-      return;
+      notify('Could not save About page content.');
+      return false;
     }
     const data = await response.json();
     setAbout({ ...emptyAbout, ...(data.about ?? payload) });
-    setMessage('About page content updated.');
+    if (!options?.quiet) {
+      notify(`About page saved successfully.${savedOnLiveSiteHint}`);
+    }
+    return true;
   }
 
-  async function savePlaceholdersBundle() {
-    await saveImages();
-    await saveAbout();
-    await savePageContent();
-    setMessage('Placeholders and page copy saved.');
-  }
-
-  async function savePageContent() {
+  async function savePageContent(options?: { quiet?: boolean }): Promise<boolean> {
     const response = await fetch('/api/admin/page-content', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ pageContent }),
     });
     if (!response.ok) {
-      setMessage('Could not save site page copy.');
-      return;
+      notify('Could not save site page copy.');
+      return false;
     }
     const data = await response.json();
     const next = data.pageContent as SitePageContents;
@@ -611,7 +678,10 @@ export default function AdminDashboardPage() {
       about2: { ...emptySitePageContents().about2, ...next.about2 },
       home: { ...emptySitePageContents().home, ...next.home },
     });
-    setMessage('Site page copy saved.');
+    if (!options?.quiet) {
+      notify(`Site page copy saved successfully.${savedOnLiveSiteHint}`);
+    }
+    return true;
   }
 
   async function saveSocialLinks() {
@@ -630,12 +700,12 @@ export default function AdminDashboardPage() {
       body: JSON.stringify({ socialLinks: cleaned }),
     });
     if (!response.ok) {
-      setMessage('Could not save social links.');
+      notify('Could not save social links.');
       return;
     }
     const data = await response.json();
     setSocialLinks(data.socialLinks ?? cleaned);
-    setMessage('Social links updated.');
+    notify('Social links saved successfully.');
   }
 
   async function uploadImage(file: File, onUploaded: (url: string) => void) {
@@ -646,19 +716,20 @@ export default function AdminDashboardPage() {
       body: formData,
     });
     if (!response.ok) {
-      setMessage('Upload failed.');
+      notify('Upload failed.');
       return;
     }
     const data = await response.json();
     onUploaded(data.url);
     const storage =
       typeof data.storage === 'string' ? data.storage : 'uploaded';
-    setMessage(
+    notify(
       storage === 'cloudinary'
-        ? 'Image uploaded to Cloudinary.'
+        ? 'Image uploaded to Cloudinary — remember to click Save when you are done editing.'
         : storage === 'local'
-          ? 'Image saved locally (add Cloudinary API keys on Vercel for production CDN).'
-          : 'Image uploaded.',
+          ? 'Image saved locally — click Save to publish (use Cloudinary on Vercel for production).'
+          : 'Image uploaded — click Save to publish.',
+      { refresh: false },
     );
   }
 
@@ -696,6 +767,7 @@ export default function AdminDashboardPage() {
       tab,
       pageSection: pageEditSection,
       about,
+      executives,
       images,
       popup,
       pageContent,
@@ -703,7 +775,7 @@ export default function AdminDashboardPage() {
       socialLinks,
       countdown,
     }),
-    [tab, pageEditSection, about, images, popup, pageContent, events, socialLinks, countdown]
+    [tab, pageEditSection, about, executives, images, popup, pageContent, events, socialLinks, countdown]
   );
 
   if (loading) {
@@ -775,7 +847,13 @@ export default function AdminDashboardPage() {
           ))}
         </nav>
 
-        {message ? <div className="admin-toast">{message}</div> : null}
+        {saveNotice ? (
+          <AdminSaveNotice
+            message={saveNotice.message}
+            variant={saveNotice.variant}
+            onDismiss={dismissSaveNotice}
+          />
+        ) : null}
 
         <div className="admin-workspace">
           <div className="admin-workspace-main">
@@ -1365,7 +1443,7 @@ export default function AdminDashboardPage() {
             <p className="text-xs text-black/50">
               Gallery collections are managed on the <strong>Gallery</strong> tab.
             </p>
-            <button type="button" onClick={saveImages} className="btn-primary rounded-full px-10">
+            <button type="button" onClick={() => void saveImages()} className="btn-primary rounded-full px-10">
               Save imagery
             </button>
           </div>
@@ -1625,7 +1703,7 @@ export default function AdminDashboardPage() {
                 onDragOver={preventDragDefaults}
               />
             </div>
-            <button type="button" onClick={saveAbout} className="btn-primary rounded-full px-10">
+            <button type="button" onClick={() => void saveAbout()} className="btn-primary rounded-full px-10">
               Save About page
             </button>
           </div>
@@ -1692,6 +1770,7 @@ export default function AdminDashboardPage() {
               <AdminHomePageEditor
                 home={pageContent.home ?? {}}
                 onChange={(home) => setPageContent((p) => ({ ...p, home }))}
+                onSwapMinistryCards={swapMinistryCards}
                 onUpload={uploadImage}
                 onDragOver={preventDragDefaults}
               />
@@ -2239,7 +2318,7 @@ export default function AdminDashboardPage() {
         {tab === 'donations' ? <AdminDonationsPanel /> : null}
 
         {tab === 'versions' ? (
-          <AdminVersionsPanel onReload={reloadAll} onMessage={setMessage} />
+          <AdminVersionsPanel onReload={reloadAll} onMessage={notify} />
         ) : null}
 
         {tab === 'registrations' ? (

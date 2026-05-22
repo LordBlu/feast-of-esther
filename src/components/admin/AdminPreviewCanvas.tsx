@@ -1,12 +1,18 @@
 'use client';
 
 import type { AdminPreviewDraft } from '@/lib/admin-preview-draft';
+import { resolveReliveFeastImages } from '@/lib/home-content';
 import { resolveGalleryItems } from '@/lib/gallery-data';
+import {
+  resolveHomeHeroSlides,
+  resolveHomeMinistryCards,
+} from '@/lib/site-placeholders';
 import styles from './AdminPreviewCanvas.module.css';
 
 interface AdminPreviewCanvasProps {
   view: string;
   draft: AdminPreviewDraft | null;
+  waitingForParent?: boolean;
 }
 
 function PreviewShell({
@@ -31,11 +37,19 @@ function PreviewShell({
   );
 }
 
-export default function AdminPreviewCanvas({ view, draft }: AdminPreviewCanvasProps) {
+export default function AdminPreviewCanvas({
+  view,
+  draft,
+  waitingForParent = false,
+}: AdminPreviewCanvasProps) {
   if (!draft) {
     return (
       <div className={styles.root}>
-        <p className={styles.empty}>Start editing to see a draft preview here.</p>
+        <p className={styles.empty}>
+          {waitingForParent
+            ? 'Loading draft preview…'
+            : 'Start editing on the left, or switch to Live site. Draft syncs from the dashboard.'}
+        </p>
       </div>
     );
   }
@@ -171,10 +185,43 @@ export default function AdminPreviewCanvas({ view, draft }: AdminPreviewCanvasPr
     );
   }
 
+  if (view === '/executive') {
+    const ex = draft.executives;
+    const chair = ex?.chairperson;
+    const committee = ex?.committee ?? [];
+    return (
+      <PreviewShell title={ex?.heroTitle || 'Executives'} path="/executive">
+        <p className={styles.kicker}>{ex?.heroEyebrow}</p>
+        {chair?.imageUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={chair.imageUrl} alt="" className={styles.hero} />
+        ) : null}
+        <h2 className={styles.headline}>{chair?.name || 'Chairperson'}</h2>
+        <p className={styles.body}>{chair?.title}</p>
+        <h3 className={styles.subhead}>{ex?.gridTitle}</h3>
+        <p className={styles.body}>{ex?.gridLead}</p>
+        <div className={styles.leaderGrid}>
+          {committee.slice(0, 8).map((member, i) => (
+            <article key={member.id || i} className={styles.leaderCard}>
+              {member.imageUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={member.imageUrl} alt="" className={styles.leaderThumb} />
+              ) : (
+                <div className={styles.thumbPlaceholder} />
+              )}
+              <strong>{member.name || 'Name'}</strong>
+              <span>{member.title}</span>
+            </article>
+          ))}
+        </div>
+      </PreviewShell>
+    );
+  }
+
   if (view === '/about-2') {
     const a = draft.pageContent?.about2;
     return (
-      <PreviewShell title={a?.chromeTitle || 'About Us'} path="/about-2">
+      <PreviewShell title={a?.chromeTitle || 'About Us'} path="/about">
         <p className={styles.kicker}>{a?.megaAccent}</p>
         <p className={styles.body}>{a?.ctaBarText}</p>
         <ul className={styles.list}>
@@ -189,14 +236,66 @@ export default function AdminPreviewCanvas({ view, draft }: AdminPreviewCanvasPr
   if (view === '/') {
     const h = draft.pageContent?.home;
     const popup = draft.popup;
+    const images = draft.images;
+    const heroSlides = images ? resolveHomeHeroSlides(images).slice(0, 3) : [];
+    const ministryCards = resolveHomeMinistryCards(h, images?.placeholderUrls).slice(0, 3);
+    const reliveUrls = resolveReliveFeastImages(h, images?.galleryCollections).slice(0, 9);
+    const placeholderEntries = Object.entries(images?.placeholderUrls ?? {}).filter(
+      ([, url]) => url?.trim(),
+    );
+
     return (
       <PreviewShell title="Homepage" path="/">
-        {draft.images?.heroPosterUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={draft.images.heroPosterUrl} alt="" className={styles.hero} />
-        ) : null}
-        <p className={styles.body}>{h?.reliveFeastTitle}</p>
+        <h3 className={styles.subhead}>Hero</h3>
+        <div className={styles.carousel}>
+          {heroSlides.length > 0 ? (
+            heroSlides.map((url, i) => (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img key={i} src={url} alt="" className={styles.carouselImg} />
+            ))
+          ) : (
+            <p className={styles.body}>No hero images yet — set under Placeholders or Imagery.</p>
+          )}
+        </div>
+        <p className={styles.body}>
+          <strong>{h?.heroTitle?.trim() || 'Hero headline (default copy)'}</strong>
+        </p>
+        <h3 className={styles.subhead}>Ministry cards</h3>
+        <div className={styles.galleryGrid}>
+          {ministryCards.map((card, i) => (
+            <article key={i} className={styles.galleryCard}>
+              {card.imageUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={card.imageUrl} alt="" className={styles.galleryThumb} />
+              ) : null}
+              <strong>{card.title}</strong>
+              <span>{card.tag}</span>
+            </article>
+          ))}
+        </div>
+        <h3 className={styles.subhead}>{h?.reliveFeastTitle?.trim() || 'Relive the Feast'}</h3>
         <p className={styles.body}>{h?.reliveFeastSubtitle}</p>
+        <div className={styles.reliveGrid}>
+          {reliveUrls.length > 0 ? (
+            reliveUrls.map((url, i) => (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img key={i} src={url} alt="" className={styles.reliveThumb} />
+            ))
+          ) : (
+            <p className={styles.body}>Add Relive URLs under Site pages → Home.</p>
+          )}
+        </div>
+        {placeholderEntries.length > 0 ? (
+          <>
+            <h3 className={styles.subhead}>Placeholder overrides</h3>
+            <div className={styles.reliveGrid}>
+              {placeholderEntries.slice(0, 6).map(([id, url]) => (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img key={id} src={url!} alt={id} title={id} className={styles.reliveThumb} />
+              ))}
+            </div>
+          </>
+        ) : null}
         {popup?.enabled ? (
           <div className={styles.popupMock}>
             <strong>{popup.title}</strong>

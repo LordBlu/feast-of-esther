@@ -12,10 +12,20 @@
 
 ## Progress so far
 
-- **Handoff (May 2026):** Maintainer resting — resume from **`FUTURE_NOTES.md`** + **`ADMIN_GUIDE.md`**. **Latest (Admin overhaul):** Gallery tab with per-collection editor (not JSON); **General photos** vs **Past event** toggle syncs `/events` past grid automatically (`src/lib/gallery-event-sync.ts`); friendly About editors (story paragraphs + leadership cards); founder carousel URL list; **Donations** tab (Zeffy/PayPal click log); admin **Draft / Live** preview panel (`/admin/preview`); slug helpers (`src/lib/slugify.ts`, `AdminSlugField.tsx`). **Still earlier:** `HomeReliveFeast`, `HomeTestimonialsMarquee`, `FounderMinistryCards`, Versions/Guide, **`ADMIN_GUIDE.md`**. **CMS:** no separate database — `data/cms-data.json` + `src/app/api/admin/*`. **QA:** run `npm run build` after pulls. **Not from this app:** MetaMask `inpage.js` = browser extension. *Update this file when you ship more.*
+- **Handoff (May 2026):** Maintainer resting — resume from **`FUTURE_NOTES.md`** + **`ADMIN_GUIDE.md`** + in-app **Guide** tab. **Docs synced** (May 20): `ADMIN_GUIDE.md`, `AdminGuidePanel.tsx`, `README.md`. **Latest shipped:**
+  - **`/executive` (Executives page):** Chairperson hero (photo left, bio right) + 3×3 committee grid with **per-cell** slideshow timing (kaleidoscopic stagger in `HomeReliveFeast.tsx` uses the same idea). CMS field **`executives`** in `cms-data.json`; Admin → **Executives** tab (`AdminExecutivesEditor.tsx`, `PUT /api/admin/executives`). Nav link: **Executives**.
+  - **Admin → Placeholders:** Bundled demo images for Home hero/ministry, About sidebar, Founder, Events fallbacks (`site-placeholder-catalog.ts`, `placeholderUrls` on `SiteImages`).
+  - **Admin → Site pages → Home:** Hero headline, mission quote, purpose block, ministry card text, Relive URLs, testimonials (`AdminHomePageEditor.tsx`, `pageContent.home`).
+  - **Admin → Site pages → Founder:** Bio paragraphs + ministry panel copy (`AdminFounderPageEditor.tsx`); carousel still under **Imagery**.
+  - **Performance / security batch:** Server-loaded CMS in root layout (`SiteShellProvider`); `SiteImage` + Cloudinary widths; filtered `GET /api/site-config`; rate limits on login/registrations/donate/Hadassah; production admin auth required; security headers in `next.config.ts`.
+  - **Donate page:** Visitor-friendly offline giving copy; canonical contact **`feastofesthernaa@gmail.com`** in `SITE.contactEmail` (`site-content.ts`). Zeffy embed via Admin **Site pages → Donate** or `NEXT_PUBLIC_ZEFFY_EMBED_URL`; PayPal via `NEXT_PUBLIC_PAYPAL_DONATE_URL` on Vercel.
+  - **Relive the Feast:** 3×3 grid — each cell advances on its **own** interval (~2s base, staggered start); not one shared tick. Hide section when `pageContent.home.reliveFeastImageUrls` has fewer than 9 URLs or `showReliveFeast === false`.
+  - **Countdown:** Section hidden after target time passes (`FlipClockCountdown.tsx` returns null).
+- **Earlier (still relevant):** Gallery tab + past-event sync; About leadership 3-up row; Donations click log; Draft/Live preview; Versions/Guide; `FounderMinistryCards` ministry tabs still partly hardcoded.
+- **CMS:** `data/cms-data.json` + `src/app/api/admin/*` — no separate DB. **QA:** `npm run build` after pulls (Vercel runs full TS check). **Build gotcha:** browser timer IDs use `number`, not `ReturnType<typeof setInterval>` (Node vs DOM types). **Not from this app:** MetaMask `inpage.js` = browser extension. *Update this file when you ship more.*
 - **Events page — Programme block:** Replaced the old alternating “Event Schedule” timeline with a **Programme** section modeled on the Alamein-style layout: three clickable **day cards** (18–20 June 2026), **Next →** cycles days, **time | status dot | title/details** timeline, accent `#006699`, responsive stacking on small screens. Implementation: `src/components/events/ProgrammeSection.tsx` + `ProgrammeSection.module.css`, wired from `src/app/events/page.tsx`. Schedule copy in the component is **placeholder** until final programme is confirmed.
 - **Events page:** Still includes hero, info card, hotel block, past events grid; programme sits between info card and hotel.
-- **Homepage (`/`):** Hero crossfade + CTAs. **Forum + video:** mission quote (`HOME_COPY` in `site-content.ts`). **Our Purpose** vision block. **Ministry cards** with in-card watermark images. **Then:** `HomeReliveFeast` → `HomeReserveStay` → `FlipClockCountdown` → `HomeTestimonialsMarquee`. CMS hook: `pageContent.home` (`reliveImageUrls`, `testimonials` JSON) merged in `page-content` API — **no Admin Home UI tab yet**. Copy defaults in `src/lib/home-content.ts`.
+- **Homepage (`/`):** Hero + CTAs; copy from **`pageContent.home`** (Admin **Site pages → Home**). **Relive the Feast** 3×3 grid with **staggered** per-cell slideshow (`HomeReliveFeast.tsx`). Then hotel → countdown (hides when ended) → testimonials. Fallbacks: `site-content.ts`, `home-content.ts`, `site-placeholders.ts`.
 - **Gallery — index (`/gallery`):** **No Back** control (Back only on collection pages). **Header** top padding **halved** vs old layout. Title + **left-aligned** gospel-style subtitle (`gallery-page-header--index`, default in `GalleryVerticalFeed.tsx`); editable via **Site pages → Gallery**. **Mosaic tiles** link to **`/gallery/[slug]`** (folders) — **not** lightbox on index. Default **9** collections in `gallery-data.ts` (2025–2023); more via Admin **Imagery → gallery collections JSON**.
 - **Gallery — collection detail (`/gallery/[slug]`):** **Lightbox** on individual photos (`GalleryImageLightbox.tsx`) with prev/next + keyboard. Grid hover enlarge + blur siblings (`GalleryImageGrid.tsx`). **Back:** `GalleryPageBack.tsx` — **sticky** under nav (`top: 68px`), links to `/gallery`. Re-export: `GalleryBackUnderLogo.tsx`.
 - **About Us (`/about`):** Huge-inspired **sticky left visual rail** + scroll narrative. **Chrome bar** (woman-led gathering + Close) **removed**. **Leadership:** featured leader (Grace Okonrende) + **3-up row** (Mabel Odigie, Rev. Dr. Felicia Ajayi, Dr. Banks) — circular portraits **~165px** desktop / **~135px** mobile, pink ring border; sidebar image on scroll/hover (`data-leader-profile`). No carousel. **CMS:** `about.leadershipProfiles` + `pageContent.about2` sidebar image URLs.
@@ -36,7 +46,9 @@
 | **Gallery** | Collections → `/gallery/[slug]`; **General photos** or **Past event** (syncs Events page) |
 | **Social Links** | Footer icons |
 | **About Page** | Hero, story **paragraphs** (list), **leadership** (per-person cards), mission |
-| **Site pages** | Marketing copy per route (Gallery title, Donate, Contact, …) |
+| **Placeholders** | Replace/clear bundled demo photos (Home, About sidebar, Founder, Events) |
+| **Executives** | Chairperson + committee on `/executive` |
+| **Site pages** | **Home**, Founder, Gallery, Donate, Contact, About sidebar, … |
 | **Donations** | Log of donate-page interactions (`donationIntents` in JSON) |
 | **Registrations** | Sign-ups + CSV export |
 | **Versions** | Undo / Zero / 30 save slots |
@@ -51,13 +63,25 @@
 
 ## Likely next steps (“the rest”)
 
-- **Admin → Site pages → Home** UI for Relive URLs + testimonials (data model exists).
-- **Founder ministry cards** → CMS or Site pages → Founder (still hardcoded in `FounderMinistryCards.tsx`).
+- **Founder → Ministry Focus** tabbed cards (`FounderMinistryCards.tsx`) — tab labels/15s rotation still in code; partial CMS via Site pages + Placeholders.
 - **Hotel block** off toggle on homepage post-event.
-- Final **programme copy** (times, titles, bullets) in `ProgrammeSection.tsx` or move data to CMS if editors need to change it without deploys.
-- **README** — starter section replaced with project pointers; extend with env var table / deploy checklist when useful.
-- **Production hardening:** `ADMIN_DASHBOARD_PASSWORD` / `ADMIN_DASHBOARD_TOKEN` set on host; understand JSON file persistence on serverless (Vercel: use persistent storage or external DB if registrations must survive).
-- **Client preview URL** — see below.
+- **PayPal URL** in Admin UI (today: `NEXT_PUBLIC_PAYPAL_DONATE_URL` on Vercel only).
+- Final **programme copy** in `ProgrammeSection.tsx` or CMS.
+- **Vercel persistence:** confirm admin saves to `cms-data.json` survive redeploys (ephemeral FS) or move to blob/DB.
+- **Env checklist** — see table below.
+
+## Vercel / local environment variables (high-signal)
+
+| Variable | Purpose |
+|----------|---------|
+| `ADMIN_DASHBOARD_PASSWORD` | Required in production for `/admin` login |
+| `ADMIN_DASHBOARD_TOKEN` | Session cookie signing (set a long random value) |
+| `OLLAMA_API_KEY` | Hadassah chat (`POST /api/hadassah`) |
+| `OLLAMA_CHAT_MODEL` | Optional; default `qwen3-coder:480b-cloud` |
+| `CLOUDINARY_API_KEY` / `CLOUDINARY_API_SECRET` | Preferred image uploads (CDN URLs) |
+| `CLOUDINARY_CLOUD_NAME` / `CLOUDINARY_UPLOAD_FOLDER` | Optional Cloudinary config |
+| `NEXT_PUBLIC_ZEFFY_EMBED_URL` | Donate page Zeffy iframe (or set in Admin → Site pages → Donate) |
+| `NEXT_PUBLIC_PAYPAL_DONATE_URL` | Donate page PayPal button link |
 
 ---
 
@@ -95,7 +119,7 @@ You do **not** need a custom domain to give them a link. You need a **hosted dep
 
 **Shared data:** `src/lib/about-chapters.ts` — `CHAPTERS`, `ChapterKey` (chapter locations for Outreach section).
 
-**Nav:** `Navbar.tsx` — one link: **About Us** → `/about` (desktop + mobile `links` array).
+**Nav:** `Navbar.tsx` — Home, About Us, **Executives** (`/executive`), Founder, Gallery, Events, Contact (+ Register/Donate buttons).
 
 **CMS (long-form About copy):** Main narrative + **`leadershipProfiles`** array (`name`, `role`, `imageUrl`, `blurb`) from **`about`** in `cms-data.json` / Admin **About Page** tab. **`pageContent.about2`:** mega accent, focus bullets, CTA bar, optional **`visualAbout` / `visualOurJourney` / …** sidebar URLs (Admin **Site pages → About Us**). `chromeTitle` still in schema but unused while chrome bar is hidden.
 
@@ -107,8 +131,10 @@ You do **not** need a custom domain to give them a link. You need a **hosted dep
 |------|--------|
 | Layout shell | `src/components/ConditionalLayout.tsx`, `PageViewTransition.tsx`, `SiteFooter.tsx` |
 | Top nav | `src/components/Navbar.tsx` (`globals.css` `.navbar-link*`) |
-| Homepage | `src/app/page.tsx`, `HomeReliveFeast.tsx`, `HomeTestimonialsMarquee.tsx`, `HomeReserveStay.tsx`, `FlipClockCountdown.tsx`, `src/lib/site-content.ts`, `src/lib/home-content.ts` |
+| Homepage | `src/app/page.tsx`, `HomeClient.tsx`, `HomeReliveFeast.tsx`, `HomeTestimonialsMarquee.tsx`, `HomeReserveStay.tsx`, `FlipClockCountdown.tsx`, `src/lib/site-content.ts`, `src/lib/home-content.ts`, `src/lib/site-placeholders.ts` |
+| Executives | `src/app/executive/page.tsx`, `ExecutiveClient.tsx`, `src/lib/executive-data.ts`, `cms-data.executives`, `PUT /api/admin/executives` |
 | Founder | `src/app/founder/page.tsx`, `FounderHero.tsx`, `FounderCarousel.tsx`, `FounderMinistryCards.tsx` + `.module.css` |
+| Placeholders | `src/lib/site-placeholder-catalog.ts`, `AdminPlaceholdersPanel.tsx`, `images.placeholderUrls` |
 | About Us | `src/app/about/page.tsx`, `AboutHugeCaseStudy.tsx`, `AboutHugeCaseStudy.module.css`; redirect `src/app/about-2/page.tsx` |
 | Shared chapter map | `src/lib/about-chapters.ts` |
 | Gallery index | `src/components/GalleryVerticalFeed.tsx`, `GalleryMosaic.module.css` |
@@ -169,7 +195,7 @@ useEffect(() => {
 
 ## CMS — Site pages (`pageContent`)
 
-- **Storage:** Merged into `data/cms-data.json` under `pageContent` (nested keys: `gallery`, `events`, `contact`, `donate`, `registration`, `founder`, `about2`, **`home`**).
+- **Storage:** `pageContent` nested keys (`gallery`, `events`, `contact`, `donate`, `registration`, `founder`, `about2`, **`home`**) plus top-level **`executives`**, **`about`**, **`images`**, events, popup, countdown, etc.
 - **Admin:** Dashboard tab **Site pages** — save calls **`PUT /api/admin/page-content`** (auth required).
 - **Public:** **`GET /api/site-config`** returns `pageContent` for client pages that fetch it; server pages use `readCmsData()` from `src/lib/cms-store.ts`.
 - **Typecheck note:** `tsconfig.json` includes `.next/types/**`. Run **`next build`** or **`next dev`** once so those files exist before **`npx tsc --noEmit`** on a clean tree.

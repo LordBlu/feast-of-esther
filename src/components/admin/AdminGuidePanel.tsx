@@ -65,6 +65,10 @@ export default function AdminGuidePanel() {
             <strong>Events</strong> → mark event as Past; link gallery slug when photos are ready.
           </li>
           <li>
+            <strong>Site pages → Home</strong> — edit Relive the Feast URLs (need 9+) and testimonials; turn off
+            Relive if you hide the section.
+          </li>
+          <li>
             Homepage <strong>hotel block</strong> has no off switch yet — ask a developer to hide it or replace it
             (gallery highlights, quotes, recap video) so the page does not feel empty.
           </li>
@@ -92,6 +96,10 @@ export default function AdminGuidePanel() {
             <dd>Hero poster, hotel photo, founder carousel list, video URL</dd>
           </div>
           <div>
+            <dt className="font-semibold text-[var(--primary-dark)]">Gallery</dt>
+            <dd>Collections for /gallery; past-event photos sync to Events</dd>
+          </div>
+          <div>
             <dt className="font-semibold text-[var(--primary-dark)]">Placeholders</dt>
             <dd>Demo photos for Home, About sidebar, Founder, Events — upload or clear</dd>
           </div>
@@ -104,8 +112,16 @@ export default function AdminGuidePanel() {
             <dd>Story, mission, leadership JSON, hero image</dd>
           </div>
           <div>
+            <dt className="font-semibold text-[var(--primary-dark)]">Executives</dt>
+            <dd>Chairperson hero + committee grid on /executive</dd>
+          </div>
+          <div>
             <dt className="font-semibold text-[var(--primary-dark)]">Site pages</dt>
             <dd>Home copy, Founder biography, page headlines, About sidebar visuals</dd>
+          </div>
+          <div>
+            <dt className="font-semibold text-[var(--primary-dark)]">Donations</dt>
+            <dd>Donate-page click log (not payments)</dd>
           </div>
           <div>
             <dt className="font-semibold text-[var(--primary-dark)]">Registrations</dt>

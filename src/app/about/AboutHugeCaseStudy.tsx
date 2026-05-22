@@ -39,7 +39,7 @@ const VISUALS: Record<SectionId, string> = {
   mission:
     'https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1777761505/20250221_200317_el9dzk.jpg',
   leadership:
-    'https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1777761734/20260219_131617_ocrby8.jpg',
+    'https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1779463665/photo_7_2026-05-22_16-05-49_y1vjex.jpg',
   outreach:
     'https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1778132653/foe_Group_foto_twphtz.png',
 };

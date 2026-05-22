@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { isAdminAuthenticated } from '@/lib/admin-auth';
 import { readCmsData, writeCmsData } from '@/lib/cms-store';
+import { CMS_PAGE_PATHS, revalidateAfterCmsSave } from '@/lib/revalidate-cms-pages';
 import type { SitePageContents } from '@/lib/cms-types';
 
 function unauthorized() {
@@ -29,5 +30,15 @@ export async function PUT(request: NextRequest) {
     home: { ...data.pageContent.home, ...patch.home },
   };
   await writeCmsData(data);
+  revalidateAfterCmsSave([
+    ...CMS_PAGE_PATHS.home,
+    ...CMS_PAGE_PATHS.gallery,
+    ...CMS_PAGE_PATHS.events,
+    ...CMS_PAGE_PATHS.about,
+    ...CMS_PAGE_PATHS.founder,
+    ...CMS_PAGE_PATHS.donate,
+    ...CMS_PAGE_PATHS.contact,
+    ...CMS_PAGE_PATHS.registration,
+  ]);
   return NextResponse.json({ pageContent: data.pageContent });
 }
