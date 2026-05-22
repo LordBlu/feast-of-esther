@@ -47,7 +47,7 @@ async function readBlobText(blobPathname: string): Promise<string | null> {
   const { get } = await import('@vercel/blob');
   try {
     const result = await get(blobPathname, { access: 'private' });
-    if (result.statusCode !== 200 || !result.stream) return null;
+    if (!result || result.statusCode !== 200 || !result.stream) return null;
     return await new Response(result.stream).text();
   } catch {
     return null;
