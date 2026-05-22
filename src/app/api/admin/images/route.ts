@@ -2,6 +2,7 @@ import { CMS_PAGE_PATHS, revalidateAfterCmsSave } from '@/lib/revalidate-cms-pag
 import { NextRequest, NextResponse } from 'next/server';
 import { isAdminAuthenticated } from '@/lib/admin-auth';
 import { syncGalleryCollectionsToEvents } from '@/lib/gallery-event-sync';
+import { cmsErrorResponse } from '@/lib/cms-api-error';
 import { readCmsData, writeCmsData } from '@/lib/cms-store';
 
 function unauthorized() {
@@ -31,7 +32,11 @@ export async function PUT(request: NextRequest) {
     data.events = sync.events;
   }
 
-  await writeCmsData(data);
+  try {
+    await writeCmsData(data);
+  } catch (error) {
+    return cmsErrorResponse(error, 'Could not save images');
+  }
 
   revalidateAfterCmsSave([
     ...CMS_PAGE_PATHS.home,

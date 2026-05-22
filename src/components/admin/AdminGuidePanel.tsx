@@ -3,6 +3,15 @@
 export default function AdminGuidePanel() {
   return (
     <div className="space-y-6">
+      <section className="admin-card space-y-3 border-2 border-amber-600/30 bg-amber-50/80">
+        <h2>Vercel: connect Blob before Save works</h2>
+        <p className="text-sm leading-relaxed text-[#4a4f5c]">
+          On the live site (feast-of-esther.vercel.app), <strong>every Save button</strong> needs Vercel Blob
+          storage. Dashboard → Storage → Blob → connect to this project → redeploy. Until then you will see a
+          yellow banner and errors when saving Placeholders, Executives, Events, and other tabs.
+        </p>
+      </section>
+
       <section className="admin-card space-y-4 border-2 border-[rgba(194,24,91,0.2)]">
         <h2>See your changes on the website</h2>
         <p className="text-sm leading-relaxed text-[#5c6370]">

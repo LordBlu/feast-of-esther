@@ -12,9 +12,26 @@ This document is for anyone editing the public site through **`/admin`**. A shor
 
 ---
 
+## Hosting on Vercel (required for Save to work)
+
+On **Vercel**, the app cannot write to `data/cms-data.json` on disk. Every Admin **Save** (Placeholders, Executives, Events, Imagery, About, etc.) needs **Vercel Blob** storage:
+
+1. Open your project in the [Vercel dashboard](https://vercel.com).
+2. Go to **Storage** → **Create** → **Blob**.
+3. **Connect** the Blob store to the **feast-of-esther** project (this sets `BLOB_READ_WRITE_TOKEN`).
+4. **Redeploy** the site (Deployments → … → Redeploy).
+
+The first time Blob is connected, the site copies the existing `data/cms-data.json` from the deployment into Blob. After that, saves update Blob and the live site reads from there.
+
+If Blob is missing, Admin shows a yellow warning and Save returns an error explaining what to do.
+
+**Local development** (`npm run dev`) still saves to `data/cms-data.json` on your computer — no Blob needed.
+
+---
+
 ## See your changes on the live site
 
-Saving in Admin updates **`data/cms-data.json`** on the server. Your browser may still show an **old cached** page.
+Saving in Admin updates site content (on disk locally, or in **Vercel Blob** in production). Your browser may still show an **old cached** page.
 
 ### Hard refresh (do this first)
 
@@ -29,7 +46,8 @@ Saving in Admin updates **`data/cms-data.json`** on the server. Your browser may
 1. Confirm you clicked **Save** on the correct tab (Events, Popup, Imagery, etc.).
 2. Try a **private/incognito** window.
 3. Wait a minute if you use a CDN/host cache (Vercel etc.) — redeploys can take a moment.
-4. Ask a developer to confirm the server saved `data/cms-data.json` (on some hosts, file writes do not persist without extra storage).
+4. On **Vercel**, confirm **Blob storage** is connected (see above). Without it, Save will always fail.
+5. Ask a developer to confirm a save succeeded (check Blob or `data/cms-data.json` locally).
 
 ---
 

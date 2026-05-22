@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { isAdminAuthenticated } from '@/lib/admin-auth';
+import { cmsErrorResponse } from '@/lib/cms-api-error';
 import { readCmsData, writeCmsData } from '@/lib/cms-store';
 import { CMS_PAGE_PATHS, revalidateAfterCmsSave } from '@/lib/revalidate-cms-pages';
 import type { SitePageContents } from '@/lib/cms-types';
@@ -29,7 +30,11 @@ export async function PUT(request: NextRequest) {
     about2: { ...data.pageContent.about2, ...patch.about2 },
     home: { ...data.pageContent.home, ...patch.home },
   };
-  await writeCmsData(data);
+  try {
+    await writeCmsData(data);
+  } catch (error) {
+    return cmsErrorResponse(error, 'Could not save site page copy');
+  }
   revalidateAfterCmsSave([
     ...CMS_PAGE_PATHS.home,
     ...CMS_PAGE_PATHS.gallery,

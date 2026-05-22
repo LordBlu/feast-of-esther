@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { isAdminAuthenticated } from '@/lib/admin-auth';
+import { cmsErrorResponse } from '@/lib/cms-api-error';
 import { readCmsData, writeCmsData } from '@/lib/cms-store';
 import { CMS_PAGE_PATHS, revalidateAfterCmsSave } from '@/lib/revalidate-cms-pages';
 
@@ -21,7 +22,11 @@ export async function PUT(request: NextRequest) {
     ...data.about,
     ...body,
   };
-  await writeCmsData(data);
+  try {
+    await writeCmsData(data);
+  } catch (error) {
+    return cmsErrorResponse(error, 'Could not save About page');
+  }
   revalidateAfterCmsSave([...CMS_PAGE_PATHS.about]);
   return NextResponse.json({ about: data.about });
 }

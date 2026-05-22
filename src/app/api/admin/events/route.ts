@@ -1,6 +1,7 @@
 import { revalidatePath } from 'next/cache';
 import { NextRequest, NextResponse } from 'next/server';
 import { isAdminAuthenticated } from '@/lib/admin-auth';
+import { cmsErrorResponse } from '@/lib/cms-api-error';
 import { readCmsData, writeCmsData } from '@/lib/cms-store';
 import { SiteEvent } from '@/lib/cms-types';
 import { slugifyPathSegment } from '@/lib/slugify';
@@ -71,7 +72,11 @@ export async function POST(request: NextRequest) {
   if (existingIndex >= 0) data.events[existingIndex] = event;
   else data.events.unshift(event);
 
-  await writeCmsData(data);
+  try {
+    await writeCmsData(data);
+  } catch (error) {
+    return cmsErrorResponse(error, 'Could not save event');
+  }
   revalidatePath('/events');
   revalidatePath('/gallery', 'layout');
   return NextResponse.json({ event });
@@ -89,6 +94,10 @@ export async function DELETE(request: NextRequest) {
   if (data.countdown?.sourceEventId === id) {
     data.countdown.sourceEventId = null;
   }
-  await writeCmsData(data);
+  try {
+    await writeCmsData(data);
+  } catch (error) {
+    return cmsErrorResponse(error, 'Could not delete event');
+  }
   return NextResponse.json({ success: true });
 }

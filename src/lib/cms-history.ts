@@ -1,6 +1,5 @@
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
-import path from 'node:path';
 import type { CmsData } from '@/lib/cms-types';
+import { readCmsHistoryRaw, writeCmsHistoryRaw } from '@/lib/cms-persistence';
 import { applyContentSnapshot, toContentSnapshot, type CmsContentSnapshot } from '@/lib/cms-snapshot';
 import {
   MAX_SAVED_STATES,
@@ -10,9 +9,6 @@ import {
 
 export { MAX_SAVED_STATES, MAX_UNDO_STATES };
 export type { CmsHistorySummary };
-
-const dataDirectory = path.join(process.cwd(), 'data');
-const historyFilePath = path.join(dataDirectory, 'cms-history.json');
 
 export interface CmsHistoryEntry {
   savedAt: string;
@@ -37,12 +33,9 @@ function emptyHistoryFile(): CmsHistoryFile {
 }
 
 async function ensureHistoryFile(): Promise<void> {
-  await mkdir(dataDirectory, { recursive: true });
-  try {
-    await readFile(historyFilePath, 'utf8');
-  } catch {
-    await writeFile(historyFilePath, JSON.stringify(emptyHistoryFile(), null, 2), 'utf8');
-  }
+  const existing = await readCmsHistoryRaw();
+  if (existing) return;
+  await writeCmsHistoryRaw(JSON.stringify(emptyHistoryFile(), null, 2));
 }
 
 function normalizeHistory(parsed: Partial<CmsHistoryFile>): CmsHistoryFile {
@@ -59,13 +52,13 @@ function normalizeHistory(parsed: Partial<CmsHistoryFile>): CmsHistoryFile {
 
 export async function readHistoryFile(): Promise<CmsHistoryFile> {
   await ensureHistoryFile();
-  const raw = await readFile(historyFilePath, 'utf8');
+  const raw = await readCmsHistoryRaw();
+  if (!raw) return emptyHistoryFile();
   return normalizeHistory(JSON.parse(raw) as Partial<CmsHistoryFile>);
 }
 
 async function writeHistoryFile(file: CmsHistoryFile): Promise<void> {
-  await ensureHistoryFile();
-  await writeFile(historyFilePath, JSON.stringify(file, null, 2), 'utf8');
+  await writeCmsHistoryRaw(JSON.stringify(file, null, 2));
 }
 
 function formatUndoLabel(savedAt: string): string {

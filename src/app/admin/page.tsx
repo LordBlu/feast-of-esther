@@ -17,6 +17,7 @@ import AdminSlugField from '@/components/admin/AdminSlugField';
 import AdminStoryParagraphsEditor from '@/components/admin/AdminStoryParagraphsEditor';
 import AdminUrlListEditor from '@/components/admin/AdminUrlListEditor';
 import AdminSaveNotice from '@/components/admin/AdminSaveNotice';
+import { readApiErrorMessage } from '@/lib/cms-api-error';
 import AdminVersionsPanel from '@/components/admin/AdminVersionsPanel';
 import { swapArrayItems } from '@/lib/reorder-array';
 import type { AdminPreviewDraft } from '@/lib/admin-preview-draft';
@@ -259,6 +260,8 @@ export default function AdminDashboardPage() {
   const [saveNotice, setSaveNotice] = useState<{ message: string; variant: 'success' | 'error' } | null>(
     null,
   );
+  const [cmsWritable, setCmsWritable] = useState(true);
+  const [cmsStorageHint, setCmsStorageHint] = useState<string | null>(null);
 
   const dismissSaveNotice = useCallback(() => setSaveNotice(null), []);
 
@@ -414,6 +417,15 @@ export default function AdminDashboardPage() {
   useEffect(() => {
     async function boot() {
       setLoading(true);
+      const statusRes = await fetch('/api/admin/cms-status');
+      if (statusRes.ok) {
+        const status = (await statusRes.json()) as {
+          writable?: boolean;
+          hint?: string | null;
+        };
+        setCmsWritable(status.writable !== false);
+        setCmsStorageHint(typeof status.hint === 'string' ? status.hint : null);
+      }
       await Promise.all([loadEvents(), loadCore()]);
       setLoading(false);
     }
@@ -447,7 +459,7 @@ export default function AdminDashboardPage() {
     });
 
     if (!response.ok) {
-      notify('Could not save event.');
+      notify(await readApiErrorMessage(response, 'Could not save event.'));
       return;
     }
 
@@ -499,7 +511,7 @@ export default function AdminDashboardPage() {
       body: JSON.stringify(popup),
     });
     if (response.ok) notify('Popup updated — changes saved.');
-    else notify('Could not save popup.');
+    else notify(await readApiErrorMessage(response, 'Could not save popup.'));
   }
 
   async function saveCountdown() {
@@ -515,7 +527,7 @@ export default function AdminDashboardPage() {
       }),
     });
     if (!response.ok) {
-      notify('Could not save countdown.');
+      notify(await readApiErrorMessage(response, 'Could not save countdown.'));
       return;
     }
     const data = await response.json();
@@ -534,7 +546,7 @@ export default function AdminDashboardPage() {
       body: JSON.stringify(images),
     });
     if (!response.ok) {
-      notify('Could not save images.');
+      notify(await readApiErrorMessage(response, 'Could not save images.'));
       return false;
     }
     const data = await response.json();
@@ -570,7 +582,7 @@ export default function AdminDashboardPage() {
       body: JSON.stringify(payload),
     });
     if (!response.ok) {
-      notify('Could not save gallery.');
+      notify(await readApiErrorMessage(response, 'Could not save gallery.'));
       return;
     }
     const data = await response.json();
@@ -611,7 +623,7 @@ export default function AdminDashboardPage() {
       body: JSON.stringify({ executives }),
     });
     if (!response.ok) {
-      notify('Could not save Executives page.');
+      notify(await readApiErrorMessage(response, 'Could not save Executives page.'));
       return;
     }
     const data = await response.json();
@@ -643,7 +655,7 @@ export default function AdminDashboardPage() {
       body: JSON.stringify(payload),
     });
     if (!response.ok) {
-      notify('Could not save About page content.');
+      notify(await readApiErrorMessage(response, 'Could not save About page content.'));
       return false;
     }
     const data = await response.json();
@@ -661,7 +673,7 @@ export default function AdminDashboardPage() {
       body: JSON.stringify({ pageContent }),
     });
     if (!response.ok) {
-      notify('Could not save site page copy.');
+      notify(await readApiErrorMessage(response, 'Could not save site page copy.'));
       return false;
     }
     const data = await response.json();
@@ -700,7 +712,7 @@ export default function AdminDashboardPage() {
       body: JSON.stringify({ socialLinks: cleaned }),
     });
     if (!response.ok) {
-      notify('Could not save social links.');
+      notify(await readApiErrorMessage(response, 'Could not save social links.'));
       return;
     }
     const data = await response.json();
@@ -846,6 +858,23 @@ export default function AdminDashboardPage() {
             </button>
           ))}
         </nav>
+
+        {!cmsWritable ? (
+          <div
+            className="rounded-xl border-2 border-amber-600/40 bg-amber-50 px-4 py-3 text-sm leading-relaxed text-amber-950"
+            role="alert"
+          >
+            <p className="font-semibold">Saves are disabled on this server until Blob storage is connected.</p>
+            <p className="mt-1">
+              {cmsStorageHint ??
+                'In the Vercel dashboard: Storage → Create Blob Store → Connect to feast-of-esther, then redeploy.'}
+            </p>
+            <p className="mt-2 text-amber-900/90">
+              This affects every Save button (Placeholders, Executives, Events, Imagery, and the rest). Image
+              uploads to Cloudinary may still work, but they will not stick until storage is fixed.
+            </p>
+          </div>
+        ) : null}
 
         {saveNotice ? (
           <AdminSaveNotice

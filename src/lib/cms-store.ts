@@ -1,6 +1,9 @@
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
-import path from 'node:path';
 import { randomUUID } from 'node:crypto';
+import {
+  ensureCmsDataFileExists,
+  readCmsDataRaw,
+  writeCmsDataRaw,
+} from '@/lib/cms-persistence';
 import {
   DEFAULT_ANTHONIA_LEADERSHIP_PROFILE,
   DEFAULT_GRACE_LEADERSHIP_PROFILE,
@@ -17,9 +20,6 @@ import type {
   SiteCountdownSettings,
   SiteEvent,
 } from '@/lib/cms-types';
-
-const dataDirectory = path.join(process.cwd(), 'data');
-const dataFilePath = path.join(dataDirectory, 'cms-data.json');
 
 const defaultCountdown: SiteCountdownSettings = {
   enabled: true,
@@ -144,18 +144,9 @@ const defaultData: CmsData = {
   pageContent: emptyPageContent,
 };
 
-async function ensureDataFile() {
-  await mkdir(dataDirectory, { recursive: true });
-  try {
-    await readFile(dataFilePath, 'utf8');
-  } catch {
-    await writeFile(dataFilePath, JSON.stringify(defaultData, null, 2), 'utf8');
-  }
-}
-
 export async function readCmsData(): Promise<CmsData> {
-  await ensureDataFile();
-  const content = await readFile(dataFilePath, 'utf8');
+  await ensureCmsDataFileExists(JSON.stringify(defaultData, null, 2));
+  const content = await readCmsDataRaw();
   const parsed = JSON.parse(content) as Partial<CmsData>;
 
   const rawEvents = parsed.events ?? [];
@@ -227,6 +218,5 @@ export async function writeCmsData(data: CmsData, options?: WriteCmsDataOptions)
       /* history must not block saves */
     }
   }
-  await ensureDataFile();
-  await writeFile(dataFilePath, JSON.stringify(data, null, 2), 'utf8');
+  await writeCmsDataRaw(JSON.stringify(data, null, 2));
 }

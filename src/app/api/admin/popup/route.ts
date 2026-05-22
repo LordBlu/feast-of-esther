@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { isAdminAuthenticated } from '@/lib/admin-auth';
+import { cmsErrorResponse } from '@/lib/cms-api-error';
 import { readCmsData, writeCmsData } from '@/lib/cms-store';
 import { revalidateAfterCmsSave } from '@/lib/revalidate-cms-pages';
 
@@ -21,7 +22,11 @@ export async function PUT(request: NextRequest) {
     ...data.popup,
     ...body,
   };
-  await writeCmsData(data);
+  try {
+    await writeCmsData(data);
+  } catch (error) {
+    return cmsErrorResponse(error, 'Could not save popup');
+  }
   revalidateAfterCmsSave(['/']);
   return NextResponse.json({ popup: data.popup });
 }

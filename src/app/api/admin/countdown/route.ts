@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { isAdminAuthenticated } from '@/lib/admin-auth';
+import { cmsErrorResponse } from '@/lib/cms-api-error';
 import { readCmsData, writeCmsData } from '@/lib/cms-store';
 import type { SiteCountdownSettings } from '@/lib/cms-types';
 import { resolveCountdownForPublic } from '@/lib/countdown-resolve';
@@ -34,7 +35,11 @@ export async function PUT(request: NextRequest) {
         : data.countdown.fallbackTargetAt,
   };
 
-  await writeCmsData(data);
+  try {
+    await writeCmsData(data);
+  } catch (error) {
+    return cmsErrorResponse(error, 'Could not save countdown');
+  }
   revalidateAfterCmsSave(['/']);
   return NextResponse.json({
     countdown: data.countdown,

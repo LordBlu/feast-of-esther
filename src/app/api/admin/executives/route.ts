@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { isAdminAuthenticated } from '@/lib/admin-auth';
 import { mergeExecutivesContent } from '@/lib/executive-data';
 import type { ExecutivesPageContent } from '@/lib/cms-types';
+import { cmsErrorResponse } from '@/lib/cms-api-error';
 import { readCmsData, writeCmsData } from '@/lib/cms-store';
 import { CMS_PAGE_PATHS, revalidateAfterCmsSave } from '@/lib/revalidate-cms-pages';
 
@@ -27,7 +28,11 @@ export async function PUT(request: NextRequest) {
       : data.executives.chairperson,
     committee: body.executives?.committee ?? data.executives.committee,
   });
-  await writeCmsData(data);
+  try {
+    await writeCmsData(data);
+  } catch (error) {
+    return cmsErrorResponse(error, 'Could not save Executives page');
+  }
   revalidateAfterCmsSave([...CMS_PAGE_PATHS.executive]);
   return NextResponse.json({ executives: data.executives });
 }
