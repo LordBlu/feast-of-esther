@@ -165,8 +165,8 @@ export default function AdminHomePageEditor({
       <div className="border-t border-black/10 pt-6">
         <h3 className="text-lg font-semibold text-[var(--primary-dark)]">Relive the Feast</h3>
         <p className="mt-1 text-sm text-black/55">
-          Rotating photo grid on the homepage. Your URLs are used first (even if you have fewer than nine). Leave empty
-          to pull from gallery collections and defaults. Use ↑ / ↓ to change order, then save under Site pages.
+          Rotating 3×3 photo grid on the homepage. Add at least nine Cloudinary URLs; the grid never shows the same
+          photo in two cells at once. Use ↑ / ↓ to reorder, upload or paste URLs, then save under Site pages.
         </p>
       </div>
 
@@ -202,7 +202,7 @@ export default function AdminHomePageEditor({
 
       <AdminUrlListEditor
         label="Relive image URLs"
-        hint="Nine or more URLs recommended. Order is used for the rotating grid."
+        hint="At least 9 unique URLs (30 bundled by default). Extra URLs give the grid more variety when rotating."
         urls={home.reliveFeastImageUrls ?? []}
         onChange={(reliveFeastImageUrls) => patch({ reliveFeastImageUrls })}
         onUpload={onUpload}

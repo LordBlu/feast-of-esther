@@ -342,6 +342,41 @@
     "registration": {},
     "founder": {},
     "about2": {},
-    "home": {}
+    "home": {
+      "showReliveFeast": true,
+      "reliveFeastImageUrls": [
+        "https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1777790072/_MG_3350-2_d2kogx.jpg",
+        "https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1777790119/IMG_9592_hfxaaj.jpg",
+        "https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1777790097/205A6376_ucpyqt.jpg",
+        "https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1779112495/gr6_ebogvw.jpg",
+        "https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1779112510/gr4_k2aqom.jpg",
+        "https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1779126489/ev1_wytnu0.jpg",
+        "https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1779126489/ev2_fxwmmb.jpg",
+        "https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1779126490/ev3_lhay3t.jpg",
+        "https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1779276508/20250220_221435_yln56r.jpg",
+        "https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1777761833/20260221_001253_0_lfigst.jpg",
+        "https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1777761818/20260220_132704_0_tjd3wo.jpg",
+        "https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1777761814/20260220_132002_nowz9r.jpg",
+        "https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1777761809/20260220_131920_aw9wt5.jpg",
+        "https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1777761788/20260220_131145_swgwc6.jpg",
+        "https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1777761781/20260220_125225_mohjmy.jpg",
+        "https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1777761766/20260219_224056_u8nneu.jpg",
+        "https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1777761762/20260219_223755_odcohd.jpg",
+        "https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1777761751/20260219_223535_jgk9ex.jpg",
+        "https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1777761737/20260219_131759_g3t4jm.jpg",
+        "https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1777761726/20260219_130355_m6sfrm.jpg",
+        "https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1777761721/20260219_114319_ljqxqc.jpg",
+        "https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1777761713/20260219_114037_gie8cl.jpg",
+        "https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1777761676/20250711_225311_zng8tc.jpg",
+        "https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1777761673/20250711_224758_g4no2c.jpg",
+        "https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1777761661/20250711_200106_dxgplr.jpg",
+        "https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1777761652/20250711_124809_yc1yww.jpg",
+        "https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1777761624/20250710_214224_emxlp3.jpg",
+        "https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1777761600/20250710_211840_x3q0zv.jpg",
+        "https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1777761586/20250710_122145_ffvnun.jpg",
+        "https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1777761583/20250710_121804_zs9qxu.jpg",
+        "https://res.cloudinary.com/dytdn0evx/image/upload/q_auto/f_auto/v1777761533/20250710_085539_dzi7v9.jpg"
+      ]
+    }
   }
 }

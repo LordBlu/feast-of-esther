@@ -1,11 +1,16 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import SiteImage from '@/components/SiteImage';
+import {
+  dedupeReliveImageUrls,
+  initialReliveGridUrls,
+  nextReliveCellUrl,
+  RELIVE_FEAST_GRID_SIZE,
+} from '@/lib/relive-feast-grid';
 import styles from './HomeReliveFeast.module.css';
 
-const GRID_SIZE = 9;
 /** Base slide cadence — each cell adds its own offset for a kaleidoscopic rhythm. */
 const BASE_INTERVAL_MS = 2000;
 
@@ -20,37 +25,35 @@ function cellStartDelayMs(cellIndex: number): number {
 
 interface ReliveFeastCellProps {
   cellIndex: number;
-  pool: string[];
+  src: string;
   reducedMotion: boolean;
+  canRotate: boolean;
+  onRotate: (cellIndex: number) => void;
 }
 
-function ReliveFeastCell({ cellIndex, pool, reducedMotion }: ReliveFeastCellProps) {
-  const [index, setIndex] = useState(() => cellIndex % pool.length);
+function ReliveFeastCell({
+  cellIndex,
+  src,
+  reducedMotion,
+  canRotate,
+  onRotate,
+}: ReliveFeastCellProps) {
   const intervalMs = cellIntervalMs(cellIndex);
   const startDelayMs = cellStartDelayMs(cellIndex);
 
   useEffect(() => {
-    setIndex(cellIndex % pool.length);
-  }, [pool.length, cellIndex]);
-
-  useEffect(() => {
-    if (reducedMotion || pool.length < 2) return;
+    if (reducedMotion || !canRotate) return;
 
     let intervalId: number | undefined;
     const timeoutId = window.setTimeout(() => {
-      intervalId = window.setInterval(
-        () => setIndex((prev) => (prev + 1) % pool.length),
-        intervalMs,
-      );
+      intervalId = window.setInterval(() => onRotate(cellIndex), intervalMs);
     }, startDelayMs);
 
     return () => {
       window.clearTimeout(timeoutId);
       if (intervalId !== undefined) window.clearInterval(intervalId);
     };
-  }, [pool.length, reducedMotion, intervalMs, startDelayMs]);
-
-  const src = pool[index % pool.length];
+  }, [canRotate, cellIndex, intervalMs, onRotate, reducedMotion, startDelayMs]);
 
   return (
     <div className={styles.cell}>
@@ -78,8 +81,28 @@ export default function HomeReliveFeast({
   subtitle = 'Moments from worship, fellowship, and renewal across North America.',
   images,
 }: HomeReliveFeastProps) {
-  const pool = useMemo(() => images.filter(Boolean), [images]);
+  const pool = useMemo(() => dedupeReliveImageUrls(images), [images]);
+  const poolKey = pool.join('\n');
+  const [cellUrls, setCellUrls] = useState<string[]>([]);
   const [reducedMotion, setReducedMotion] = useState(false);
+
+  useEffect(() => {
+    setCellUrls(initialReliveGridUrls(pool));
+  }, [poolKey, pool]);
+
+  const canRotate = pool.length > RELIVE_FEAST_GRID_SIZE;
+
+  const rotateCell = useCallback(
+    (cellIndex: number) => {
+      setCellUrls((prev) => {
+        if (prev.length !== RELIVE_FEAST_GRID_SIZE) return prev;
+        const next = [...prev];
+        next[cellIndex] = nextReliveCellUrl(pool, prev, cellIndex);
+        return next;
+      });
+    },
+    [pool],
+  );
 
   useEffect(() => {
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -89,7 +112,9 @@ export default function HomeReliveFeast({
     return () => mq.removeEventListener('change', fn);
   }, []);
 
-  if (pool.length < GRID_SIZE) return null;
+  if (pool.length < RELIVE_FEAST_GRID_SIZE || cellUrls.length !== RELIVE_FEAST_GRID_SIZE) {
+    return null;
+  }
 
   return (
     <section className={styles.section} aria-labelledby="home-relive-heading">
@@ -105,12 +130,14 @@ export default function HomeReliveFeast({
 
       <div className={styles.gridWrap}>
         <div className={styles.grid} aria-live="polite">
-          {Array.from({ length: GRID_SIZE }, (_, cellIndex) => (
+          {cellUrls.map((src, cellIndex) => (
             <ReliveFeastCell
               key={cellIndex}
               cellIndex={cellIndex}
-              pool={pool}
+              src={src}
               reducedMotion={reducedMotion}
+              canRotate={canRotate}
+              onRotate={rotateCell}
             />
           ))}
         </div>
@@ -124,4 +151,3 @@ export default function HomeReliveFeast({
     </section>
   );
 }
-

@@ -20,6 +20,7 @@ import type {
   SiteCountdownSettings,
   SiteEvent,
 } from '@/lib/cms-types';
+import { DEFAULT_RELIVE_FEAST_IMAGES } from '@/lib/relive-feast-grid';
 
 const defaultCountdown: SiteCountdownSettings = {
   enabled: true,
@@ -80,7 +81,10 @@ const emptyPageContent: SitePageContents = {
   registration: {},
   founder: {},
   about2: {},
-  home: {},
+  home: {
+    reliveFeastImageUrls: [...DEFAULT_RELIVE_FEAST_IMAGES],
+    showReliveFeast: true,
+  },
 };
 
 function mergeSitePageContents(patch: Partial<SitePageContents> | undefined): SitePageContents {
