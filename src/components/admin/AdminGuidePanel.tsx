@@ -14,6 +14,17 @@ export default function AdminGuidePanel() {
       </section>
 
       <section className="admin-card space-y-3">
+        <h2>Gallery collections</h2>
+        <p className="text-sm leading-relaxed text-[#4a4f5c]">
+          <strong>Gallery</strong> tab — each collection is a folder on <strong>/gallery</strong> and its own page at{' '}
+          <strong>/gallery/your-slug</strong>. Fill slug, title, year, description, and at least one photo for the{' '}
+          <strong>Live on site</strong> badge. Use <strong>↑ Up</strong> / <strong>↓ Down</strong> to set order on the
+          public gallery, then <strong>Save gallery</strong>. Choose <strong>Past event</strong> to list it on the
+          Events page automatically.
+        </p>
+      </section>
+
+      <section className="admin-card space-y-3">
         <h2>Relive the Feast (homepage photo grid)</h2>
         <p className="text-sm leading-relaxed text-[#4a4f5c]">
           <strong>Site pages → Home</strong> → <strong>Relive image URLs</strong>. The 3×3 grid uses at least 9
@@ -119,7 +130,7 @@ export default function AdminGuidePanel() {
           </div>
           <div>
             <dt className="font-semibold text-[var(--primary-dark)]">Gallery</dt>
-            <dd>Collections for /gallery; past-event photos sync to Events</dd>
+            <dd>Collections for /gallery; reorder with ↑ / ↓; past-event photos sync to Events</dd>
           </div>
           <div>
             <dt className="font-semibold text-[var(--primary-dark)]">Placeholders</dt>

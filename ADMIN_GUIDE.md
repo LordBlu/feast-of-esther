@@ -112,14 +112,15 @@ Footer icons: URL, label, enable/disable, add/remove.
 
 ### Gallery
 
-Each **collection** is one folder on `/gallery` and its own page `/gallery/your-slug`.
+Each **collection** is one folder on `/gallery` and its own page `/gallery/your-slug`. **Order on the public gallery** follows the list in the editor (top = first).
 
 1. Fill **URL slug**, **title**, **year**, **description**, and **at least one photo** (Cloudinary URL or upload).
 2. Choose collection type:
    - **General photos** — gallery only.
    - **Past event** — also appears on the **Events** page under “Past Events” (no need to create the same event twice under Events).
 3. For **Past event**, add **Event dates** (e.g. `June 18–20, 2025`) and optional **venue**.
-4. Wait for the **Live on site** badge (not **Draft**), then click **Save gallery**.
+4. Use **↑ Up** / **↓ Down** on each collection to reorder how folders appear on `/gallery`.
+5. Wait for the **Live on site** badge (not **Draft**), then click **Save gallery**.
 
 **Draft** means something is still missing — the yellow hint lists what’s needed. **Yellow-highlighted** photos are demo placeholders you can replace or delete.
 
@@ -264,6 +265,7 @@ The tabbed block at the bottom of `/founder` is **`FounderMinistryCards.tsx`** (
 |---------|-----|
 | Changes not visible | Hard refresh; incognito |
 | Gallery not saving / missing on site | Fill all fields + one photo; check **Draft** vs **Live** badge; read toast after **Save gallery** |
+| Gallery order wrong on `/gallery` | **Gallery** tab → **↑ Up** / **↓ Down** → **Save gallery** → hard refresh |
 | Past event not on Events page | Set type **Past event**, complete all fields, **Save gallery** |
 | Countdown wrong time | Set target on the **event** + pick it under Countdown |
 | Broke the whole site | Versions → Undo or Restore Zero |
@@ -279,6 +281,7 @@ The tabbed block at the bottom of `/founder` is **`FounderMinistryCards.tsx`** (
 - **Cache:** Root `layout.tsx` uses `force-dynamic`; Blob reads use `useCache: false`; `revalidateAfterCmsSave` invalidates `/` layout after writes
 - **Gallery + events sync:** `src/lib/gallery-event-sync.ts` from `PUT /api/admin/images` when `galleryCollections` is present; types on `GalleryCollection` (`collectionType`, `linkedEventId`, `eventDateLabel`, `eventVenue`)
 - **Gallery validation:** `normalizeGalleryCollection`, `isGalleryCollectionComplete` in `src/lib/gallery-data.ts`
+- **Gallery reorder:** `AdminReorderButtons` + `swapArrayItems` in `AdminGalleryEditor.tsx` (array order = `/gallery` index order)
 - **Slugs:** `src/lib/slugify.ts`, `AdminSlugField.tsx`
 - **Donate intents:** `POST /api/donate/intent` → `appendDonationIntent`; admin list `GET /api/admin/donations`
 - **Preview iframe:** `src/app/admin/preview/page.tsx` + `admin-preview-draft` (localStorage + postMessage)

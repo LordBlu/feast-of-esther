@@ -3,7 +3,7 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 ## Feast of Esther — North America
 
 - **Run locally:** `npm run dev` → [http://localhost:3000](http://localhost:3000)
-- **Content:** JSON-backed CMS (`data/cms-data.json` locally; **Vercel Blob** in production). Events, popup, imagery, about, **executives**, social, registrations, **`pageContent`** (incl. **Relive the Feast** photo pool on Home). **Admin:** `/admin` — see **`ADMIN_GUIDE.md`**.
+- **Content:** JSON-backed CMS (`data/cms-data.json` locally; **Vercel Blob** in production). Events, popup, imagery, about, **executives**, social, registrations, **`pageContent`** (incl. **Relive the Feast** photo pool on Home), **gallery collections** (reorderable in Admin). **Admin:** `/admin` — see **`ADMIN_GUIDE.md`**.
 - **Public routes (high-signal):** `/` home · `/about` · `/executive` Executives · `/founder` · `/gallery` · `/events` · `/donate` · `/contact` · `/registration`
 - **Hadassah (AI chat):** **`OLLAMA_API_KEY`** on the server. Optional **`OLLAMA_CHAT_MODEL`** (`POST /api/hadassah`).
 - **Donations:** Zeffy embed via Admin or `NEXT_PUBLIC_ZEFFY_EMBED_URL`; PayPal via `NEXT_PUBLIC_PAYPAL_DONATE_URL`.

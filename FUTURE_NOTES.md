@@ -12,7 +12,9 @@
 
 ## Progress so far
 
-- **Handoff (May 2026):** Resume from **`FUTURE_NOTES.md`** + **`ADMIN_GUIDE.md`** + in-app **Guide** tab. **Docs synced** (May 23): Relive grid + Blob persistence. **Latest shipped (May 23):**
+- **Handoff (May 2026):** Resume from **`FUTURE_NOTES.md`** + **`ADMIN_GUIDE.md`** + in-app **Guide** tab. **Docs synced** (May 24): gallery collection reorder. **Latest shipped (May 24):**
+  - **Gallery reorder:** **↑ Up** / **↓ Down** on each collection in Admin → **Gallery** (`AdminGalleryEditor.tsx`, `5484ecc`). Public `/gallery` order follows `galleryCollections` array order after **Save gallery**.
+- **Earlier (May 23):** Relive grid + Blob persistence + gallery draft preview fix (`318766c`). **May 23 details:**
   - **Vercel Blob CMS:** `src/lib/cms-persistence.ts` + `@vercel/blob` — production saves go to private Blob (`feast-of-esther/cms-data.json`, history JSON). Requires **Blob store connected** + `BLOB_READ_WRITE_TOKEN` + redeploy. Admin yellow banner + clear API errors when missing. Local dev still uses `data/cms-data.json`.
   - **Stale public site fix:** `layout.tsx` `force-dynamic`; Blob `get()` with `useCache: false`; no fallback to bundled JSON on Vercel when Blob mode is on (`b21b82d`).
   - **Relive the Feast:** **30** default Cloudinary URLs in `src/lib/relive-feast-grid.ts`; 3×3 grid assigns **9 unique** images on load; rotation picks a random URL **not used by another cell** (`3285ce9`). Editable: Admin → **Site pages → Home** → Relive image URLs → **Save site page copy**.
@@ -30,7 +32,7 @@
 - **Events page — Programme block:** Replaced the old alternating “Event Schedule” timeline with a **Programme** section modeled on the Alamein-style layout: three clickable **day cards** (18–20 June 2026), **Next →** cycles days, **time | status dot | title/details** timeline, accent `#006699`, responsive stacking on small screens. Implementation: `src/components/events/ProgrammeSection.tsx` + `ProgrammeSection.module.css`, wired from `src/app/events/page.tsx`. Schedule copy in the component is **placeholder** until final programme is confirmed.
 - **Events page:** Still includes hero, info card, hotel block, past events grid; programme sits between info card and hotel.
 - **Homepage (`/`):** Hero + CTAs; copy from **`pageContent.home`** (Admin **Site pages → Home**). **Relive the Feast** 3×3 grid with **staggered** per-cell slideshow (`HomeReliveFeast.tsx`). Then hotel → countdown (hides when ended) → testimonials. Fallbacks: `site-content.ts`, `home-content.ts`, `site-placeholders.ts`.
-- **Gallery — index (`/gallery`):** **No Back** control (Back only on collection pages). **Header** top padding **halved** vs old layout. Title + **left-aligned** gospel-style subtitle (`gallery-page-header--index`, default in `GalleryVerticalFeed.tsx`); editable via **Site pages → Gallery**. **Mosaic tiles** link to **`/gallery/[slug]`** (folders) — **not** lightbox on index. Default **9** collections in `gallery-data.ts` (2025–2023); more via Admin **Imagery → gallery collections JSON**.
+- **Gallery — index (`/gallery`):** **No Back** control (Back only on collection pages). **Header** top padding **halved** vs old layout. Title + **left-aligned** gospel-style subtitle (`gallery-page-header--index`, default in `GalleryVerticalFeed.tsx`); editable via **Site pages → Gallery**. **Mosaic tiles** link to **`/gallery/[slug]`** (folders) — **not** lightbox on index. Default **9** collections in `gallery-data.ts` (2025–2023); more via Admin **Gallery** tab (reorder with ↑ / ↓, then **Save gallery**).
 - **Gallery — collection detail (`/gallery/[slug]`):** **Lightbox** on individual photos (`GalleryImageLightbox.tsx`) with prev/next + keyboard. Grid hover enlarge + blur siblings (`GalleryImageGrid.tsx`). **Back:** `GalleryPageBack.tsx` — **sticky** under nav (`top: 68px`), links to `/gallery`. Re-export: `GalleryBackUnderLogo.tsx`.
 - **About Us (`/about`):** Huge-inspired **sticky left visual rail** + scroll narrative. **Chrome bar** (woman-led gathering + Close) **removed**. **Leadership:** featured leader (Grace Okonrende) + **3-up row** (Mabel Odigie, Rev. Dr. Felicia Ajayi, Dr. Banks) — circular portraits **~165px** desktop / **~135px** mobile, pink ring border; sidebar image on scroll/hover (`data-leader-profile`). No carousel. **CMS:** `about.leadershipProfiles` + `pageContent.about2` sidebar image URLs.
 - **Global UI:** Nav active link = **full bar height** fill (no lift/glow). **Footer** compact padding on all pages (`.site-footer` in `globals.css`). **Hadassah:** launcher/window title **“Hadassah”** only (no portrait image).
@@ -47,7 +49,7 @@
 | **Countdown** | Homepage flip clock |
 | **Popup** | Welcome modal |
 | **Imagery** | Hero, YouTube, founder carousel URLs, hotel, etc. — **not** gallery folders |
-| **Gallery** | Collections → `/gallery/[slug]`; **General photos** or **Past event** (syncs Events page) |
+| **Gallery** | Collections → `/gallery/[slug]`; **General photos** or **Past event** (syncs Events page); **↑ / ↓ reorder** |
 | **Social Links** | Footer icons |
 | **About Page** | Hero, story **paragraphs** (list), **leadership** (per-person cards), mission |
 | **Placeholders** | Replace/clear bundled demo photos (Home, About sidebar, Founder, Events) |
