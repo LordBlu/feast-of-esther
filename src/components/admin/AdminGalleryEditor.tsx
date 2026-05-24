@@ -9,7 +9,9 @@ import {
   slugifyGallerySlug,
 } from '@/lib/gallery-data';
 import AdminImageUrlField from '@/components/admin/AdminImageUrlField';
+import AdminReorderButtons from '@/components/admin/AdminReorderButtons';
 import AdminSlugField from '@/components/admin/AdminSlugField';
+import { swapArrayItems } from '@/lib/reorder-array';
 import styles from './AdminGalleryEditor.module.css';
 
 const emptyCollection = (): GalleryCollection => ({
@@ -76,9 +78,11 @@ export default function AdminGalleryEditor({
   return (
     <div className="space-y-5">
       <p className="text-xs text-black/55">
-        Each collection becomes its own page at <strong>/gallery/your-slug</strong>. Choose{' '}
-        <strong>Past event</strong> to also list it on the Events page — no need to add it again under Events.{' '}
-        <strong className="text-[#7a5a00]">Yellow-highlighted</strong> images are demo placeholders.
+        Each collection becomes its own page at <strong>/gallery/your-slug</strong>. Order on the public{' '}
+        <strong>/gallery</strong> page follows the list below — use ↑ / ↓ to reorder, then{' '}
+        <strong>Save gallery</strong>. Choose <strong>Past event</strong> to also list it on the Events page — no
+        need to add it again under Events. <strong className="text-[#7a5a00]">Yellow-highlighted</strong> images are
+        demo placeholders.
       </p>
       <p className={`${styles.summaryStrip} text-xs`}>
         <strong>{rows.length}</strong> collection{rows.length === 1 ? '' : 's'} in editor ·{' '}
@@ -105,15 +109,24 @@ export default function AdminGalleryEditor({
               )}
               {isEvent ? <span className={`${styles.eventBadge} ml-2`}>Past event</span> : null}
             </h3>
-            {rows.length > 1 ? (
-              <button
-                type="button"
-                className="admin-btn-ghost text-xs"
-                onClick={() => onChange(rows.filter((_, i) => i !== cIndex))}
-              >
-                Remove collection
-              </button>
-            ) : null}
+            <div className="flex flex-wrap items-center gap-2">
+              <AdminReorderButtons
+                index={cIndex}
+                total={rows.length}
+                label={`collection ${cIndex + 1}`}
+                onMoveUp={() => onChange(swapArrayItems(rows, cIndex, cIndex - 1))}
+                onMoveDown={() => onChange(swapArrayItems(rows, cIndex, cIndex + 1))}
+              />
+              {rows.length > 1 ? (
+                <button
+                  type="button"
+                  className="admin-btn-ghost text-xs"
+                  onClick={() => onChange(rows.filter((_, i) => i !== cIndex))}
+                >
+                  Remove collection
+                </button>
+              ) : null}
+            </div>
           </header>
           {!complete && missing.length > 0 ? (
             <p className={styles.draftHint}>Still needed: {missing.join(', ')}.</p>
