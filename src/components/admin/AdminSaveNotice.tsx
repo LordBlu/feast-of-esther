@@ -1,6 +1,6 @@
 'use client';
 
-export type AdminSaveNoticeVariant = 'success' | 'error';
+export type AdminSaveNoticeVariant = 'success' | 'error' | 'warning';
 
 interface AdminSaveNoticeProps {
   message: string;
@@ -16,7 +16,7 @@ export default function AdminSaveNotice({ message, variant, onDismiss }: AdminSa
       aria-live="polite"
     >
       <span className="admin-save-notice__icon" aria-hidden>
-        {variant === 'success' ? '✓' : '!'}
+        {variant === 'success' ? '✓' : variant === 'warning' ? '!' : '!'}
       </span>
       <span className="admin-save-notice__text">{message}</span>
       {onDismiss ? (

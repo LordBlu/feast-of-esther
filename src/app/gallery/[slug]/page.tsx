@@ -5,6 +5,8 @@ import GalleryImageGrid from '@/components/GalleryImageGrid';
 import { resolveGalleryItems } from '@/lib/gallery-data';
 import { readCmsData } from '@/lib/cms-store';
 
+export const dynamic = 'force-dynamic';
+
 export default async function GalleryDetailPage({
   params,
 }: {

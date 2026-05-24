@@ -1,6 +1,6 @@
 'use client';
 
-import type { DragEvent } from 'react';
+import { useEffect, type DragEvent } from 'react';
 import type { GalleryCollection, GalleryCollectionType } from '@/lib/cms-types';
 import {
   getGalleryCollectionValidationErrors,
@@ -34,28 +34,41 @@ export default function AdminGalleryEditor({
   onUploadImage,
   onDragOver,
 }: AdminGalleryEditorProps) {
-  const rows = collections.length > 0 ? collections : [emptyCollection()];
+  useEffect(() => {
+    if (collections.length === 0) {
+      onChange([emptyCollection()]);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- run once when gallery is empty
+  }, [collections.length]);
+
+  function workingRows(): GalleryCollection[] {
+    return collections.length > 0 ? collections : [emptyCollection()];
+  }
+
+  const rows = workingRows();
+  const liveCount = rows.filter(isGalleryCollectionComplete).length;
+  const draftCount = rows.length - liveCount;
 
   function updateCollection(index: number, patch: Partial<GalleryCollection>) {
-    onChange(rows.map((row, i) => (i === index ? { ...row, ...patch } : row)));
+    onChange(workingRows().map((row, i) => (i === index ? { ...row, ...patch } : row)));
   }
 
   function updateImage(collectionIndex: number, imageIndex: number, url: string) {
-    const collection = rows[collectionIndex];
+    const collection = workingRows()[collectionIndex];
     const urls = [...(collection.imageUrls ?? [])];
     urls[imageIndex] = url;
     updateCollection(collectionIndex, { imageUrls: urls });
   }
 
   function addImage(collectionIndex: number) {
-    const collection = rows[collectionIndex];
+    const collection = workingRows()[collectionIndex];
     updateCollection(collectionIndex, {
       imageUrls: [...(collection.imageUrls ?? []), ''],
     });
   }
 
   function removeImage(collectionIndex: number, imageIndex: number) {
-    const collection = rows[collectionIndex];
+    const collection = workingRows()[collectionIndex];
     const urls = (collection.imageUrls ?? []).filter((_, i) => i !== imageIndex);
     updateCollection(collectionIndex, { imageUrls: urls.length > 0 ? urls : [''] });
   }
@@ -66,6 +79,11 @@ export default function AdminGalleryEditor({
         Each collection becomes its own page at <strong>/gallery/your-slug</strong>. Choose{' '}
         <strong>Past event</strong> to also list it on the Events page — no need to add it again under Events.{' '}
         <strong className="text-[#7a5a00]">Yellow-highlighted</strong> images are demo placeholders.
+      </p>
+      <p className={`${styles.summaryStrip} text-xs`}>
+        <strong>{rows.length}</strong> collection{rows.length === 1 ? '' : 's'} in editor ·{' '}
+        <strong>{liveCount}</strong> live on /gallery · <strong>{draftCount}</strong> draft
+        {draftCount > 0 ? ' (drafts appear in preview but stay hidden on the public site until complete)' : ''}
       </p>
       {rows.map((collection, cIndex) => {
         const complete = isGalleryCollectionComplete(collection);
@@ -249,7 +267,7 @@ export default function AdminGalleryEditor({
         </section>
       );
       })}
-      <button type="button" className="admin-btn-ghost" onClick={() => onChange([...rows, emptyCollection()])}>
+      <button type="button" className="admin-btn-ghost" onClick={() => onChange([...workingRows(), emptyCollection()])}>
         Add collection
       </button>
     </div>

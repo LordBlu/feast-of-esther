@@ -12,14 +12,18 @@
 
 ## Progress so far
 
-- **Handoff (May 2026):** Maintainer resting — resume from **`FUTURE_NOTES.md`** + **`ADMIN_GUIDE.md`** + in-app **Guide** tab. **Docs synced** (May 20): `ADMIN_GUIDE.md`, `AdminGuidePanel.tsx`, `README.md`. **Latest shipped:**
+- **Handoff (May 2026):** Resume from **`FUTURE_NOTES.md`** + **`ADMIN_GUIDE.md`** + in-app **Guide** tab. **Docs synced** (May 23): Relive grid + Blob persistence. **Latest shipped (May 23):**
+  - **Vercel Blob CMS:** `src/lib/cms-persistence.ts` + `@vercel/blob` — production saves go to private Blob (`feast-of-esther/cms-data.json`, history JSON). Requires **Blob store connected** + `BLOB_READ_WRITE_TOKEN` + redeploy. Admin yellow banner + clear API errors when missing. Local dev still uses `data/cms-data.json`.
+  - **Stale public site fix:** `layout.tsx` `force-dynamic`; Blob `get()` with `useCache: false`; no fallback to bundled JSON on Vercel when Blob mode is on (`b21b82d`).
+  - **Relive the Feast:** **30** default Cloudinary URLs in `src/lib/relive-feast-grid.ts`; 3×3 grid assigns **9 unique** images on load; rotation picks a random URL **not used by another cell** (`3285ce9`). Editable: Admin → **Site pages → Home** → Relive image URLs → **Save site page copy**.
+- **Earlier (May 20):**
   - **`/executive` (Executives page):** Chairperson hero (photo left, bio right) + 3×3 committee grid with **per-cell** slideshow timing (kaleidoscopic stagger in `HomeReliveFeast.tsx` uses the same idea). CMS field **`executives`** in `cms-data.json`; Admin → **Executives** tab (`AdminExecutivesEditor.tsx`, `PUT /api/admin/executives`). Nav link: **Executives**.
   - **Admin → Placeholders:** Bundled demo images for Home hero/ministry, About sidebar, Founder, Events fallbacks (`site-placeholder-catalog.ts`, `placeholderUrls` on `SiteImages`).
   - **Admin → Site pages → Home:** Hero headline, mission quote, purpose block, ministry card text, Relive URLs, testimonials (`AdminHomePageEditor.tsx`, `pageContent.home`).
   - **Admin → Site pages → Founder:** Bio paragraphs + ministry panel copy (`AdminFounderPageEditor.tsx`); carousel still under **Imagery**.
   - **Performance / security batch:** Server-loaded CMS in root layout (`SiteShellProvider`); `SiteImage` + Cloudinary widths; filtered `GET /api/site-config`; rate limits on login/registrations/donate/Hadassah; production admin auth required; security headers in `next.config.ts`.
   - **Donate page:** Visitor-friendly offline giving copy; canonical contact **`feastofesthernaa@gmail.com`** in `SITE.contactEmail` (`site-content.ts`). Zeffy embed via Admin **Site pages → Donate** or `NEXT_PUBLIC_ZEFFY_EMBED_URL`; PayPal via `NEXT_PUBLIC_PAYPAL_DONATE_URL` on Vercel.
-  - **Relive the Feast:** 3×3 grid — each cell advances on its **own** interval (~2s base, staggered start); not one shared tick. Hide section when `pageContent.home.reliveFeastImageUrls` has fewer than 9 URLs or `showReliveFeast === false`.
+  - **Relive the Feast:** 3×3 grid — per-cell staggered timers; **no duplicate images across cells** at once; hide when fewer than 9 URLs or `showReliveFeast === false`. See `relive-feast-grid.ts`, `HomeReliveFeast.tsx`.
   - **Countdown:** Section hidden after target time passes (`FlipClockCountdown.tsx` returns null).
 - **Earlier (still relevant):** Gallery tab + past-event sync; About leadership 3-up row; Donations click log; Draft/Live preview; Versions/Guide; `FounderMinistryCards` ministry tabs still partly hardcoded.
 - **CMS:** `data/cms-data.json` + `src/app/api/admin/*` — no separate DB. **QA:** `npm run build` after pulls (Vercel runs full TS check). **Build gotcha:** browser timer IDs use `number`, not `ReturnType<typeof setInterval>` (Node vs DOM types). **Not from this app:** MetaMask `inpage.js` = browser extension. *Update this file when you ship more.*
@@ -67,7 +71,7 @@
 - **Hotel block** off toggle on homepage post-event.
 - **PayPal URL** in Admin UI (today: `NEXT_PUBLIC_PAYPAL_DONATE_URL` on Vercel only).
 - Final **programme copy** in `ProgrammeSection.tsx` or CMS.
-- **Vercel persistence:** confirm admin saves to `cms-data.json` survive redeploys (ephemeral FS) or move to blob/DB.
+- ~~**Vercel persistence**~~ **Done:** private Vercel Blob (`cms-persistence.ts`). Confirm `feast-of-esther-blob` stays connected after domain changes.
 - **Env checklist** — see table below.
 
 ## Vercel / local environment variables (high-signal)
@@ -82,6 +86,7 @@
 | `CLOUDINARY_CLOUD_NAME` / `CLOUDINARY_UPLOAD_FOLDER` | Optional Cloudinary config |
 | `NEXT_PUBLIC_ZEFFY_EMBED_URL` | Donate page Zeffy iframe (or set in Admin → Site pages → Donate) |
 | `NEXT_PUBLIC_PAYPAL_DONATE_URL` | Donate page PayPal button link |
+| `BLOB_READ_WRITE_TOKEN` | **Production CMS writes** (auto-set when Blob store is connected to the Vercel project) |
 
 ---
 
@@ -98,7 +103,7 @@ You do **not** need a custom domain to give them a link. You need a **hosted dep
 
 **Important for “all the features” on the preview**
 
-- **Admin + JSON writes:** If the admin dashboard writes to `data/cms-data.json`, on Vercel the filesystem is **ephemeral** — changes may not persist across deploys/restarts unless you add external storage (database, blob, or Vercel KV / similar). For a **read-only marketing preview**, public pages are fine; for **testing admin saves**, call that out or use a staging setup with persistent storage.
+- **Admin + CMS writes:** On Vercel, connect **Blob** storage to the project (see `ADMIN_GUIDE.md`). Saves update `feast-of-esther/cms-data.json` in Blob; the bundled repo JSON is only a seed. Without Blob, every Save fails (yellow banner in Admin).
 - Set **environment variables** in the Vercel project settings for anything the build or server needs (e.g. admin secrets), same as you would locally in `.env`.
 
 **Alternatives**
@@ -131,7 +136,7 @@ You do **not** need a custom domain to give them a link. You need a **hosted dep
 |------|--------|
 | Layout shell | `src/components/ConditionalLayout.tsx`, `PageViewTransition.tsx`, `SiteFooter.tsx` |
 | Top nav | `src/components/Navbar.tsx` (`globals.css` `.navbar-link*`) |
-| Homepage | `src/app/page.tsx`, `HomeClient.tsx`, `HomeReliveFeast.tsx`, `HomeTestimonialsMarquee.tsx`, `HomeReserveStay.tsx`, `FlipClockCountdown.tsx`, `src/lib/site-content.ts`, `src/lib/home-content.ts`, `src/lib/site-placeholders.ts` |
+| Homepage | `src/app/page.tsx`, `HomeClient.tsx`, `HomeReliveFeast.tsx`, `src/lib/relive-feast-grid.ts`, `HomeTestimonialsMarquee.tsx`, `HomeReserveStay.tsx`, `FlipClockCountdown.tsx`, `src/lib/site-content.ts`, `src/lib/home-content.ts`, `src/lib/site-placeholders.ts`, `src/lib/cms-persistence.ts` |
 | Executives | `src/app/executive/page.tsx`, `ExecutiveClient.tsx`, `src/lib/executive-data.ts`, `cms-data.executives`, `PUT /api/admin/executives` |
 | Founder | `src/app/founder/page.tsx`, `FounderHero.tsx`, `FounderCarousel.tsx`, `FounderMinistryCards.tsx` + `.module.css` |
 | Placeholders | `src/lib/site-placeholder-catalog.ts`, `AdminPlaceholdersPanel.tsx`, `images.placeholderUrls` |

@@ -206,3 +206,32 @@ export function resolveGalleryItems(cmsCollections: GalleryCollection[] | undefi
   if (fromCms.length > 0) return fromCms;
   return galleryItems;
 }
+
+export type GalleryPreviewItem = GalleryItem & {
+  isDraft: boolean;
+  missingFields: string[];
+};
+
+/** Admin draft preview — all CMS rows, including incomplete drafts (never bundled demo fallbacks). */
+export function resolveGalleryPreviewItems(
+  cmsCollections: GalleryCollection[] | undefined,
+): GalleryPreviewItem[] {
+  const rows = cmsCollections ?? [];
+  return rows.map((collection, index) => {
+    const normalized = normalizeGalleryCollection(collection);
+    const missingFields = getGalleryCollectionValidationErrors(normalized);
+    const images = normalized.imageUrls;
+    const slug = normalized.slug || `draft-${index + 1}`;
+    return {
+      slug,
+      title: normalized.title || `Collection ${index + 1}`,
+      year: normalized.year || '—',
+      subtitle: normalized.year ? `${normalized.year} Collection` : 'Draft collection',
+      coverImage: images[0] ?? '',
+      description: normalized.description || 'Still missing required fields.',
+      images,
+      isDraft: missingFields.length > 0,
+      missingFields,
+    };
+  });
+}

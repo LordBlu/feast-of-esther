@@ -38,6 +38,16 @@ export async function PUT(request: NextRequest) {
     return cmsErrorResponse(error, 'Could not save images');
   }
 
+  let imagesOut = data.images;
+  let eventsOut = data.events;
+  try {
+    const verified = await readCmsData();
+    imagesOut = verified.images;
+    eventsOut = verified.events;
+  } catch {
+    /* return in-memory payload if re-read fails */
+  }
+
   revalidateAfterCmsSave([
     ...CMS_PAGE_PATHS.home,
     ...CMS_PAGE_PATHS.gallery,
@@ -46,5 +56,5 @@ export async function PUT(request: NextRequest) {
     ...CMS_PAGE_PATHS.about,
   ]);
 
-  return NextResponse.json({ images: data.images, events: data.events });
+  return NextResponse.json({ images: imagesOut, events: eventsOut });
 }

@@ -5,6 +5,16 @@
   padding: 1rem;
 }
 
+.summaryStrip {
+  margin: 0;
+  padding: 0.65rem 0.85rem;
+  border-radius: 0.65rem;
+  background: rgba(255, 255, 255, 0.75);
+  border: 1px solid rgba(194, 24, 91, 0.12);
+  color: #4a4f5c;
+  line-height: 1.45;
+}
+
 .collectionDraft {
   border-color: rgba(160, 7, 90, 0.35);
   background: linear-gradient(145deg, #fff9fc 0%, #fff5f8 100%);

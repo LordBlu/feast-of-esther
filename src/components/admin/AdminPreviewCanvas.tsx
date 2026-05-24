@@ -2,7 +2,7 @@
 
 import type { AdminPreviewDraft } from '@/lib/admin-preview-draft';
 import { resolveReliveFeastImages } from '@/lib/home-content';
-import { resolveGalleryItems } from '@/lib/gallery-data';
+import { resolveGalleryPreviewItems } from '@/lib/gallery-data';
 import {
   resolveHomeHeroSlides,
   resolveHomeMinistryCards,
@@ -88,23 +88,41 @@ export default function AdminPreviewCanvas({
   }
 
   if (view === '/gallery') {
-    const collections = draft.images?.galleryCollections ?? [];
-    const items = resolveGalleryItems(collections.length > 0 ? collections : undefined).slice(0, 6);
+    const items = resolveGalleryPreviewItems(draft.images?.galleryCollections);
     const g = draft.pageContent?.gallery;
+    const liveCount = items.filter((item) => !item.isDraft).length;
+    const draftOnlyCount = items.length - liveCount;
     return (
       <PreviewShell title={g?.pageTitle || 'Gallery'} path="/gallery">
         <p className={styles.body}>{g?.pageSubtitle}</p>
-        <div className={styles.galleryGrid}>
-          {items.map((item) => (
-            <article key={item.slug} className={styles.galleryCard}>
+        <p className={styles.body}>
+          {items.length === 0
+            ? 'No collections yet — add one on the left.'
+            : `${items.length} in draft preview · ${liveCount} would show on /gallery · ${draftOnlyCount} draft only`}
+        </p>
+        <div className={styles.galleryGridScroll}>
+          <div className={styles.galleryGrid}>
+            {items.map((item, index) => (
+            <article
+              key={`${item.slug}-${index}`}
+              className={`${styles.galleryCard} ${item.isDraft ? styles.galleryCardDraft : ''}`}
+            >
               {item.coverImage ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={item.coverImage} alt="" className={styles.galleryThumb} />
-              ) : null}
+              ) : (
+                <div className={styles.galleryThumbPlaceholder}>No photo yet</div>
+              )}
               <strong>{item.title}</strong>
               <span>{item.year}</span>
+              {item.isDraft ? (
+                <span className={styles.draftLabel}>
+                  Draft · needs {item.missingFields.join(', ')}
+                </span>
+              ) : null}
             </article>
           ))}
+          </div>
         </div>
       </PreviewShell>
     );

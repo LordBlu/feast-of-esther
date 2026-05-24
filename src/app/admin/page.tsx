@@ -257,17 +257,22 @@ export default function AdminDashboardPage() {
   const [regSearch, setRegSearch] = useState('');
   const [regSearchInput, setRegSearchInput] = useState('');
   const [loading, setLoading] = useState(true);
-  const [saveNotice, setSaveNotice] = useState<{ message: string; variant: 'success' | 'error' } | null>(
-    null,
-  );
+  const [saveNotice, setSaveNotice] = useState<{
+    message: string;
+    variant: 'success' | 'error' | 'warning';
+  } | null>(null);
   const [cmsWritable, setCmsWritable] = useState(true);
   const [cmsStorageHint, setCmsStorageHint] = useState<string | null>(null);
 
   const dismissSaveNotice = useCallback(() => setSaveNotice(null), []);
 
   const notify = useCallback(
-    (text: string, options?: { refresh?: boolean }) => {
-      const variant = /^could not/i.test(text) ? 'error' : 'success';
+    (
+      text: string,
+      options?: { refresh?: boolean; variant?: 'success' | 'error' | 'warning' },
+    ) => {
+      const variant =
+        options?.variant ?? (/^could not/i.test(text) ? 'error' : 'success');
       setSaveNotice({ message: text, variant });
       if (variant === 'success' && options?.refresh !== false) {
         router.refresh();
@@ -586,7 +591,11 @@ export default function AdminDashboardPage() {
       return;
     }
     const data = await response.json();
-    setImages(data.images ?? payload);
+    const savedCollections = data.images?.galleryCollections ?? payload.galleryCollections;
+    setImages({
+      ...(data.images ?? payload),
+      galleryCollections: Array.isArray(savedCollections) ? savedCollections : normalized,
+    });
     if (Array.isArray(data.events)) {
       setEvents(data.events);
     } else {
@@ -600,8 +609,16 @@ export default function AdminDashboardPage() {
     if (draftCount > 0) {
       const firstDraft = normalized.find((row) => !isGalleryCollectionComplete(row));
       const missing = firstDraft ? getGalleryCollectionValidationErrors(firstDraft).join(', ') : '';
+      const draftTitles = normalized
+        .filter((row) => !isGalleryCollectionComplete(row))
+        .map((row) => row.title.trim() || 'Untitled')
+        .slice(0, 3)
+        .join(', ');
       notify(
-        `Gallery saved. ${liveCount} collection${liveCount === 1 ? '' : 's'} live on /gallery. ${draftCount} still need: ${missing} (fill every field + one photo, then save again).`,
+        liveCount > 0
+          ? `Saved. ${liveCount} collection${liveCount === 1 ? '' : 's'} live on /gallery. ${draftCount} still Draft (${draftTitles}) — needs: ${missing}. Draft collections are hidden on the public site until complete.`
+          : `Saved, but your collection is still Draft and hidden on /gallery until you fill: ${missing}.`,
+        { variant: 'warning', refresh: liveCount > 0 },
       );
       return;
     }
@@ -612,7 +629,7 @@ export default function AdminDashboardPage() {
     notify(
       liveCount === 0
         ? 'Gallery saved (no collections on the public gallery yet — add one with all fields filled).'
-        : `Gallery saved. ${liveCount} collection${liveCount === 1 ? '' : 's'} are live on /gallery.${eventNote}`,
+        : `Gallery saved. ${liveCount} collection${liveCount === 1 ? '' : 's'} are live on /gallery (${normalized.length} total in CMS).${eventNote}`,
     );
   }
 
@@ -1502,7 +1519,7 @@ export default function AdminDashboardPage() {
             >
               Save placeholders
             </button>
-          </div>
+            </div>
         ) : null}
 
         {tab === 'gallery' ? (

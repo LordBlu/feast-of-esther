@@ -136,7 +136,7 @@ Pick a section from the dropdown, then edit and save.
 
 | Section | What you can change |
 |---------|---------------------|
-| **Home** | Hero headline, mission quote, purpose title/subtitle, ministry card text (title, tag, copy, link), Relive the Feast image URLs (need **9+** for the grid), testimonials, show/hide Relive & testimonials |
+| **Home** | Hero headline, mission quote, purpose title/subtitle, ministry card text (title, tag, copy, link), **Relive the Feast** photo URLs (need **9+** unique URLs; **30** bundled by default), testimonials, show/hide Relive & testimonials |
 | **Founder** | Hero image URL, biography paragraphs, ministry panel titles/text |
 | **Gallery** | Page title and subtitle |
 | **Donate** | Labels, Zeffy embed URL, offline giving hint template |
@@ -167,18 +167,28 @@ Undo, Zero, and 30 save slots — see [Reset or undo](#reset-or-undo-site-conten
 
 ## Homepage sections (what exists today)
 
-**Order on `/`:** hero → mission video strip → Our Purpose + ministry cards → **Relive the Feast** (3×3 photo grid, each cell changes on its own rhythm) → hotel block → countdown (hides automatically after the target time) → **testimonials** marquee.
+**Order on `/`:** hero → mission video strip → Our Purpose + ministry cards → **Relive the Feast** (3×3 photo grid) → hotel block → countdown (hides automatically after the target time) → **testimonials** marquee.
+
+### Relive the Feast (homepage grid)
+
+- **3×3 grid** of photos; each cell rotates on its **own** timer (staggered rhythm).
+- The grid **never shows the same image in two cells at once** (needs at least **9** URLs in the pool; more URLs = more variety when rotating).
+- **Edit:** **Site pages → Home** → **Relive image URLs** (paste Cloudinary links, upload, or reorder with ↑ / ↓) → **Save site page copy**.
+- **Defaults:** 30 Cloudinary photos are bundled in the CMS; you can replace or extend the list in Admin.
+- **Not the same as Placeholders:** Relive URLs live under **Site pages → Home**. **Placeholders** is for demo hero/ministry/About/Founder slots elsewhere.
+- **Popup image** is under the **Popup** tab (`popup.imageUrl`), not Relive.
 
 | Section | Editable in Admin? |
 |---------|---------------------|
 | Hero headline, mission quote, purpose, ministry cards | **Yes** — **Site pages → Home** |
-| Relive the Feast (≥9 image URLs, on/off) | **Yes** — **Site pages → Home** |
-| Relive photos (demo placeholders) | **Yes** — **Placeholders** tab (Home ministry / hero slots) |
+| Relive the Feast (≥9 URLs, on/off) | **Yes** — **Site pages → Home** |
+| Home hero / ministry **demo** photos | **Yes** — **Placeholders** tab |
 | Testimonials | **Yes** — **Site pages → Home** |
 | Hotel block | **Partial** — Imagery (hotel photo); **no off switch** |
 | Countdown | **Yes** — Countdown tab |
+| Welcome popup image | **Yes** — **Popup** tab |
 
-After any homepage change, hard refresh (`Ctrl + Shift + R` on Windows).
+After any homepage change, hard refresh (`Ctrl + Shift + R` on Windows). On Vercel, also **Save site page copy** so Blob storage updates.
 
 ---
 
@@ -264,15 +274,16 @@ The tabbed block at the bottom of `/founder` is **`FounderMinistryCards.tsx`** (
 
 ## For developers
 
-- **CMS file:** `data/cms-data.json` (events, popup, images, about, **`executives`**, social, registrations, `donationIntents`, `pageContent`, …)
-- **No separate CMS database** — Admin `PUT` handlers call `readCmsData` / `writeCmsData` in `src/lib/cms-store.ts`
+- **CMS storage:** `data/cms-data.json` locally; on **Vercel**, `src/lib/cms-persistence.ts` reads/writes **private Blob** (`feast-of-esther/cms-data.json`, `feast-of-esther/cms-history.json`) when `BLOB_READ_WRITE_TOKEN` is set. `GET /api/admin/cms-status` reports whether saves are writable.
+- **No separate CMS database** — Admin `PUT` handlers call `readCmsData` / `writeCmsData` in `src/lib/cms-store.ts` (with `cmsErrorResponse` on failure)
+- **Cache:** Root `layout.tsx` uses `force-dynamic`; Blob reads use `useCache: false`; `revalidateAfterCmsSave` invalidates `/` layout after writes
 - **Gallery + events sync:** `src/lib/gallery-event-sync.ts` from `PUT /api/admin/images` when `galleryCollections` is present; types on `GalleryCollection` (`collectionType`, `linkedEventId`, `eventDateLabel`, `eventVenue`)
 - **Gallery validation:** `normalizeGalleryCollection`, `isGalleryCollectionComplete` in `src/lib/gallery-data.ts`
 - **Slugs:** `src/lib/slugify.ts`, `AdminSlugField.tsx`
 - **Donate intents:** `POST /api/donate/intent` → `appendDonationIntent`; admin list `GET /api/admin/donations`
-- **Preview iframe:** `src/app/admin/preview/page.tsx` + `admin-preview-draft` sessionStorage key
+- **Preview iframe:** `src/app/admin/preview/page.tsx` + `admin-preview-draft` (localStorage + postMessage)
 - History: `src/lib/cms-history.ts`, UI: `src/components/admin/AdminVersionsPanel.tsx`
-- Homepage: `HomeClient.tsx`, `src/lib/home-content.ts`, `src/lib/site-placeholders.ts`, `AdminHomePageEditor.tsx`, `HomeReliveFeast.tsx` (per-cell timers — use `number` for `setInterval` ids in browser code)
+- Homepage: `HomeClient.tsx`, `src/lib/home-content.ts`, `src/lib/relive-feast-grid.ts` (`DEFAULT_RELIVE_FEAST_IMAGES`, unique grid helpers), `AdminHomePageEditor.tsx`, `HomeReliveFeast.tsx` (per-cell timers — use `number` for `setInterval` ids in browser code)
 - Executives: `src/app/executive/`, `src/lib/executive-data.ts`, `PUT /api/admin/executives`, `AdminExecutivesEditor.tsx`
 - Placeholders: `src/lib/site-placeholder-catalog.ts`, `site-placeholders.ts`, `AdminPlaceholdersPanel.tsx`
 - Contact email constant: `SITE.contactEmail` in `src/lib/site-content.ts` (`feastofesthernaa@gmail.com`)
@@ -284,4 +295,4 @@ Update this file when new Admin fields or toggles are added.
 
 ---
 
-*Last updated: May 2026 — Executives page + Admin tab, Placeholders, Site pages Home/Founder editors, staggered Relive grid, donate/contact email, performance/security batch.*
+*Last updated: May 23, 2026 — Vercel Blob CMS persistence, Relive the Feast 30-photo pool + unique 3×3 grid, admin save errors/banner, stale-cache fixes for production.*

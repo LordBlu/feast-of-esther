@@ -7,8 +7,21 @@ export default function AdminGuidePanel() {
         <h2>Vercel: connect Blob before Save works</h2>
         <p className="text-sm leading-relaxed text-[#4a4f5c]">
           On the live site (feast-of-esther.vercel.app), <strong>every Save button</strong> needs Vercel Blob
-          storage. Dashboard → Storage → Blob → connect to this project → redeploy. Until then you will see a
-          yellow banner and errors when saving Placeholders, Executives, Events, and other tabs.
+          storage connected to this project (<code className="text-xs">feast-of-esther-blob</code>, Private). If
+          saves fail, open Storage → connect store → <strong>Redeploy</strong>. A yellow banner appears when Blob
+          is missing.
+        </p>
+      </section>
+
+      <section className="admin-card space-y-3">
+        <h2>Relive the Feast (homepage photo grid)</h2>
+        <p className="text-sm leading-relaxed text-[#4a4f5c]">
+          <strong>Site pages → Home</strong> → <strong>Relive image URLs</strong>. The 3×3 grid uses at least 9
+          photos and never shows the same image in two cells at once. Thirty photos are bundled by default; add,
+          remove, or reorder URLs, then <strong>Save site page copy</strong>. Hard refresh the homepage to preview.
+        </p>
+        <p className="text-sm text-[#5c6370]">
+          Popup flyer image is under the <strong>Popup</strong> tab, not Relive.
         </p>
       </section>
 
@@ -74,7 +87,7 @@ export default function AdminGuidePanel() {
             <strong>Events</strong> → mark event as Past; link gallery slug when photos are ready.
           </li>
           <li>
-            <strong>Site pages → Home</strong> — edit Relive the Feast URLs (need 9+) and testimonials; turn off
+            <strong>Site pages → Home</strong> — Relive the Feast URLs (9+; 30 defaults), testimonials; turn off
             Relive if you hide the section.
           </li>
           <li>
@@ -126,7 +139,7 @@ export default function AdminGuidePanel() {
           </div>
           <div>
             <dt className="font-semibold text-[var(--primary-dark)]">Site pages</dt>
-            <dd>Home copy, Founder biography, page headlines, About sidebar visuals</dd>
+            <dd>Home copy, Relive photo URLs, Founder bio, page headlines, About sidebar visuals</dd>
           </div>
           <div>
             <dt className="font-semibold text-[var(--primary-dark)]">Donations</dt>

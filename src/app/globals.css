@@ -637,6 +637,12 @@ body {
   color: #6b1f1f;
 }
 
+.admin-save-notice--warning {
+  background: #fff8e6;
+  border: 1px solid #c9a84c;
+  color: #5c4a12;
+}
+
 .admin-save-notice__icon {
   flex-shrink: 0;
   display: inline-flex;
@@ -656,6 +662,11 @@ body {
 
 .admin-save-notice--error .admin-save-notice__icon {
   background: #c45c5c;
+  color: #fff;
+}
+
+.admin-save-notice--warning .admin-save-notice__icon {
+  background: #c9a84c;
   color: #fff;
 }
 
