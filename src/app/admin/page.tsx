@@ -22,7 +22,6 @@ import AdminVersionsPanel from '@/components/admin/AdminVersionsPanel';
 import { swapArrayItems } from '@/lib/reorder-array';
 import type { AdminPreviewDraft } from '@/lib/admin-preview-draft';
 import {
-  getDefaultGalleryCollections,
   getGalleryCollectionValidationErrors,
   isGalleryCollectionComplete,
   normalizeGalleryCollection,
@@ -362,10 +361,9 @@ export default function AdminDashboardPage() {
     const loadedImages = imagesData.images ?? {};
     setImages({
       ...loadedImages,
-      galleryCollections:
-        loadedImages.galleryCollections !== undefined && loadedImages.galleryCollections !== null
-          ? loadedImages.galleryCollections
-          : getDefaultGalleryCollections(),
+      galleryCollections: Array.isArray(loadedImages.galleryCollections)
+        ? loadedImages.galleryCollections
+        : [],
     });
     const cd = countdownData.countdown ?? emptyCountdown;
     setCountdown({ ...emptyCountdown, ...cd });
@@ -545,17 +543,28 @@ export default function AdminDashboardPage() {
   }
 
   async function saveImages(options?: { quiet?: boolean }): Promise<boolean> {
+    const imageryPatch = {
+      heroPosterUrl: images.heroPosterUrl,
+      hotelRoomUrl: images.hotelRoomUrl,
+      founderImageUrl: images.founderImageUrl,
+      popupImageUrl: images.popupImageUrl,
+      homeVideoEmbedUrl: images.homeVideoEmbedUrl,
+      founderCarouselUrls: images.founderCarouselUrls,
+    };
     const response = await fetch('/api/admin/images', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(images),
+      body: JSON.stringify(imageryPatch),
     });
     if (!response.ok) {
       notify(await readApiErrorMessage(response, 'Could not save images.'));
       return false;
     }
     const data = await response.json();
-    if (data.images) setImages(data.images);
+    if (data.images) {
+      setImages((prev) => ({ ...prev, ...data.images }));
+    }
+    await loadCore();
     if (!options?.quiet) {
       notify(`Images saved successfully.${savedOnLiveSiteHint}`);
     }
@@ -580,27 +589,28 @@ export default function AdminDashboardPage() {
     const liveCount = normalized.filter(isGalleryCollectionComplete).length;
     const draftCount = normalized.length - liveCount;
 
-    const payload = { ...images, galleryCollections: normalized };
     const response = await fetch('/api/admin/images', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
+      body: JSON.stringify({ galleryCollections: normalized }),
     });
     if (!response.ok) {
       notify(await readApiErrorMessage(response, 'Could not save gallery.'));
       return;
     }
     const data = await response.json();
-    const savedCollections = data.images?.galleryCollections ?? payload.galleryCollections;
-    setImages({
-      ...(data.images ?? payload),
+    const savedCollections = data.images?.galleryCollections ?? normalized;
+    setImages((prev) => ({
+      ...prev,
+      ...(data.images ?? {}),
       galleryCollections: Array.isArray(savedCollections) ? savedCollections : normalized,
-    });
+    }));
     if (Array.isArray(data.events)) {
       setEvents(data.events);
     } else {
       await loadEvents();
     }
+    await loadCore();
 
     const eventCollectionCount = (data.images?.galleryCollections ?? normalized).filter(
       (c: GalleryCollection) => c.collectionType === 'event' && isGalleryCollectionComplete(c)
@@ -649,9 +659,36 @@ export default function AdminDashboardPage() {
   }
 
   async function savePlaceholdersBundle() {
-    if (!(await saveImages({ quiet: true }))) return;
-    if (!(await saveAbout({ quiet: true }))) return;
-    if (!(await savePageContent({ quiet: true }))) return;
+    const response = await fetch('/api/admin/placeholders', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        images: {
+          placeholderUrls: images.placeholderUrls,
+          heroPosterUrl: images.heroPosterUrl,
+        },
+        about: { heroImageUrl: about.heroImageUrl },
+        pageContent: {
+          about2: pageContent.about2,
+          founder: pageContent.founder,
+        },
+      }),
+    });
+    if (!response.ok) {
+      notify(await readApiErrorMessage(response, 'Could not save placeholders.'));
+      return;
+    }
+    const data = await response.json();
+    if (data.images) setImages((prev) => ({ ...prev, ...data.images }));
+    if (data.about) setAbout({ ...emptyAbout, ...data.about });
+    if (data.pageContent) {
+      setPageContent((prev) => ({
+        ...prev,
+        about2: { ...prev.about2, ...data.pageContent.about2 },
+        founder: { ...prev.founder, ...data.pageContent.founder },
+      }));
+    }
+    await loadCore();
     notify(`Placeholders and related content saved successfully.${savedOnLiveSiteHint}`);
   }
 

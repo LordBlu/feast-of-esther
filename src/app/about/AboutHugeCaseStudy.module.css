@@ -327,9 +327,10 @@
 }
 
 .colHead {
-  margin: 0 0 1rem;
-  font-size: 0.95rem;
+  margin: 0 0 1.15rem;
+  font-size: clamp(1.15rem, 2.2vw, 1.45rem);
   font-weight: 700;
+  letter-spacing: -0.02em;
   color: #111;
 }
 
@@ -344,9 +345,9 @@
 
 .arrowList li {
   position: relative;
-  padding-left: 1.35rem;
-  font-size: clamp(0.88rem, 1.2vw, 0.95rem);
-  line-height: 1.45;
+  padding-left: 1.5rem;
+  font-size: clamp(1rem, 1.45vw, 1.12rem);
+  line-height: 1.5;
   color: #222;
 }
 
@@ -362,7 +363,7 @@
 
 .body {
   margin: 0;
-  font-size: clamp(0.88rem, 1.15vw, 0.98rem);
+  font-size: clamp(1rem, 1.45vw, 1.12rem);
   line-height: 1.65;
   color: #333;
 }

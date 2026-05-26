@@ -43,10 +43,27 @@ async function writeLocalFile(filePath: string, content: string): Promise<void> 
   await writeFile(filePath, content, 'utf8');
 }
 
+async function blobObjectExists(blobPathname: string): Promise<boolean> {
+  const token = process.env.BLOB_READ_WRITE_TOKEN?.trim();
+  if (!token) return false;
+
+  const { head, BlobNotFoundError } = await import('@vercel/blob');
+  try {
+    await head(blobPathname, { token });
+    return true;
+  } catch (error) {
+    if (error instanceof BlobNotFoundError) return false;
+    const name = error instanceof Error ? error.name : '';
+    if (name === 'BlobNotFoundError') return false;
+    throw error;
+  }
+}
+
 async function readBlobText(blobPathname: string): Promise<string | null> {
   const { get } = await import('@vercel/blob');
+  const token = process.env.BLOB_READ_WRITE_TOKEN?.trim();
   try {
-    const result = await get(blobPathname, { access: 'private', useCache: false });
+    const result = await get(blobPathname, { access: 'private', useCache: false, token });
     if (!result || result.statusCode !== 200 || !result.stream) return null;
     return await new Response(result.stream).text();
   } catch {
@@ -71,8 +88,14 @@ async function writeBlobText(blobPathname: string, content: string): Promise<voi
 
 export async function readCmsDataRaw(): Promise<string> {
   if (getCmsStorageMode() === 'blob') {
-    const fromBlob = await readBlobText(BLOB_CMS_PATH);
-    if (fromBlob) return fromBlob;
+    const exists = await blobObjectExists(BLOB_CMS_PATH);
+    if (exists) {
+      const fromBlob = await readBlobText(BLOB_CMS_PATH);
+      if (fromBlob) return fromBlob;
+      throw new Error(
+        'CMS data exists in Blob storage but could not be read. Check BLOB_READ_WRITE_TOKEN and try again — do not redeploy to reset content.',
+      );
+    }
     // On Vercel, bundled data/cms-data.json is stale after admin saves — do not serve it.
     if (isVercelRuntime()) {
       throw new Error(
@@ -119,8 +142,7 @@ export async function writeCmsHistoryRaw(content: string): Promise<void> {
 
 export async function ensureCmsDataFileExists(defaultJson: string): Promise<void> {
   if (getCmsStorageMode() === 'blob') {
-    const fromBlob = await readBlobText(BLOB_CMS_PATH);
-    if (fromBlob) return;
+    if (await blobObjectExists(BLOB_CMS_PATH)) return;
     const fromDisk = await readLocalFile(CMS_DATA_LOCAL_PATH);
     await writeBlobText(BLOB_CMS_PATH, fromDisk ?? defaultJson);
     return;
