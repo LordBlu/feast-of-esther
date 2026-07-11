@@ -72,7 +72,7 @@ export default function ContactClient({ page, socialLinks }: ContactClientProps)
   const showPhone2 =
     page.phone2Display === undefined ? true : page.phone2Display.trim().length > 0;
   const email = page.email ?? SITE.contactEmail;
-  const websiteUrl = page.websiteUrl ?? 'https://www.feastofestherna.com';
+  const websiteUrl = page.websiteUrl ?? 'https://www.feastofestherusa.com';
   const websiteLabel =
     page.websiteDisplay?.trim() ||
     websiteUrl.replace(/^https?:\/\//i, '').replace(/\/$/, '');
