@@ -203,7 +203,8 @@
 .zeffyEmbed {
   display: block;
   width: 100%;
-  min-height: 520px;
+  height: 680px;
+  min-height: 650px;
   border: 0;
 }
 

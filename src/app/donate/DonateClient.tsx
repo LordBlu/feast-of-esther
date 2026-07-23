@@ -129,39 +129,7 @@ export default function DonateClient({ page }: DonateClientProps) {
         </aside>
 
         <div className={styles.main}>
-          <h2 className={styles.sectionLabel}>{sectionChooseAmount}</h2>
-          <div className={styles.presetRow}>
-            {PRESETS.map((n) => (
-              <button
-                key={n}
-                type="button"
-                className={`${styles.preset} ${amount === n && !custom ? styles.presetActive : ''}`}
-                onClick={() => {
-                  setAmount(n);
-                  setCustom('');
-                }}
-              >
-                ${n}
-              </button>
-            ))}
-          </div>
-          <div className={styles.customWrap}>
-            <label className={styles.customLabel} htmlFor="donate-custom">
-              {sectionCustomAmount}
-            </label>
-            <div className={styles.customField}>
-              <span>$</span>
-              <input
-                id="donate-custom"
-                value={custom}
-                onChange={(e) => setCustom(e.target.value)}
-                placeholder="0.00"
-                inputMode="decimal"
-                autoComplete="off"
-              />
-            </div>
-          </div>
-
+          {/* Payment Method Switcher */}
           <h2 className={styles.sectionLabel}>{sectionMethod}</h2>
           <div className={styles.methodRow}>
             <button
@@ -177,13 +145,17 @@ export default function DonateClient({ page }: DonateClientProps) {
             <button
               type="button"
               className={`${styles.method} ${method === 'paypal' ? styles.methodActive : ''}`}
-              onClick={() => setMethod('paypal')}
+              onClick={() => {
+                setMethod('paypal');
+                void trackDonation('method_select', 'paypal');
+              }}
             >
               {methodPaypal}
             </button>
           </div>
 
-          {showZeffyEmbed ? (
+          {/* ZEFFY VIEW: Embedded Form */}
+          {method === 'zeffy' && zeffyEmbedUrl ? (
             <div id="zeffy-embed" className={styles.zeffyEmbedWrap}>
               <iframe
                 src={zeffyEmbedUrl}
@@ -196,108 +168,25 @@ export default function DonateClient({ page }: DonateClientProps) {
             </div>
           ) : null}
 
-          <h2 className={styles.sectionLabel}>{sectionDetails}</h2>
-          <div className={styles.fieldGrid}>
-            <div className={styles.field}>
-              <label className={styles.label} htmlFor="donate-first">
-                First name
-              </label>
-              <input
-                id="donate-first"
-                className={styles.input}
-                placeholder="First name"
-                value={info.first}
-                onChange={(e) => setInfo((p) => ({ ...p, first: e.target.value }))}
-              />
-            </div>
-            <div className={styles.field}>
-              <label className={styles.label} htmlFor="donate-last">
-                Last name
-              </label>
-              <input
-                id="donate-last"
-                className={styles.input}
-                placeholder="Last name"
-                value={info.last}
-                onChange={(e) => setInfo((p) => ({ ...p, last: e.target.value }))}
-              />
-            </div>
-            <div className={styles.field}>
-              <label className={styles.label} htmlFor="donate-email">
-                Email
-              </label>
-              <input
-                id="donate-email"
-                type="email"
-                className={styles.input}
-                placeholder="you@example.com"
-                value={info.email}
-                onChange={(e) => setInfo((p) => ({ ...p, email: e.target.value }))}
-              />
-            </div>
-            <div className={styles.field}>
-              <label className={styles.label} htmlFor="donate-phone">
-                Phone (optional)
-              </label>
-              <input
-                id="donate-phone"
-                className={styles.input}
-                placeholder="Phone number"
-                value={info.phone}
-                onChange={(e) => setInfo((p) => ({ ...p, phone: e.target.value }))}
-              />
-            </div>
-          </div>
-
+          {/* PAYPAL VIEW: Direct PayPal Link */}
           {method === 'paypal' && paypalHref ? (
-            <Link
-              href={paypalHref}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={`${styles.cta} ${styles.ctaLink}`}
-              onClick={() => void trackDonation('paypal_link', 'paypal')}
-            >
-              Give ${displayAmount.toFixed(0)} — PayPal
-            </Link>
-          ) : canGiveOnline ? (
-            <button type="button" className={styles.cta} onClick={handleGiveClick}>
-              {method === 'zeffy'
-                ? `Give $${displayAmount.toFixed(0)} — continue to form`
-                : `Give $${displayAmount.toFixed(0)} — online`}
-            </button>
-          ) : (
-            <button type="button" className={styles.cta} onClick={handleGiveClick}>
-              Give ${displayAmount.toFixed(0)} — {method === 'paypal' ? 'PayPal' : 'Zeffy'}
-            </button>
-          )}
-
-          {showOffline && !canGiveOnline ? (
-            <p className={styles.hint} role="status">
-              {offlineHintText}
-            </p>
-          ) : (
-            <p className={styles.hint}>
-              {canGiveOnline
-                ? method === 'zeffy'
-                  ? 'Complete your gift in the secure form above. Amounts shown here are suggestions — choose what you wish to give on the form.'
-                  : hintOnline
-                : DEFAULT_OFFLINE_HINT}
-            </p>
-          )}
-
-          {finePrintCustom ? (
-            <p className={styles.finePrint}>{finePrintCustom}</p>
-          ) : (
-            <p className={styles.finePrint}>
-              Feast of Esther North America is grateful for your partnership. For questions about recurring gifts or
-              stock transfers, contact the team using the same email or phone listed on our{' '}
-              <Link href="/contact" style={{ color: '#9d2a6a', fontWeight: 600 }}>
-                contact page
+            <div style={{ padding: '1.5rem 0' }}>
+              <p className={styles.hint} style={{ marginBottom: '1rem' }}>
+                Complete your gift securely on PayPal:
+              </p>
+              <Link
+                href={paypalHref}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`${styles.cta} ${styles.ctaLink}`}
+                onClick={() => void trackDonation('paypal_link', 'paypal')}
+              >
+                Give via PayPal
               </Link>
-              .
-            </p>
-          )}
+            </div>
+          ) : null}
 
+          {/* Features Section */}
           <div className={styles.features}>
             <div className={styles.feature}>
               <svg className={styles.featureIcon} viewBox="0 0 24 24" fill="currentColor" aria-hidden>
