@@ -56,6 +56,8 @@ export interface ContactClientProps {
 
 export default function ContactClient({ page, socialLinks }: ContactClientProps) {
   const [sent, setSent] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
 
   const formTitle = page.formTitle ?? 'Get In Touch';
   const infoHeading = page.infoHeading ?? 'Contact Information';
@@ -84,9 +86,35 @@ export default function ContactClient({ page, socialLinks }: ContactClientProps)
   const facebook = pickSocialUrl(socialLinks, 'facebook', 'https://facebook.com');
   const youtube = pickSocialUrl(socialLinks, 'youtube', 'https://youtube.com');
 
-  function handleSubmit(e: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setSent(true);
+    setIsSubmitting(true);
+    setErrorMsg('');
+
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+    const data = {
+      name: formData.get('name'),
+      email: formData.get('email'),
+      message: formData.get('message'),
+    };
+
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+
+      if (!res.ok) throw new Error('Failed to send');
+
+      setSent(true);
+      form.reset();
+    } catch (err) {
+      setErrorMsg('Failed to send message. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -115,10 +143,11 @@ export default function ContactClient({ page, socialLinks }: ContactClientProps)
             <textarea id="contact-message" required name="message" rows={5} placeholder="What would you like to tell us?" />
           </div>
 
-          <button type="submit" className={styles.submitBtn}>
-            Send Message
+          <button type="submit" disabled={isSubmitting} className={styles.submitBtn}>
+            {isSubmitting ? 'Sending...' : 'Send Message'}
           </button>
           {sent ? <p className={styles.sent}>Thank you. We&apos;ll get back to you shortly.</p> : null}
+          {errorMsg ? <p style={{ color: '#ffb3b3', marginTop: '1rem' }}>{errorMsg}</p> : null}
         </form>
 
         <div className={styles.infoPanel}>
