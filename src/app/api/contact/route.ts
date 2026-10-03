@@ -18,7 +18,7 @@ export async function POST(req: Request) {
 
     // ---- send ----------------------------------------------------------------
     const { data, error } = await resend.emails.send({
-      from: 'Feast of Esther <init-access@resend.dev>',
+      from: 'Feast of Esther <init-access@feastofestherusa.com>',
       to: 'feastofesthernaa@gmail.com',
       replyTo: email,
       subject: `New Contact Form Submission from ${name}`,
